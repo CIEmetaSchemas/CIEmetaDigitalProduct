@@ -11,14 +11,15 @@
 // -additional resourceTypeGeneral items
 // -relatedItem added
 // -only one identifier is allowed (as in the official schema), additional are introduced by "alternateIdentifier"
+//  -schemaType replaced by schemaName
 //
 //  CIE additions:
 //  --------------
 //  checksums (required)
 //  datatableInfo (validation,dataQuality,extrapolationMethod, interpolationMethod)
-//  schemaType (required)
+//  schemaName (required)
 //	schemaVersion (required)
-//
+//	schemaURL:(required)//
 //   
 //  to validate your JSON file use any online tool, i.e.: https://www.jsonschemavalidator.net/
 //
@@ -817,7 +818,7 @@
 		},
 		"schemaVersion": {
 			"type": "number",
-			"const": 0.3
+			"const": 3
 		},
 		"schemaURL": {
 			"type": "string",
@@ -849,6 +850,27 @@
 								"type": "string"
 							},
 							"validationValue": {
+								"type": "string"
+							}
+						}
+					},
+					"uniqueItems": true
+				},
+				"columnHeaders": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"title": {
+								"type": "string"
+							},
+							"unit": {
+								"type": "string"
+							},
+							"quantity": {
+								"type": "string"
+							},
+							"description": {
 								"type": "string"
 							}
 						}
