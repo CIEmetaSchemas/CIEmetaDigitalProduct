@@ -822,6 +822,7 @@
 		},
 		"schemaURL": {
 			"type": "string",
+			"const": "https://doi.org/10.25039/CIE.SC.4taqevcd"
 		},		
 		"datatableInfo": {
 			"type": "object",
