@@ -1,6 +1,6 @@
 {
 //
-//  CIEmetaDataProduct Schema
+//  CIEmetaDigitalProduct Schema
 //  ---------------------
 //
 // based on
@@ -814,7 +814,7 @@
 		},
 		"schemaName": {
 			"type": "string",
-			"const": "CIEmetaDataset"
+			"const": "CIEmetaDigitalProduct"
 		},
 		"schemaVersion": {
 			"type": "number",
