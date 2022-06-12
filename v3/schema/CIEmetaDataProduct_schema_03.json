@@ -1,6 +1,6 @@
 {
 //
-//  CIEmetaDataset Schema
+//  CIEmetaDataProduct Schema
 //  ---------------------
 //
 // based on
@@ -15,7 +15,7 @@
 //
 //  CIE additions:
 //  --------------
-//  checksums (required)
+//  checksums (recommended)
 //  datatableInfo (validation,dataQuality,extrapolationMethod, interpolationMethod)
 //  schemaName (required)
 //	schemaVersion (required)
@@ -907,7 +907,6 @@
 		"publisher",
 		"publicationYear",
 		"types",
-		"checksums",
 		"schemaName",
 		"schemaVersion",
 		"schemaURL"
