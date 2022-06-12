@@ -1,0 +1,117 @@
+{
+    "identifier":{
+        "identifier":"10.25039/CIE.DS.mifmy4x4",
+        "identifierType":"DOI"
+    },
+    "creators":[
+        {
+            "name":"International Commission on Illumination (CIE)",
+            "nameType":"Organizational"
+        }
+    ],
+    "titles":[
+        {
+            "title":"CIE 1931 chromaticity coordinates of spectrum loci, 2 degree  observer, 1 nm"
+}
+    ],
+    "publisher":"International Commission on Illumination (CIE), Vienna, AT",
+    "publicationYear":"2019",
+    "subjects":[
+        {
+            "subject":"Photometry"
+},
+        {
+            "subject":"Objective photometry"
+},
+        {
+            "subject":"Units. Constants"
+}
+    ],
+    "language":"en",
+    "alternateIdentifiers":[
+        {
+            "alternateIdentifier":"CIE_cc_1931_2deg.csv",
+            "alternateIdentifierType":"fileName"
+        }
+    ],
+    "relatedIdentifiers":[
+        {
+            "relatedIdentifier":"10.25039/tr.018.2019",
+            "relatedIdentifierType":"DOI",
+            "relationType":"IsPartOf",
+            "resourceTypeGeneral":"Report"
+        }
+    ],
+    "formats":[
+        "text/csv"
+    ],
+    "types":{
+        "resourceType":"dataTable",
+        "resourceTypeGeneral":"Dataset"
+    },
+    "descriptions":[
+        {
+            "description":"!!!!! This is only a trial version, please refer to the CIE webpage for the official version!!!!! locis in a chromaticity diagram of points that represent monochromatic stimuli, CIE 1931, 2degree observer, original source: CIE 018:2019, Table 6",
+            "descriptionType":"Abstract"
+        }
+    ],
+    "checksums":[
+        {
+            "hashMethod":"md5",
+            "checksum":"3e5fe537a1d26f88e7c15e824bf5e691"
+        },
+        {
+            "hashMethod":"sha256",
+            "checksum":"8155652510c7ca99f0d8bb06acb2ed9240589fd04b6b74bef2ce445ac85680e"
+        }
+    ],
+    "datatableInfo":{
+        "validations":[
+            {
+                "validationType":"sumOfColumns",
+                "validationValue":"[280245,217.40319,135.74996,117.84685]"
+            },
+            {
+                "validationType":"numberOfRows",
+                "validationParameter":"90",
+                "validationValue":"[449,0.157630,0.016840,0.825530]"
+            },
+            {
+                "validationType":"sampleRow",
+                "validationParameter":"191",
+                "validationValue":"[550,0.301600,0.692310,0.006090]"
+            },
+            {
+                "validationType":"numberOfRows",
+                "validationValue":"471"
+            },
+            {
+                "validationType":"numberOfColumns",
+                "validationValue":"4"
+            }
+        ],
+        "interpolationMethod":":unap",
+        "extrapolationMethod":"zero",
+        "dataQuality":"approximated",
+        "columnHeaders":[
+            {
+                "title":"wavelength",
+                "unit":"nm",
+                "quantity":"wavelength"
+},
+            {
+                "title":"x(lambda)",
+                "unit":"dimensionless",
+                "quantity":"chromaticity coordinates"
+},
+            {
+                "title":"y(lambda)",
+                "unit":"dimensionless",
+                "quantity":"chromaticity coordinates"
+}
+        ]
+    },
+    "schemaName":"CIEmetaDataProduct",
+    "schemaVersion":3,
+    "schemaURL":"https://doi.org/10.25039/CIE.SC.4taqevcd"
+}
