@@ -155,6 +155,7 @@
 			"type": "string",
 			"enum": [
 				"",
+				":unal",
 				":unap",
 				":unas",
 				"nearest",
@@ -172,6 +173,7 @@
 			"type": "string",
 			"enum": [
 				"",
+				":unal",
 				":unap",
 				":unas",
 				"nearest",
