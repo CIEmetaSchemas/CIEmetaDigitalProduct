@@ -210,30 +210,91 @@ Many dataTables represent data as a function of wavelength. If the wavelength sp
 |Value|Descrition|
 |---|---|
 |"nearest"|Chooses the Y value corresponding to the X value that is nearest to the current xi value|
-|---|---|
 |"linear"|Sets the interpolated values to points along the line segments connecting the X and Y data points|
-|---|---|
 |"cubic-spline"|Guarantees that the first and second derivatives of the cubic interpolating polynomials are continuous, even at the data points|
-|---|---|
 |"cubic-Hermite"|Guarantees that the first derivative of the cubic interpolating polynomials is continuous and sets the derivative at the endpoints to certain values in order to preserve the original shape and monotonicity of the Y data.|
-|---|---|
 |"Sprague"|Sprague 5 point interpolation as outlined in CIE 167:2005|
-|---|---|
 |"Lagrange"|Lagrange Interpolation|
-|---|---|
 |"useRelatedDataset"|In some cases interpolation is not recommended but a dataset with different wavelength range is recommended. Example is the 5 nm spectral data given in CIE 015. For those the 1 nm data should be used as published with CIE 018:2019. The related dataset should be stated in the corresponding relatedIdentifier field.|
-|---|---|
 |"useRelatedFormula"|In some cases interpolation is not recommended but an explicitely formula shall be used. Example is the Standard illuminant A. The reference to the formula shall be described in the description of the dataset|
-|---|---|
 |":unal"|unallowed, suppressed intentionally|
-|---|---|
 |":unap"|not applicable, makes no sense|
-|---|---|
 |":unas"|value unassigned (e.g., Untitled)|
-|---|---|
 |"other"|The method of interpolation shall be stated in the description|
+
+The same interpolationMethod parameter applies to all data provided by the given dataset. If different interpolation methods have to be used, the dataset shall be splited.
+
+|ID|Property|Obligation|
+|---|---|---|
+|CIE 2.2|datatableInfo extrapolationMethod|R|
+
+The property can have the following values:
+
+
+|Value|Descrition|
 |---|---|
+|"nearest"|Chooses the Y value corresponding to the X value that is nearest to the current xi value (i.e. Y stays constant to the first/last value|
+|"zero"|Values are set to zero for X values outside the xi range|
+|"useRelatedDataset"|In some cases interpolation is not recommended but a dataset with different wavelength range is recommended. Example is the 5 nm spectral data given in CIE 015. For those the 1 nm data should be used as published with CIE 018:2019. The related dataset should be stated in the corresponding relatedIdentifier field.|
+|"useRelatedFormula"|In some cases interpolation is not recommended but an explicitely formula shall be used. Example is the Standard illuminant A. The reference to the formula shall be described in the description of the dataset|
+|":unal"|unallowed, suppressed intentionally|
+|":unap"|not applicable, makes no sense|
+|":unas"|value unassigned (e.g., Untitled)|
+|"other"|The method of extrapolation shall be stated in the description|
 
 
+The same extrapolationMethod parameter applies to all data provided by the given dataset. If different extrapolation methods have to be used, the dataset shall be splited.
 
+|ID|Property|Obligation|
+|---|---|---|
+|CIE 2.3|datatableInfo dataQuality|R|
+
+The property can have the following values:
+
+|Value|Descrition|
+|---|---|
+|"nominal"|The stated values are nominal values (i.e. without uncertainty, etc)|
+|"approximated"|The stated values are approximated values (typically the result of a computation)|
+|":unap"|not applicable, makes no sense|
+|":unas"|value unassigned (e.g., Untitled)|
+|"other"|Information on the dataQuality shall be stated in the description|
+
+
+|ID|Property|Obligation|
+|---|---|---|
+|CIE 2.4|datatableInfo columnHeaders|R|
+|CIE 2.4.1|title|R|
+|CIE 2.4.2|quantity|R|
+|CIE 2.4.3|unit|R|
+|CIE 2.4.4|descrition|O|
+
+For data tables that are typically distributed CIE publication, additional information shall be provided to increase the machine interpretability of the datasets. In particular, for each column: 
+Title: The title includes typically the quantity and additional relevant information
+Quantity: The generic quantity
+Unit: the unit associated with the quantity ("dimensionless" for relative quantity or those that are based on counting).
+Description: Additional information about the column can be stated. This information can also be given in a structure JSON string. Example 
+Example for CIE 241:2020 (data sets for spectral distributions):
+
+![image](https://user-images.githubusercontent.com/102721116/193693428-14b4dc5f-57f5-42de-b289-0fe5f04f0a00.png)
+
+Example:
+
+![image](https://user-images.githubusercontent.com/102721116/193693494-01a59a83-c2da-4159-aa59-f152864abcd2.png)
+
+|ID|Property|Obligation|
+|---|---|---|
+|CIE 2.5|datatableInfo validation|R|
+
+Additional validation information can be provided (the field can be repeated):
+
+|Value|Descrition|
+|---|---|
+|"sumOfColumns"|States the sum of each column, in JSON string notation (see example below)|
+|"sampleRow"|States a sample row in JSON notation, the row number has to be specified|
+|"numberOfRows"|Number of rows|
+|"numberOfColumns"|Number of columns|
+|":unap"|not applicable, makes no sense|
+|"other"|The method of interpolation shall be stated in the description|
+
+![image](https://user-images.githubusercontent.com/102721116/193694039-b73087e7-5861-4ec6-8cb7-b5891a82d28c.png)
 
