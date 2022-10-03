@@ -20,3 +20,17 @@ The DOI is typically attributed by CIE CB.
 
 Example:
 
+![image](https://user-images.githubusercontent.com/102721116/193686808-e8f242a4-23d2-410f-8562-faa7389b723f.png)
+
+If a publication is translated into another language, usually same dataset is used however a "translated" metadata file may be generated, using the same number but the language code is added.
+
+
+Example: "identifier":"10.25039/CIE.DS.mifmy4x4.ES"
+
+Attention: not all terms shall be translated! In particular to JSON field names and datatableInfo (except the title and description) shall not be translated but the original english language shall be used.
+
+
+|ID|Property|Obligation|
+|---|---|---|
+|2|Creator|M|
+
