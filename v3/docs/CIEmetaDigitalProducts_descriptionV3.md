@@ -179,8 +179,61 @@ Usually not used
 
 Usually not used
 
-## Additional fields
+## Additional (CIE related) fields
 In addition to all fields defined above by the Datacite 4.4 schema, CIE dataProducts 
 
 The basic structure of a file that contains the metadata and is integrated into the document contains the following fields:
+
+![image](https://user-images.githubusercontent.com/102721116/193691568-7d5d9553-fd59-4c51-b744-7630901e5e4c.png)
+
+|ID|Property|Obligation|
+|---|---|---|
+|CIE 1|checksums|R|
+
+An important point is to give the user the possibility to check the integrity of the data itself (as a human and as a machine). For this purpose, hash algorithms are usually used (a kind of checksum). There are different standards (e.g. md5 https://en.wikipedia.org/wiki/MD5  or sha256 https://en.wikipedia.org/wiki/SHA-2  ) If only a single letter or number in the document is changed, the checksum changes. These cryptographic algorithms are directly integrated in most operating systems and can be used from any software (Excel®, Python, Labview, Matlab). There is also freeware that can be used to generate the checksum. In the CIE metadata system this could be mapped as follows (example of 2 hash values):
+
+![image](https://user-images.githubusercontent.com/102721116/193691678-d45125af-97ff-4dd3-af05-d1d28eae141d.png)
+
+
+The following CMD can be used on any WinOS to generate the hashes:
+
+>certutil -hashfile "filename.exe" MD5 
+>certutil -hashfile "filename.exe" SHA256
+
+
+|ID|Property|Obligation|
+|---|---|---|
+|CIE 2.1|datatableInfo interpolationMethod|R|
+
+Many dataTables represent data as a function of wavelength. If the wavelength spacing is different to the values given in the dataset, interpolation algorithm is typically used. The following methods can be used:
+
+|Value|Descrition|
+|---|---|
+|"nearest"|Chooses the Y value corresponding to the X value that is nearest to the current xi value|
+|---|---|
+|"linear"|Sets the interpolated values to points along the line segments connecting the X and Y data points|
+|---|---|
+|"cubic-spline"|Guarantees that the first and second derivatives of the cubic interpolating polynomials are continuous, even at the data points|
+|---|---|
+|"cubic-Hermite"|Guarantees that the first derivative of the cubic interpolating polynomials is continuous and sets the derivative at the endpoints to certain values in order to preserve the original shape and monotonicity of the Y data.|
+|---|---|
+|"Sprague"|Sprague 5 point interpolation as outlined in CIE 167:2005|
+|---|---|
+|"Lagrange"|Lagrange Interpolation|
+|---|---|
+|"useRelatedDataset"|In some cases interpolation is not recommended but a dataset with different wavelength range is recommended. Example is the 5 nm spectral data given in CIE 015. For those the 1 nm data should be used as published with CIE 018:2019. The related dataset should be stated in the corresponding relatedIdentifier field.|
+|---|---|
+|"useRelatedFormula"|In some cases interpolation is not recommended but an explicitely formula shall be used. Example is the Standard illuminant A. The reference to the formula shall be described in the description of the dataset|
+|---|---|
+|":unal"|unallowed, suppressed intentionally|
+|---|---|
+|":unap"|not applicable, makes no sense|
+|---|---|
+|":unas"|value unassigned (e.g., Untitled)|
+|---|---|
+|"other"|The method of interpolation shall be stated in the description|
+|---|---|
+
+
+
 
