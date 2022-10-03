@@ -89,16 +89,53 @@ Usually not attributed in CIE datasets
 
 The primary language of the resource according ISO 639-1 language codes.
 
+|ID|Property|Obligation|
+|---|---|---|
+|10|ResourceType|M|
+
+For Datasets including "data tables" the ResourceTypeGeneral "Dataset" is used as the recourceType "dataTable". Other types could be "ComputationalNotebook" for excel calculation sheets, "Image", "Audiovisual ","Software",
+Examples:
+
+![image](https://user-images.githubusercontent.com/102721116/193689420-708d60e0-524b-4ed6-84f9-22d695adcf2d.png)
+
+|ID|Property|Obligation|
+|---|---|---|
+|11|AlternateIdentifier (with type sub-property)|R|
+
+For datasets, computationalnotebooks typically the filename is given:
+
+![image](https://user-images.githubusercontent.com/102721116/193689645-cf125ac5-31b3-415b-bd4a-86b51fea98cc.png)
 
 
+A short but meaningful file name shall be selected. White characters (space) shall be replaced by "_" characters. English language shall be used.
+
+|ID|Property|Obligation|
+|---|---|---|
+|12|RelatedIdentifier (with type and relation type sub-properties)|R|
+
+The identifier (DOI) of the related publication(s) shall be specified. In case of a new publication relating to the existing dataproduct, the metadatafile needs to be updated. Also the relation to other datasets can be specified, typically:
+IsSupplementTo, IsSupplementedBy, HasVersion, IsVersionOf, IsNewVersionOf, IsPreviousVersionOf IsPartOf, HasPart, IsPublishedIn, IsReferencedBy, References, IsVariantFormOf, IsOriginalFormOf, IsIdenticalTo, IsDerivedFrom, IsSourceOf, IsRequiredBy Requires. 
+
+As an example:
+
+![image](https://user-images.githubusercontent.com/102721116/193689919-be22874b-c6c8-4a14-9275-71ec2fa6252b.png)
+
+|ID|Property|Obligation|
+|---|---|---|
+|13|Size|O|
+
+Optional, however care has to be taken that the actual size is used and not the size on the data storage (usually larger)
 
 
+|ID|Property|Obligation|
+|---|---|---|
+|14|Format|R|
 
+Use MIME type where possible (see https://www.iana.org/assignments/media-types/media-types.xhtml for the official definition. Alternatively the file extension can be given.
+Example:
+![image](https://user-images.githubusercontent.com/102721116/193690308-590e5880-9dba-4625-a18f-71b67288b070.png)
 
-
-
-
-
+|Recommendation: The standard data format for CIE data table is CSV according RFC4180 (https://datatracker.ietf.org/doc/html/rfc4180 ), without header line. The fields are separated by comma. Other formats can be included however, a reference to the format description shall be provided|
 
 
 
