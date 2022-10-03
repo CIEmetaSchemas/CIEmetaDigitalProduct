@@ -9,3 +9,14 @@ Following points have to be considered (the ID reference to the number in the Da
 |ID|Property|Obligation|
 |---|---|---|
 |1|Identifier (with mandatory type sub-property)|M|
+
+The standard identifier for CIE datasets is a DOI composed as following:
+
+10.25039/CIE.DS.$$$$$$$$
+
+$$$$$$$$ is a composition of random numbers and characterize excluding the following symbols (to avoid confusions): oOlL1I0
+
+The DOI is typically attributed by CIE CB.
+
+Example:
+
