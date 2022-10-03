@@ -4,6 +4,8 @@ Version 3
 
 The CIEmetaDigitalProduct meta schema is based on the most recent version of the DataCite schema (https://schema.datacite.org/meta/kernel-4.4/ ) . Additional, CIE relevant fields are defined as outlined below. The JSON schema description can be found here: https://doi.org/10.25039/CIE.SC.4taqevcd
 
+## Datacite fields
+
 Following points have to be considered (the ID reference to the number in the Datacite 4.4 Schema), the obligation (mandatory, recommended, option may be different to Datacite 4.4):
 
 |ID|Property|Obligation|
@@ -135,8 +137,50 @@ Use MIME type where possible (see https://www.iana.org/assignments/media-types/m
 Example:
 ![image](https://user-images.githubusercontent.com/102721116/193690308-590e5880-9dba-4625-a18f-71b67288b070.png)
 
-|Recommendation: The standard data format for CIE data table is CSV according RFC4180 (https://datatracker.ietf.org/doc/html/rfc4180 ), without header line. The fields are separated by comma. Other formats can be included however, a reference to the format description shall be provided|
+Recommendation: The standard data format for CIE data table is CSV according RFC4180 (https://datatracker.ietf.org/doc/html/rfc4180 ), without header line. The fields are separated by comma. Other formats can be included however, a reference to the format description shall be provided.
+
+|ID|Property|Obligation|
+|---|---|---|
+|15|Version|O|
+
+Usually not used for dataset (in case of a revision, a new dataset should be provided), however for other dataProducts (i.e. file-format) this entry could be used.
+
+|ID|Property|Obligation|
+|---|---|---|
+|16|Rights|R|
+
+Needs to be define by CIE/CB
 
 
+|ID|Property|Obligation|
+|---|---|---|
+|17|Description (with type sub-property)|R|
 
+Description of the dataproduct. Usually the sub-property "abstract" is used. Also the original source of the dataproduct shall be stated. Example:
+
+![image](https://user-images.githubusercontent.com/102721116/193691247-cbfec5ef-3b92-42c9-af3b-9016a8369406.png)
+
+
+|ID|Property|Obligation|
+|---|---|---|
+|18|GeoLocation|O|
+
+Usually not used
+
+|ID|Property|Obligation|
+|---|---|---|
+|19|FundingReference|O|
+
+Usually not used
+
+|ID|Property|Obligation|
+|---|---|---|
+|20|RelatedItem|O|
+
+Usually not used
+
+## Additional fields
+In addition to all fields defined above by the Datacite 4.4 schema, CIE dataProducts 
+
+The basic structure of a file that contains the metadata and is integrated into the document contains the following fields:
 
