@@ -298,3 +298,4 @@ Additional validation information can be provided (the field can be repeated):
 
 ![image](https://user-images.githubusercontent.com/102721116/193694039-b73087e7-5861-4ec6-8cb7-b5891a82d28c.png)
 
+|CIE 3| schemaName|R|
