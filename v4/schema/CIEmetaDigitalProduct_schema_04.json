@@ -825,7 +825,7 @@
 		},
 		"schemaVersion": {
 			"type": "number",
-			"const": 3
+			"const": 4
 		},
 		"schemaURL": {
 			"type": "string",
@@ -880,6 +880,15 @@
 							},
 							"description": {
 								"type": "string"
+							},							,
+							"wavelength_first": {
+								"type": "number"
+							},
+							"wavelength_last": {
+								"type": "number"
+							},
+							"wavelength_step": {
+								"type": "number"
 							}
 						}
 					},
