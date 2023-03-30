@@ -88,61 +88,91 @@
 			{
 				"title": "lambda",
 				"unit": "nm",
-				"quantity": "wavelength"
+				"quantity": "wavelength",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 5
 			},
 			{
 				"title": "FL1",
 				"unit": "dimensionless",
 				"quantity": "spectral distribution",
-				"descrition": "standard"
+				"descrition": "standard",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 5				
 			},
 			{
 				"title": "FL2",
 				"unit": "dimensionless",
 				"quantity": "spectral distribution",
-				"descrition": "standard"
+				"descrition": "standard",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 5
 			},
 			{
 				"title": "FL3",
 				"unit": "dimensionless",
 				"quantity": "spectral distribution",
-				"descrition": "standard"
+				"descrition": "standard",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 5
 			},
 			{
 				"title": "FL4",
 				"unit": "dimensionless",
 				"quantity": "spectral distribution",
-				"descrition": "standard"
+				"descrition": "standard",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 5
 			},
 			{
 				"title": "FL5",
 				"unit": "dimensionless",
 				"quantity": "spectral distribution",
-				"descrition": "standard"
+				"descrition": "standard",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 5
 			},
 			{
 				"title": "FL6",
 				"unit": "dimensionless",
 				"quantity": "spectral distribution",
-				"descrition": "standard"
+				"descrition": "standard",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 5
 			},
 			{
 				"title": "FL7",
 				"unit": "dimensionless",
 				"quantity": "spectral distribution",
-				"descrition": "broad-band"
+				"descrition": "broad-band",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 5
 			},
 			{
 				"title": "FL8",
 				"unit": "dimensionless",
 				"quantity": "spectral distribution",
-				"descrition": "broad-band"
+				"descrition": "broad-band",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 5
 			},
 			{
 				"title": "FL9",
 				"unit": "dimensionless",
 				"quantity": "spectral distribution",
-				"descrition": "broad-band"
+				"descrition": "broad-band",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 5
 			}
 		]
 	},
