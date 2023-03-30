@@ -37,12 +37,13 @@
 			"alternateIdentifierType": "fileName"
 		}
 	],
-	"relatedIdentifiers": [
+	"relatedItem": [
 		{
-			"relatedIdentifier": "10.25039/tr.015.2018",
-			"relatedIdentifierType": "DOI",
+			"relatedItemType": "Report",
 			"relationType": "IsPartOf",
-			"resourceTypeGeneral": "Report"
+			"relatedItemIdentifier": "10.25039/tr.015.2018",
+			"relatedItemIdentifierType": "DOI",
+			"title":"Colorimetry, 4th edition"
 		}
 	],
 	"formats": [
@@ -146,6 +147,6 @@
 		]
 	},
 	"schemaName": "CIEmetaDigitalProduct",
-	"schemaVersion": 3,
+	"schemaVersion": 4,
 	"schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd"
 }
