@@ -1,6 +1,6 @@
 # CIEmetaDigitalProduct - Description
 
-Version 3
+Version 4
 
 The CIEmetaDigitalProduct meta schema is based on the most recent version of the DataCite schema (https://schema.datacite.org/meta/kernel-4.4/ ) . Additional, CIE relevant fields are defined as outlined below. The JSON schema description can be found here: https://doi.org/10.25039/CIE.SC.4taqevcd
 
@@ -96,6 +96,7 @@ The primary language of the resource according ISO 639-1 language codes.
 |10|ResourceType|M|
 
 For Datasets including "data tables" the ResourceTypeGeneral "Dataset" is used as the recourceType "dataTable". Other types could be "ComputationalNotebook" for excel calculation sheets, "Image", "Audiovisual ","Software",
+
 Examples:
 
 ![image](https://user-images.githubusercontent.com/102721116/193689420-708d60e0-524b-4ed6-84f9-22d695adcf2d.png)
@@ -113,14 +114,10 @@ A short but meaningful file name shall be selected. White characters (space) sha
 
 |ID|Property|Obligation|
 |---|---|---|
-|12|RelatedIdentifier (with type and relation type sub-properties)|R|
+|12|RelatedIdentifier (with type and relation type sub-properties)|O|
 
-The identifier (DOI) of the related publication(s) shall be specified. In case of a new publication relating to the existing dataproduct, the metadatafile needs to be updated. Also the relation to other datasets can be specified, typically:
-IsSupplementTo, IsSupplementedBy, HasVersion, IsVersionOf, IsNewVersionOf, IsPreviousVersionOf IsPartOf, HasPart, IsPublishedIn, IsReferencedBy, References, IsVariantFormOf, IsOriginalFormOf, IsIdenticalTo, IsDerivedFrom, IsSourceOf, IsRequiredBy Requires. 
+Starting from version 4 it is usually not used for CIE datasets but RelatedItem (item 20) shall be used.
 
-As an example:
-
-![image](https://user-images.githubusercontent.com/102721116/193689919-be22874b-c6c8-4a14-9275-71ec2fa6252b.png)
 
 |ID|Property|Obligation|
 |---|---|---|
@@ -175,9 +172,31 @@ Usually not used
 
 |ID|Property|Obligation|
 |---|---|---|
-|20|RelatedItem|O|
+|20|RelatedItem|R|
 
-Usually not used
+The identifier (DOI) of the related publication(s) shall be specified. In case of a new publication relating to the existing dataproduct, the metadatafile needs to be updated. Also 
+
+As an example:
+
+![image](https://user-images.githubusercontent.com/102721116/193689919-be22874b-c6c8-4a14-9275-71ec2fa6252b.png)
+
+20.a relatedItemType
+is usually "Report", "Standard", or "Dataset"
+
+20.b relationType
+the relation to the relatedItem can be specified, typically:
+IsSupplementTo, IsSupplementedBy, HasVersion, IsVersionOf, IsNewVersionOf, IsPreviousVersionOf IsPartOf, HasPart, IsPublishedIn, IsReferencedBy, References, IsVariantFormOf, IsOriginalFormOf, IsIdenticalTo, IsDerivedFrom, IsSourceOf, IsRequiredBy Requires. 
+
+20.1 relatedItemIdentifier
+Typically the DOI is given, i.e. "10.25039/CIE.DS.ukaymjdn"
+
+20.1.a relatedItemIdentifierType
+Should usually be "DOI"
+
+20.3 Title
+Specify the title of the document (including the number of CIE publication)
+
+The other subitems are not necessary used ("creator", "PublicationYear", "volume", "Publisher",...
 
 ## Additional (CIE related) fields
 In addition to all fields defined above by the Datacite 4.4 schema, CIE dataProducts 
@@ -298,4 +317,13 @@ Additional validation information can be provided (the field can be repeated):
 
 ![image](https://user-images.githubusercontent.com/102721116/193694039-b73087e7-5861-4ec6-8cb7-b5891a82d28c.png)
 
+
 |CIE 3| schemaName|R|
+
+
+## Version history
+
+Version 4: 
+- wavelength range added to the column name
+- relatedItem to be used instead of the RelatedIdentifier enabling adding the title of the related publication 
+
