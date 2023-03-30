@@ -880,7 +880,7 @@
 							},
 							"description": {
 								"type": "string"
-							},							,
+							},
 							"wavelength_first": {
 								"type": "number"
 							},
