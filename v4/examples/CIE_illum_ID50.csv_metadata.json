@@ -1,0 +1,103 @@
+{
+	"identifier": {
+		"identifier": "10.25039/CIE.DS.r4gcnrzc",
+		"identifierType": "DOI"
+	},
+	"creators": [
+		{
+			"name": "International Commission on Illumination (CIE)",
+			"nameType": "Organizational"
+		}
+	],
+	"titles": [
+		{
+			"title": "CIE indoor daylight illuminant ID50"
+		}
+	],
+	"publisher": "International Commission on Illumination (CIE), Vienna, AT",
+	"publicationYear": "2009",
+	"subjects": [
+		{
+			"subject": "Influence of the colour of the light"
+		},
+		{
+			"subject": "Artificial daylight"
+		}
+	],
+	"language": "en",
+	"alternateIdentifiers": [
+		{
+			"alternateIdentifier": "CIE_illum_ID50.csv",
+			"alternateIdentifierType": "fileName"
+		}
+	],
+	"relatedItem": [
+		{
+			"relatedItemIdentifier": "10.25039/tr.184.2009",
+			"relatedItemIdentifierType": "DOI",
+			"relationType": "IsPartOf",
+			"relatedItemType": "Report",
+			"title": "Indoor daylight illuminants"
+		}
+	],
+	"formats": [
+		"text/csv"
+	],
+	"types": {
+		"resourceType": "dataTable",
+		"resourceTypeGeneral": "Dataset"
+	},
+	"descriptions": [
+		{
+			"description": "Relative spectral power distribution of the daylight indoor illuminant ID50, wavelength range: 380 nm to 780 nm, wavelength increment: 5 nm, original source: CIE 184:2009 Table 2",
+			"descriptionType": "Abstract"
+		}
+	],
+	"checksums": [
+		{
+			"hashMethod": "md5",
+			"checksum": "fed40bf7ffc86b054b497f645d9f8fc3"
+		},
+		{
+			"hashMethod": "sha256",
+			"checksum": "70541ed195eb91066d3a986d8d5cdd3cbfb2ab963f713022d2a88dfd59b849e2"
+		}
+	],
+	"datatableInfo": {
+		"validations": [
+			{
+				"validationType": "sumOfColumns",
+				"validationValue": "[52380,6820.49]"
+			},
+			{
+				"validationType": "sampleRow",
+				"validationParameter": "14",
+				"validationValue": "[365,22.50]"
+			}
+		],
+		"interpolationMethod": "linear",
+		"extrapolationMethod": "zero",
+		"dataQuality": "approximated",
+		"columnHeaders": [
+			{
+				"title": "lambda",
+				"unit": "nm",
+				"quantity": "wavelength",
+				"wavelength_first": 300,
+				"wavelength_last": 780,
+				"wavelength_step": 5
+			},
+			{
+				"title": "S_ID50(lambda)",
+				"unit": "dimensionless",
+				"quantity": "spectral distribution",
+				"wavelength_first": 300,
+				"wavelength_last": 780,
+				"wavelength_step": 5
+			}
+		]
+	},
+	"schemaName": "CIEmetaDigitalProduct",
+	"schemaVersion": 4,
+	"schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+}
