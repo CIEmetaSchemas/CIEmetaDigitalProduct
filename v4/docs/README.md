@@ -286,6 +286,10 @@ The property can have the following values:
 |CIE 2.4.2|quantity|R|
 |CIE 2.4.3|unit|R|
 |CIE 2.4.4|descrition|O|
+|CIE 2.4.5|wavelength_first|O|
+|CIE 2.4.6|wavelength_last|O|
+|CIE 2.4.7|wavelength_step|O|
+
 
 For data tables that are typically distributed CIE publication, additional information shall be provided to increase the machine interpretability of the datasets. In particular, for each column: 
 Title: The title includes typically the quantity and additional relevant information
@@ -295,6 +299,17 @@ Description: Additional information about the column can be stated. This informa
 Example for CIE 241:2020 (data sets for spectral distributions):
 
 ![image](https://user-images.githubusercontent.com/102721116/193693428-14b4dc5f-57f5-42de-b289-0fe5f04f0a00.png)
+
+wavelength_first,wavelength_last defines the spectral range for the data in the column. Some CIE functions (i.e. z_bar_10) have a limited wavelength range.
+For none spectral datatable the value should be set to 
+
+|":unap"|not applicable, makes no sense|
+
+The wavelength_step can only be specified if the wavelength spacing is the same over the full defining wavelength range. If not the field shall be set to
+|":null"|explicitly and meaningfully empty|,  for none spectral datatable to
+|":unap"|not applicable, makes no sense|
+
+
 
 Example:
 
