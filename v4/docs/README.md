@@ -303,10 +303,18 @@ Example for CIE 241:2020 (data sets for spectral distributions):
 wavelength_first,wavelength_last defines the spectral range for the data in the column. Some CIE functions (i.e. z_bar_10) have a limited wavelength range.
 For none spectral datatable the value should be set to 
 
+|Value|Descrition|
+|---|---|
 |":unap"|not applicable, makes no sense|
 
 The wavelength_step can only be specified if the wavelength spacing is the same over the full defining wavelength range. If not the field shall be set to
-|":null"|explicitly and meaningfully empty|,  for none spectral datatable to
+
+||Value|Descrition|
+|---|---|
+":null"|explicitly and meaningfully empty|
+for none spectral datatable to
+|Value|Descrition|
+|---|---|
 |":unap"|not applicable, makes no sense|
 
 
