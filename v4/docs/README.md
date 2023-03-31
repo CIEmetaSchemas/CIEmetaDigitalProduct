@@ -309,10 +309,12 @@ For none spectral datatable the value should be set to
 
 The wavelength_step can only be specified if the wavelength spacing is the same over the full defining wavelength range. If not the field shall be set to
 
-||Value|Descrition|
+|Value|Descrition|
 |---|---|
-":null"|explicitly and meaningfully empty|
+|":null"|explicitly and meaningfully empty|
+
 for none spectral datatable to
+
 |Value|Descrition|
 |---|---|
 |":unap"|not applicable, makes no sense|
