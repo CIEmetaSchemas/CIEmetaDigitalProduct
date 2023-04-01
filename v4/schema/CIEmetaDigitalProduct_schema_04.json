@@ -195,6 +195,7 @@
 				":unap",
 				":unas",
 				"nominal",
+				"fromFormula",
 				"approximated",
 				"other"
 			]
