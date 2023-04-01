@@ -117,7 +117,7 @@ A short but meaningful file name shall be selected. White characters (space) sha
 |---|---|---|
 |12|RelatedIdentifier (with type and relation type sub-properties)|O|
 
-Starting from version 4 it is usually not used for CIE datasets but RelatedItem (item 20) shall be used.
+Starting from version 4 it is usually not used for CIE datasets but RelatedItems (item 20) shall be used.
 
 
 |ID|Property|Obligation|
@@ -173,7 +173,7 @@ Usually not used
 
 |ID|Property|Obligation|
 |---|---|---|
-|20|RelatedItem|R|
+|20|RelatedItems|R|
 
 The identifier (DOI) of the related publication(s) shall be specified. In case of a new publication relating to the existing dataproduct, the metadatafile needs to be updated. Also 
 
