@@ -37,7 +37,9 @@
 			"relatedItemIdentifierType": "DOI",
 			"relationType": "IsPartOf",
 			"relatedItemType": "Report",
-			"title": "Indoor daylight illuminants"
+			"titles": [
+				"Indoor daylight illuminants"
+				]
 		}
 	],
 	"formats": [
