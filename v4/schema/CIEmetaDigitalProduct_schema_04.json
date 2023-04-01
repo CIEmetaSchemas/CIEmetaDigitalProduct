@@ -796,7 +796,7 @@
 						"type": "array",
                           			"items" : {
                             				"type": "string"
-            						},
+            						}
 					},
 					"resourceTypeGeneral": {
 						"$ref": "#/definitions/resourceTypeGeneral"
