@@ -295,13 +295,14 @@ The property can have the following values:
 
 
 For data tables that are typically distributed CIE publication, additional information shall be provided to increase the machine interpretability of the datasets. In particular, for each column: 
-Title: The title includes typically the quantity and additional relevant information
-Quantity: The generic quantity
-Unit: the unit associated with the quantity ("dimensionless" for relative quantity or those that are based on counting).
-Description: Additional information about the column can be stated. This information can also be given in a structure JSON string. Example 
-Example for CIE S026:2020:
 
-![grafik](https://user-images.githubusercontent.com/102721116/229273517-01236b13-6d67-4cca-94c0-415288e04b36.png)
+Title: The title includes typically the quantity and additional relevant information
+
+Quantity: The generic quantity
+
+Unit: the unit associated with the quantity ("dimensionless" for relative quantity or those that are based on counting).
+
+Description: Additional information about the column can be stated. This information can also be given in a structure JSON string. Example 
 
 wavelength_first,wavelength_last defines the spectral range for the data in the column. Some CIE functions (i.e. z_bar_10) have a limited wavelength range.
 For none spectral datatable the value should be set to 
@@ -324,9 +325,10 @@ for none spectral datatable to
 
 
 
-Example:
+Example for CIE S026:2020:
 
-![image](https://user-images.githubusercontent.com/102721116/193693494-01a59a83-c2da-4159-aa59-f152864abcd2.png)
+![grafik](https://user-images.githubusercontent.com/102721116/229273517-01236b13-6d67-4cca-94c0-415288e04b36.png)
+
 
 |ID|Property|Obligation|
 |---|---|---|
