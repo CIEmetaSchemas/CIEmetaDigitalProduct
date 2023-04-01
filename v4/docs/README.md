@@ -179,7 +179,7 @@ The identifier (DOI) of the related publication(s) shall be specified. In case o
 
 As an example:
 
-![grafik](https://user-images.githubusercontent.com/102721116/229273429-7f5add03-d5b5-41d4-95e4-6a6597e4432e.png)
+![grafik](https://user-images.githubusercontent.com/102721116/229276063-c078cabd-b067-4440-a1c6-98fb86bd50dd.png)
 
 
 20.a relatedItemType
@@ -195,8 +195,8 @@ Typically the DOI is given, i.e. "10.25039/CIE.DS.ukaymjdn"
 20.1.a relatedItemIdentifierType
 Should usually be "DOI"
 
-20.3 Title
-Specify the title of the document (including the number of CIE publication)
+20.3 Titles
+Specify the titles of the document (including the number of CIE publication). Usually only one title is added
 
 The other subitems are not necessary used ("creator", "PublicationYear", "volume", "Publisher",...
 
