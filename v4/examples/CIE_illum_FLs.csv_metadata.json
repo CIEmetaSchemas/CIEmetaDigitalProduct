@@ -37,7 +37,7 @@
 			"alternateIdentifierType": "fileName"
 		}
 	],
-	"relatedItem": [
+	"relatedItems": [
 		{
 			"relatedItemType": "Report",
 			"relationType": "IsPartOf",
