@@ -147,7 +147,9 @@ Usually not used for dataset (in case of a revision, a new dataset should be pro
 |---|---|---|
 |16|Rights|R|
 
-Needs to be define by CIE/CB
+for datasets that are publically available the "Creative Commons Attribution-ShareAlike 4.0 International" is usually specified:
+
+![grafik](https://user-images.githubusercontent.com/102721116/229286018-92c058a0-d00c-47dd-bcd1-35c85fe05489.png)
 
 
 |ID|Property|Obligation|
