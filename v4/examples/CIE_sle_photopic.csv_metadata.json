@@ -93,17 +93,17 @@
 			{
 				"validationType": "sampleRow",
 				"validationParameter": "120",
-				"validationValue": "[479,0.1334528000000]"
+				"validationValue": "479,0.1334528000000"
 			},
 			{
 				"validationType": "sampleRow",
 				"validationParameter": "470",
-				"validationValue": "[829,0.0000004846123]"
+				"validationValue": "829,0.0000004846123"
 			},
 			{
 				"validationType": "sampleRow",
 				"validationParameter": "4",
-				"validationValue": "[363,0.0000055321360]"
+				"validationValue": "363,0.0000055321360"
 			}
 		],
 		"interpolationMethod": "linear",
