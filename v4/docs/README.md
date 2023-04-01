@@ -179,7 +179,8 @@ The identifier (DOI) of the related publication(s) shall be specified. In case o
 
 As an example:
 
-![image](https://user-images.githubusercontent.com/102721116/193689919-be22874b-c6c8-4a14-9275-71ec2fa6252b.png)
+![grafik](https://user-images.githubusercontent.com/102721116/229273429-7f5add03-d5b5-41d4-95e4-6a6597e4432e.png)
+
 
 20.a relatedItemType
 is usually "Report", "Standard", or "Dataset"
