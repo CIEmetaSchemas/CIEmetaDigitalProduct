@@ -12,6 +12,7 @@
 // -relatedItem added
 // -only one identifier is allowed (as in the official schema), additional are introduced by "alternateIdentifier"
 //  -schemaType replaced by schemaName
+//  -relatedItem.title replaced relatedItem.titles (array of string) to be compatible with strict datacite 4.4 xml definition
 //
 //  CIE additions:
 //  --------------
@@ -790,6 +791,12 @@
 					},
 					"schemeType": {
 						"type": "string"
+					},
+					"titles": {
+						"type": "array",
+                          			"items" : {
+                            				"type": "string"
+            						},
 					},
 					"resourceTypeGeneral": {
 						"$ref": "#/definitions/resourceTypeGeneral"
