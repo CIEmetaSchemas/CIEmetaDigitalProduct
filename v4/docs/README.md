@@ -274,6 +274,7 @@ The property can have the following values:
 |Value|Descrition|
 |---|---|
 |"nominal"|The stated values are nominal values (i.e. without uncertainty, etc)|
+|"fromFormula"|The stated values are calculated using a related analytical formula (i.e. standard illuminant A)|
 |"approximated"|The stated values are approximated values (typically the result of a computation)|
 |":unap"|not applicable, makes no sense|
 |":unas"|value unassigned (e.g., Untitled)|
@@ -344,7 +345,7 @@ Additional validation information can be provided (the field can be repeated):
 ![image](https://user-images.githubusercontent.com/102721116/193694039-b73087e7-5861-4ec6-8cb7-b5891a82d28c.png)
 
 
-|CIE 3| schemaName|R|
+
 
 
 ## Version history
@@ -352,4 +353,5 @@ Additional validation information can be provided (the field can be repeated):
 Version 4: 
 - wavelength range added to the column name
 - relatedItem to be used instead of the RelatedIdentifier enabling adding the title of the related publication 
+- open "fromFormula" added to "dataQuality" (example: standard illuminant A)
 
