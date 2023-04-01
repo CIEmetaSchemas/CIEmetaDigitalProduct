@@ -89,7 +89,7 @@
 			{
 				"validationType": "sampleRow",
 				"validationParameter": "220",
-				"validationValue": "579,1.00191,0.877986,0"
+				"validationValue": "579,1.00191,0.877986,:null"
 			}
 		],
 		"interpolationMethod": "linear",
