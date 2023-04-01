@@ -1,6 +1,6 @@
 {
 	"identifier": {
-		"identifier": "10.25039/CIE.DS.r4gcnrzc",
+		"identifier": "10.25039/CIE.DS.caky9gj2",
 		"identifierType": "DOI"
 	},
 	"creators": [
@@ -11,34 +11,40 @@
 	],
 	"titles": [
 		{
-			"title": "CIE indoor daylight illuminant ID50"
+			"title": "Values of the first deviation function used in the calculation of the CIE special metamerism index for a change in observer"
 		}
 	],
 	"publisher": "International Commission on Illumination (CIE), Vienna, AT",
-	"publicationYear": "2009",
+	"publicationYear": "2018",
 	"subjects": [
 		{
-			"subject": "Influence of the colour of the light"
+			"subject": "Colorimetry"
 		},
 		{
-			"subject": "Artificial daylight"
+			"subject": "Colour of objects"
+		},
+		{
+			"subject": "Colour vision"
+		},
+		{
+			"subject": "Perception of colour"
 		}
 	],
 	"language": "en",
 	"alternateIdentifiers": [
 		{
-			"alternateIdentifier": "CIE_illum_ID50.csv",
+			"alternateIdentifier": "CIE_1st_deriv_meta_ind.csv",
 			"alternateIdentifierType": "fileName"
 		}
 	],
 	"relatedItems": [
 		{
-			"relatedItemIdentifier": "10.25039/tr.184.2009",
+			"relatedItemIdentifier": "10.25039/tr.015.2018",
 			"relatedItemIdentifierType": "DOI",
 			"relationType": "IsPartOf",
 			"relatedItemType": "Report",
 			"titles": [
-				"CIE 184:2009 Indoor daylight illuminants"
+				"CIE 015:2018 Colorimetry, 4th Edition"
 			]
 		}
 	],
@@ -51,7 +57,7 @@
 	},
 	"descriptions": [
 		{
-			"description": "Relative spectral power distribution of the daylight indoor illuminant ID50, wavelength range: 380 nm to 780 nm, wavelength increment: 5 nm, original source: CIE 184:2009 Table 2",
+			"description": "Values of the first deviation function used in the calculation of the CIE special metamerism index for a change in observer, , wavelength range: 360 nm to 830 nm, wavelength increment: 1 nm, original source: CIE 015:2018 table 16",
 			"descriptionType": "Abstract"
 		}
 	],
@@ -65,23 +71,23 @@
 	"checksums": [
 		{
 			"hashMethod": "md5",
-			"checksum": "fed40bf7ffc86b054b497f645d9f8fc3"
+			"checksum": "73de03dc084a116e3b79902d6d4e2c5a"
 		},
 		{
 			"hashMethod": "sha256",
-			"checksum": "70541ed195eb91066d3a986d8d5cdd3cbfb2ab963f713022d2a88dfd59b849e2"
+			"checksum": "1f1413de6d58e533e8a3d26e4b7dc3f4cd6f67aebb7593fa3553394da939952"
 		}
 	],
 	"datatableInfo": {
 		"validations": [
 			{
 				"validationType": "sumOfColumns",
-				"validationValue": "[52380,6820.49]"
+				"validationValue": "[46980,-0.6690,-0.2564,-0.0556]"
 			},
 			{
 				"validationType": "sampleRow",
-				"validationParameter": "14",
-				"validationValue": "365,22.50"
+				"validationParameter": "30",
+				"validationValue": "525,0.0017,0.0005,0.0005"
 			}
 		],
 		"interpolationMethod": "linear",
@@ -92,15 +98,28 @@
 				"title": "lambda",
 				"unit": "nm",
 				"quantity": "wavelength",
-				"wavelength_first": 300,
+				"wavelength_first": 380,
 				"wavelength_last": 780,
 				"wavelength_step": 5
 			},
 			{
-				"title": "S_ID50(lambda)",
+				"title": "delta_x_bar(lambda)",
 				"unit": "dimensionless",
-				"quantity": "spectral distribution",
-				"wavelength_first": 300,
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 5
+			},
+			{
+				"title": "delta_y_bar(lambda)",
+				"unit": "dimensionless",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 5
+			},
+			{
+				"title": "delta_z_bar(lambda)",
+				"unit": "dimensionless",
+				"wavelength_first": 380,
 				"wavelength_last": 780,
 				"wavelength_step": 5
 			}

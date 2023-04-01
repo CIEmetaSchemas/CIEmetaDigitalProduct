@@ -1,6 +1,6 @@
 {
 	"identifier": {
-		"identifier": "10.25039/CIE.DS.ukaymjdn",
+		"identifier": "10.25039/CIE.DS.54hy6srn",
 		"identifierType": "DOI"
 	},
 	"creators": [
@@ -11,7 +11,7 @@
 	],
 	"titles": [
 		{
-			"title": "Relative spectral power distributions of illuminants representing typical fluorescent lamps"
+			"title": "Relative spectral power distributions of illuminants representing typical fluorescent lamps, 1nm wavelength steps"
 		}
 	],
 	"publisher": "International Commission on Illumination (CIE), Vienna, AT",
@@ -33,7 +33,7 @@
 	"language": "en",
 	"alternateIdentifiers": [
 		{
-			"alternateIdentifier": "CIE_illum_FLs.csv",
+			"alternateIdentifier": "CIE_illum_FLs_1nm.csv",
 			"alternateIdentifierType": "fileName"
 		}
 	],
@@ -41,7 +41,7 @@
 		{
 			"relatedItemIdentifier": "10.25039/tr.015.2018",
 			"relatedItemIdentifierType": "DOI",
-			"relationType": "IsPartOf",
+			"relationType": "IsSupplementTo",
 			"relatedItemType": "Report",
 			"titles": [
 				"CIE 015:2018 Colorimetry, 4th Edition"
@@ -57,7 +57,7 @@
 	},
 	"descriptions": [
 		{
-			"description": "Relative spectral power distributions of illuminants representing typical fluorescent lamps, wavelength range: 380 nm to 780 nm, wavelength increment: 5 nm, original source: CIE 015:2018 table 10.1, 10.2, 10.3",
+			"description": "Relative spectral power distributions of illuminants representing typical fluorescent lamps, wavelength range: 380 nm to 780 nm, wavelength increment: 1 nm, original source: CIE 015:2018 table 10.1, 10.2, 10.3",
 			"descriptionType": "Abstract"
 		}
 	],
@@ -71,23 +71,23 @@
 	"checksums": [
 		{
 			"hashMethod": "md5",
-			"checksum": "441613e501ab0a58e62f2669ff005db7"
+			"checksum": "77df774b47c2de724211d5f26592759e"
 		},
 		{
 			"hashMethod": "sha256",
-			"checksum": "24303adacbfee5e19b2123ea2c3208a993577a054abaf55ea7e19517f98e4d55"
+			"checksum": "929ee966bf465fca2073ada8965afbc332d163f6f2cb54c710a6e193251ab0cc"
 		}
 	],
 	"datatableInfo": {
 		"validations": [
 			{
 				"validationType": "sumOfColumns",
-				"validationValue": "[46980,684.33,594.50,556.19,540.17,664.37,565.79,788.90,789.42,743.46,615.56,594.08,566.76,2705.00,3232.05,3342.02,3891.36,3961.43,3925.64,2824.99,2930.19,3062.75,809.69,3175.14,3422.09,3520.19,3684.53,29041]"
+				"validationValue": "[232580,3416.31310956789476,2968.911293645001703,2778.185591236070386,2698.589722171763767,3316.530363131191343,2825.762214982577077,3937.12124546917356,3941.47948440841796,3712.641830532033963,3075.356858228162344,2968.319365342079792,2832.245578809528746,13519.646451067596523,16144.52552409140196,16690.6812397059072,19437.62262166456645,19786.14277373280101,19606.31822964576094,14111.2394472025232801,14651.352488197919024,15323.19696320407113,4050.9001186987832566,15874.08697390150826,17107.73899835519218,17592.89424065664869,18410.25998027052900,144499.6923753144023]"
 			},
 			{
 				"validationType": "sampleRow",
-				"validationParameter": "14",
-				"validationValue": "445,10.72,6.27,4.02,2.55,10.32,5.48,11.35,7.68,5.84,10.40,6.95,2.65,11.38,27.63,49.79,8.37,31.92,37.98,11.96,33.35,51.83,12.28,65.31,7.13,16.88,26.33,343.00"
+				"validationParameter": "101",
+				"validationValue": "480,13.23,7.65,4.87,3.09,12.58,6.59,13.95,11.98,9.31,7.91,5.66,3.01,13.59,35.02,60.24,15.74,51.21,61.36,12.0800060172255,23.4000000000007,31.94,11.66,40.04,31.66,59.49,78.25,567"
 			},
 			{
 				"validationType": "numberOfColumns",
@@ -104,7 +104,7 @@
 				"quantity": "wavelength",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL1",
@@ -113,7 +113,7 @@
 				"descrition": "standard",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL2",
@@ -122,7 +122,7 @@
 				"descrition": "standard",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL3",
@@ -131,7 +131,7 @@
 				"descrition": "standard",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL4",
@@ -140,7 +140,7 @@
 				"descrition": "standard",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL5",
@@ -149,7 +149,7 @@
 				"descrition": "standard",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL6",
@@ -158,7 +158,7 @@
 				"descrition": "standard",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL7",
@@ -167,7 +167,7 @@
 				"descrition": "broad-band",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL8",
@@ -176,7 +176,7 @@
 				"descrition": "broad-band",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL9",
@@ -185,7 +185,7 @@
 				"descrition": "broad-band",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL10",
@@ -194,7 +194,7 @@
 				"descrition": "narrow-band",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL11",
@@ -203,7 +203,7 @@
 				"descrition": "narrow-band",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL12",
@@ -212,7 +212,7 @@
 				"descrition": "narrow-band",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL3.1",
@@ -221,7 +221,7 @@
 				"descrition": "Standard halophosphate",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL3.2",
@@ -230,7 +230,7 @@
 				"descrition": "Standard halophosphate",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL3.3",
@@ -239,7 +239,7 @@
 				"descrition": "Standard halophosphate",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL3.4",
@@ -248,7 +248,7 @@
 				"descrition": "DeLuxe type",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL3.5",
@@ -257,7 +257,7 @@
 				"descrition": "DeLuxe type",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL3.6",
@@ -266,7 +266,7 @@
 				"descrition": "DeLuxe type",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL3.7",
@@ -275,7 +275,7 @@
 				"descrition": "Three-band",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL3.8",
@@ -284,7 +284,7 @@
 				"descrition": "Three-band",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL3.9",
@@ -293,7 +293,7 @@
 				"descrition": " Three-band",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL3.10",
@@ -302,7 +302,7 @@
 				"descrition": " Three-band",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL3.11",
@@ -311,7 +311,7 @@
 				"descrition": " Three-band",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL3.12",
@@ -320,7 +320,7 @@
 				"descrition": "Multi-band",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL3.13",
@@ -329,7 +329,7 @@
 				"descrition": "Multi-band",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL3.14",
@@ -338,7 +338,7 @@
 				"descrition": "Multi-band",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			},
 			{
 				"title": "FL3.15",
@@ -347,7 +347,7 @@
 				"descrition": " D65 simulator",
 				"wavelength_first": 380,
 				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_step": 1
 			}
 		]
 	},

@@ -1,6 +1,6 @@
 {
 	"identifier": {
-		"identifier": "10.25039/CIE.DS.r4gcnrzc",
+		"identifier": "10.25039/CIE.DS.mjdd2enu",
 		"identifierType": "DOI"
 	},
 	"creators": [
@@ -11,34 +11,40 @@
 	],
 	"titles": [
 		{
-			"title": "CIE indoor daylight illuminant ID50"
+			"title": "Relative spectral power distributions of CIE illuminant C"
 		}
 	],
 	"publisher": "International Commission on Illumination (CIE), Vienna, AT",
-	"publicationYear": "2009",
+	"publicationYear": "2018",
 	"subjects": [
 		{
-			"subject": "Influence of the colour of the light"
+			"subject": "Colorimetry"
 		},
 		{
-			"subject": "Artificial daylight"
+			"subject": "Colour of objects"
+		},
+		{
+			"subject": "Colour vision"
+		},
+		{
+			"subject": "Perception of colour"
 		}
 	],
 	"language": "en",
 	"alternateIdentifiers": [
 		{
-			"alternateIdentifier": "CIE_illum_ID50.csv",
+			"alternateIdentifier": "CIE_illum_C.csv",
 			"alternateIdentifierType": "fileName"
 		}
 	],
 	"relatedItems": [
 		{
-			"relatedItemIdentifier": "10.25039/tr.184.2009",
+			"relatedItemIdentifier": "10.25039/tr.015.2018",
 			"relatedItemIdentifierType": "DOI",
 			"relationType": "IsPartOf",
 			"relatedItemType": "Report",
 			"titles": [
-				"CIE 184:2009 Indoor daylight illuminants"
+				"CIE 015:2018 Colorimetry, 4th Edition"
 			]
 		}
 	],
@@ -51,7 +57,7 @@
 	},
 	"descriptions": [
 		{
-			"description": "Relative spectral power distribution of the daylight indoor illuminant ID50, wavelength range: 380 nm to 780 nm, wavelength increment: 5 nm, original source: CIE 184:2009 Table 2",
+			"description": "Relative spectral power distributions of CIE illuminant C, wavelength range: 380 nm to 780 nm, wavelength increment: 5 nm, original source: CIE 015:2018 table 5",
 			"descriptionType": "Abstract"
 		}
 	],
@@ -65,23 +71,23 @@
 	"checksums": [
 		{
 			"hashMethod": "md5",
-			"checksum": "fed40bf7ffc86b054b497f645d9f8fc3"
+			"checksum": "bb325f040bab332d91f8d9447aa47b78"
 		},
 		{
 			"hashMethod": "sha256",
-			"checksum": "70541ed195eb91066d3a986d8d5cdd3cbfb2ab963f713022d2a88dfd59b849e2"
+			"checksum": "51c53bf065345fc1fb9d50aff4fb0a2ce37bcf35121a3dc4bafc0888602fb"
 		}
 	],
 	"datatableInfo": {
 		"validations": [
 			{
 				"validationType": "sumOfColumns",
-				"validationValue": "[52380,6820.49]"
+				"validationValue": "[52380,7327.20]"
 			},
 			{
 				"validationType": "sampleRow",
-				"validationParameter": "14",
-				"validationValue": "365,22.50"
+				"validationParameter": "30",
+				"validationValue": "445,123.45"
 			}
 		],
 		"interpolationMethod": "linear",
@@ -97,7 +103,7 @@
 				"wavelength_step": 5
 			},
 			{
-				"title": "S_ID50(lambda)",
+				"title": "CIE illuminant C",
 				"unit": "dimensionless",
 				"quantity": "spectral distribution",
 				"wavelength_first": 300,

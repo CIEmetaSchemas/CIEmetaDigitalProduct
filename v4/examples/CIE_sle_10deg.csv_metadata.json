@@ -1,6 +1,6 @@
 {
 	"identifier": {
-		"identifier": "10.25039/CIE.DS.r4gcnrzc",
+		"identifier": "10.25039/CIE.DS.bfn2eqci",
 		"identifierType": "DOI"
 	},
 	"creators": [
@@ -11,34 +11,37 @@
 	],
 	"titles": [
 		{
-			"title": "CIE indoor daylight illuminant ID50"
+			"title": "CIE spectral luminous efficiency for 10° photopic vision"
 		}
 	],
 	"publisher": "International Commission on Illumination (CIE), Vienna, AT",
-	"publicationYear": "2009",
+	"publicationYear": "2019",
 	"subjects": [
 		{
-			"subject": "Influence of the colour of the light"
+			"subject": "Photometry"
 		},
 		{
-			"subject": "Artificial daylight"
+			"subject": "Objective photometry"
+		},
+		{
+			"subject": "Units. Constants"
 		}
 	],
 	"language": "en",
 	"alternateIdentifiers": [
 		{
-			"alternateIdentifier": "CIE_illum_ID50.csv",
+			"alternateIdentifier": "CIE_sle_10deg.csv",
 			"alternateIdentifierType": "fileName"
 		}
 	],
 	"relatedItems": [
 		{
-			"relatedItemIdentifier": "10.25039/tr.184.2009",
+			"relatedItemIdentifier": "10.25039/tr.018.2019",
 			"relatedItemIdentifierType": "DOI",
 			"relationType": "IsPartOf",
 			"relatedItemType": "Report",
 			"titles": [
-				"CIE 184:2009 Indoor daylight illuminants"
+				"CIE 018:2019 The Basis of Physical Photometry, 3rd Edition"
 			]
 		}
 	],
@@ -51,7 +54,7 @@
 	},
 	"descriptions": [
 		{
-			"description": "Relative spectral power distribution of the daylight indoor illuminant ID50, wavelength range: 380 nm to 780 nm, wavelength increment: 5 nm, original source: CIE 184:2009 Table 2",
+			"description": "Values of spectral luminous efficiency for 10° photopic vision, V10(lambda), lambda in standard air, original source: CIE 018:2019, Table 5",
 			"descriptionType": "Abstract"
 		}
 	],
@@ -65,44 +68,44 @@
 	"checksums": [
 		{
 			"hashMethod": "md5",
-			"checksum": "fed40bf7ffc86b054b497f645d9f8fc3"
+			"checksum": "b702e2c81f87115f151e9e0603925834"
 		},
 		{
 			"hashMethod": "sha256",
-			"checksum": "70541ed195eb91066d3a986d8d5cdd3cbfb2ab963f713022d2a88dfd59b849e2"
+			"checksum": "e67ec48406bdb6cef7ce03c42bd66f9dfc8601fb0a60837f8971973d4b960c9"
 		}
 	],
 	"datatableInfo": {
 		"validations": [
 			{
 				"validationType": "sumOfColumns",
-				"validationValue": "[52380,6820.49]"
+				"validationValue": "[280245,116.661877102312]"
 			},
 			{
 				"validationType": "sampleRow",
-				"validationParameter": "14",
-				"validationValue": "365,22.50"
+				"validationParameter": "120",
+				"validationValue": "479,0.245997000000"
 			}
 		],
 		"interpolationMethod": "linear",
 		"extrapolationMethod": "zero",
-		"dataQuality": "approximated",
+		"dataQuality": "nominal",
 		"columnHeaders": [
 			{
 				"title": "lambda",
 				"unit": "nm",
 				"quantity": "wavelength",
-				"wavelength_first": 300,
-				"wavelength_last": 780,
-				"wavelength_step": 5
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 1
 			},
 			{
-				"title": "S_ID50(lambda)",
+				"title": "V_10(lambda)",
 				"unit": "dimensionless",
-				"quantity": "spectral distribution",
-				"wavelength_first": 300,
-				"wavelength_last": 780,
-				"wavelength_step": 5
+				"quantity": "spectral luminous efficiency",
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 1
 			}
 		]
 	},

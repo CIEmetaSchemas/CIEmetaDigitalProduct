@@ -1,0 +1,134 @@
+{
+	"identifier": {
+		"identifier": "10.25039/CIE.DS.qhaz5si9",
+		"identifierType": "DOI"
+	},
+	"creators": [
+		{
+			"name": "International Commission on Illumination (CIE)",
+			"nameType": "Organizational"
+		}
+	],
+	"titles": [
+		{
+			"title": "CIE spectral MacLeod-Boynton chromaticity coordinates for 2° field size"
+		}
+	],
+	"publisher": "International Commission on Illumination (CIE), Vienna, AT",
+	"publicationYear": "2015",
+	"subjects": [
+		{
+			"subject": "Photometry"
+		},
+		{
+			"subject": "Objective photometry"
+		},
+		{
+			"subject": "Units. Constants"
+		}
+	],
+	"language": "en",
+	"alternateIdentifiers": [
+		{
+			"alternateIdentifier": "CIE_smb_cc_2deg.csv",
+			"alternateIdentifierType": "fileName"
+		}
+	],
+	"relatedItems": [
+		{
+			"relatedItemIdentifier": "10.25039/TR.170-2.2015",
+			"relatedItemIdentifierType": "DOI",
+			"relationType": "IsPartOf",
+			"relatedItemType": "Report",
+			"titles": [
+				"CIE 170-2:2015 Fundamental Chromaticity Diagram with Physiological Axes - Part 2: Spectral Luminous Efficiency Functions and Chromaticity Diagrams"
+			]
+		}
+	],
+	"formats": [
+		"text/csv"
+	],
+	"types": {
+		"resourceType": "dataTable",
+		"resourceTypeGeneral": "Dataset"
+	},
+	"descriptions": [
+		{
+			"description": "CIE spectral MacLeod-Boynton chromaticity coordinates for 2° field size, wavelength range: 390 nm to 830 nm, wavelength increment: 5 nm, original source: CIE 170-2:2015, Table 10.5",
+			"descriptionType": "Abstract"
+		}
+	],
+	"rightsList": [
+		{
+			"rights": "Creative Commons Attribution-ShareAlike 4.0 International",
+			"rightsURI": "https://creativecommons.org/licenses/by-sa/4.0/",
+			"rightsIdentifier": "CC BY-SA 4.0"
+		}
+	],
+	"checksums": [
+		{
+			"hashMethod": "md5",
+			"checksum": "b608343496f5e03d711f436d063b11ce"
+		},
+		{
+			"hashMethod": "sha256",
+			"checksum": "57a53ce67409cd69853acf9dc14bb6aa91f51b94dd9544e8aaf224895c141b"
+		}
+	],
+	"datatableInfo": {
+		"validations": [
+			{
+				"validationType": "sumOfColumns",
+				"validationValue": "[54290,70.889333,18.110655,12.566033]"
+			},
+			{
+				"validationType": "sampleRow",
+				"validationParameter": "19",
+				"validationValue": "480,0.540738,0.459262,0.081120"
+			}
+		],
+		"interpolationMethod": "useRelatedFormula",
+		"extrapolationMethod": "zero",
+		"dataQuality": "approximated",
+		"columnHeaders": [
+			{
+				"title": "lambda",
+				"unit": "nm",
+				"quantity": "wavelength",
+				"wavelength_first": 390,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "l_MB(lambda)",
+				"unit": "dimensionless",
+				"quantity": "chromaticity coordinates",
+				"descrition": "MacLeod Boynton chromaticity coordinates",
+				"wavelength_first": 390,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "m_MB(lambda)",
+				"unit": "dimensionless",
+				"quantity": "chromaticity coordinates",
+				"descrition": "MacLeod Boynton chromaticity coordinates",
+				"wavelength_first": 390,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "s_MB(lambda)",
+				"unit": "dimensionless",
+				"quantity": "chromaticity coordinates",
+				"descrition": "MacLeod Boynton chromaticity coordinates",
+				"wavelength_first": 390,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			}
+		]
+	},
+	"schemaName": "CIEmetaDigitalProduct",
+	"schemaVersion": 4,
+	"schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+}

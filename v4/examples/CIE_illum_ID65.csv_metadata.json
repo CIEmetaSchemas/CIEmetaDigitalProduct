@@ -1,6 +1,6 @@
 {
 	"identifier": {
-		"identifier": "10.25039/CIE.DS.r4gcnrzc",
+		"identifier": "10.25039/CIE.DS.bd53qdqk",
 		"identifierType": "DOI"
 	},
 	"creators": [
@@ -11,7 +11,7 @@
 	],
 	"titles": [
 		{
-			"title": "CIE indoor daylight illuminant ID50"
+			"title": "CIE indoor daylight illuminant ID65"
 		}
 	],
 	"publisher": "International Commission on Illumination (CIE), Vienna, AT",
@@ -27,7 +27,7 @@
 	"language": "en",
 	"alternateIdentifiers": [
 		{
-			"alternateIdentifier": "CIE_illum_ID50.csv",
+			"alternateIdentifier": "CIE_illum_ID65.csv",
 			"alternateIdentifierType": "fileName"
 		}
 	],
@@ -51,7 +51,7 @@
 	},
 	"descriptions": [
 		{
-			"description": "Relative spectral power distribution of the daylight indoor illuminant ID50, wavelength range: 380 nm to 780 nm, wavelength increment: 5 nm, original source: CIE 184:2009 Table 2",
+			"description": "Relative spectral power distribution of the daylight indoor illuminant ID65, wavelength range: 380 nm to 780 nm, wavelength increment: 5 nm, original source: CIE 184:2009 table 2",
 			"descriptionType": "Abstract"
 		}
 	],
@@ -65,23 +65,23 @@
 	"checksums": [
 		{
 			"hashMethod": "md5",
-			"checksum": "fed40bf7ffc86b054b497f645d9f8fc3"
+			"checksum": "c8843fdca93e747c8a3590cd74b01cfd"
 		},
 		{
 			"hashMethod": "sha256",
-			"checksum": "70541ed195eb91066d3a986d8d5cdd3cbfb2ab963f713022d2a88dfd59b849e2"
+			"checksum": "be1dc615b4b03eb4b3e294660101526a3ed17dc800e85786c29759b3dcb7a6"
 		}
 	],
 	"datatableInfo": {
 		"validations": [
 			{
 				"validationType": "sumOfColumns",
-				"validationValue": "[52380,6820.49]"
+				"validationValue": "[52380,7122.09]"
 			},
 			{
 				"validationType": "sampleRow",
 				"validationParameter": "14",
-				"validationValue": "365,22.50"
+				"validationValue": "365,43.65"
 			}
 		],
 		"interpolationMethod": "linear",
@@ -97,7 +97,7 @@
 				"wavelength_step": 5
 			},
 			{
-				"title": "S_ID50(lambda)",
+				"title": "S_ID65(lambda)",
 				"unit": "dimensionless",
 				"quantity": "spectral distribution",
 				"wavelength_first": 300,

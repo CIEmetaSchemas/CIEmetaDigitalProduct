@@ -1,0 +1,152 @@
+{
+	"identifier": {
+		"identifier": "10.25039/CIE.DS.vqqhzp5a",
+		"identifierType": "DOI"
+	},
+	"creators": [
+		{
+			"name": "International Commission on Illumination (CIE)",
+			"nameType": "Organizational"
+		}
+	],
+	"titles": [
+		{
+			"title": "CIE alpha-opic action spectra"
+		}
+	],
+	"publisher": "International Commission on Illumination (CIE), Vienna, AT",
+	"publicationYear": "2018",
+	"subjects": [
+		{
+			"subject": "Photometry"
+		},
+		{
+			"subject": "Objective photometry"
+		},
+		{
+			"subject": "Units. Constants"
+		}
+	],
+	"language": "en",
+	"alternateIdentifiers": [
+		{
+			"alternateIdentifier": "CIE_a-opic_action_spectra.csv",
+			"alternateIdentifierType": "fileName"
+		}
+	],
+	"relatedItems": [
+		{
+			"relatedItemIdentifier": "10.25039/S026.2018",
+			"relatedItemIdentifierType": "DOI",
+			"relationType": "IsPartOf",
+			"relatedItemType": "Report",
+			"titles": [
+				"CIE S 026:2018 CIE System for Metrology of Optical Radiation for ipRGC-Influenced Responses to Light"
+			]
+		}
+	],
+	"formats": [
+		"text/csv"
+	],
+	"types": {
+		"resourceType": "dataTable",
+		"resourceTypeGeneral": "Dataset"
+	},
+	"descriptions": [
+		{
+			"description": "Alpha-opic action spectra describing the ability of optical radiation to stimulate each of the five photoreceptor types that can contribute, via the melanopsin-containing intrinsically-photosensitive retinal ganglion cells (ipRGCs), to retina-mediated non-visual effects of light in humans, wavelength range: 380 nm to 780 nm, wavelength increment: 1 nm, original source: CIE S026:2018, Table 2",
+			"descriptionType": "Abstract"
+		}
+	],
+	"rightsList": [
+		{
+			"rights": "Creative Commons Attribution-ShareAlike 4.0 International",
+			"rightsURI": "https://creativecommons.org/licenses/by-sa/4.0/",
+			"rightsIdentifier": "CC BY-SA 4.0"
+		}
+	],
+	"checksums": [
+		{
+			"hashMethod": "md5",
+			"checksum": "31e5423041b92379c9c9f6c6a6e83c23"
+		},
+		{
+			"hashMethod": "sha256",
+			"checksum": "efd6bebe96f76f81afd5d1a14feb708ec1ee6ff67649ffbbb93968d85ce4828"
+		}
+	],
+	"datatableInfo": {
+		"validations": [
+			{
+				"validationType": "sumOfColumns",
+				"validationValue": "[232580,55.20481795993,101.93985505123,119.6121622561,97.0713165740,87.6753991157421]"
+			},
+			{
+				"validationType": "sampleRow",
+				"validationParameter": "120",
+				"validationValue": "499,1.03934E-01,5.77150E-01,3.79907E-01,9.76E-01,9.72451E-01"
+			}
+		],
+		"interpolationMethod": "linear",
+		"extrapolationMethod": "zero",
+		"dataQuality": "nominal",
+		"columnHeaders": [
+			{
+				"title": "lambda",
+				"unit": "nm",
+				"quantity": "wavelength",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "s_sc(lambda)",
+				"unit": "dimensionless",
+				"quantity": "action spectra",
+				"descrition": "S-cone-opic response",
+				"wavelength_first": 390,
+				"wavelength_last": 615,
+				"wavelength_step": 1
+			},
+			{
+				"title": "s_mc(lambda)",
+				"unit": "dimensionless",
+				"quantity": "action spectra",
+				"descrition": "M-cone-opic response",
+				"wavelength_first": 390,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "s_lc(lambda)",
+				"unit": "dimensionless",
+				"quantity": "action spectra",
+				"descrition": "L-cone-opic response",
+				"wavelength_first": 390,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "s_rh(lambda)",
+				"unit": "dimensionless",
+				"quantity": "action spectra",
+				"descrition": "Rhodopic response",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "s_mel(lambda)",
+				"unit": "dimensionless",
+				"quantity": "action spectra",
+				"descrition": "Melanopic response",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			}
+		]
+	},
+	"schemaName": "CIEmetaDigitalProduct",
+	"schemaVersion": 4,
+	"schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+}

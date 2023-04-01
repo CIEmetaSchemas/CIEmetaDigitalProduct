@@ -1,0 +1,237 @@
+{
+	"identifier": {
+		"identifier": "10.25039/CIE.DS.wuiuu9cz",
+		"identifierType": "DOI"
+	},
+	"creators": [
+		{
+			"name": "International Commission on Illumination (CIE)",
+			"nameType": "Organizational"
+		}
+	],
+	"titles": [
+		{
+			"title": "Spectral radiance factors of 14 test samples for the CIE colour rendering index calculation"
+		}
+	],
+	"publisher": "International Commission on Illumination (CIE), Vienna, AT",
+	"publicationYear": "1995",
+	"subjects": [
+		{
+			"subject": "Influence of the colour of the light"
+		},
+		{
+			"subject": "Lighting with respect to object illuminated"
+		},
+		{
+			"subject": "Evaluation of light sources"
+		}
+	],
+	"language": "en",
+	"alternateIdentifiers": [
+		{
+			"alternateIdentifier": "CIE_srf_cri.csv",
+			"alternateIdentifierType": "fileName"
+		}
+	],
+	"relatedItems": [
+		{
+			"relatedItemIdentifier": "10.25039/tr.013.3.1995",
+			"relatedItemIdentifierType": "DOI",
+			"relationType": "IsPartOf",
+			"relatedItemType": "Report",
+			"titles": [
+				"CIE 013.3-1995 Method of measuring and specifying colour rendering properties of light sources"
+			]
+		}
+	],
+	"formats": [
+		"text/csv"
+	],
+	"types": {
+		"resourceType": "dataTable",
+		"resourceTypeGeneral": "Dataset"
+	},
+	"descriptions": [
+		{
+			"description": "Spectral radiance factors of 14 test samples for the CIE colour rendering index calculation, for the general colour rendering index calculation the first 8 samples are used,  wavelength range: 360 nm to 830 nm, wavelength increment: 5 nm, original source: CIE 13.3:1995 Table 1 and 2.",
+			"descriptionType": "Abstract"
+		}
+	],
+	"rightsList": [
+		{
+			"rights": "Creative Commons Attribution-ShareAlike 4.0 International",
+			"rightsURI": "https://creativecommons.org/licenses/by-sa/4.0/",
+			"rightsIdentifier": "CC BY-SA 4.0"
+		}
+	],
+	"checksums": [
+		{
+			"hashMethod": "md5",
+			"checksum": "6ad6522831a844edb8484e884d05c9e9"
+		},
+		{
+			"hashMethod": "sha256",
+			"checksum": "f461decedb5c1880c61a6923240c71f6cf91fd23ac94865133cbfdb7e05c0ad"
+		}
+	],
+	"datatableInfo": {
+		"validations": [
+			{
+				"validationType": "sumOfColumns",
+				"validationValue": "[56525,33.215,24.252,26.713,19.393,25.560,34.759,41.443,46.683,37.916,48.787,18.613,20.974,54.325,14.798]"
+			},
+			{
+				"validationType": "sampleRow",
+				"validationParameter": "24",
+				"validationValue": "475,0.214,0.143,0.094,0.254,0.41,0.531,0.429,0.366,0.031,0.125,0.167,0.328,0.389,0.052"
+			},
+			{
+				"validationType": "numberOfColumns",
+				"validationValue": "100"
+			}
+		],
+		"interpolationMethod": "linear",
+		"extrapolationMethod": "zero",
+		"dataQuality": "approximated",
+		"columnHeaders": [
+			{
+				"title": "lambda",
+				"unit": "nm",
+				"quantity": "wavelength",
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "TCS01",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "7.5R6/4",
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "TCS02",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "5Y6/4",
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "TCS03",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "5GY6/8",
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "TCS04",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "2.5G6/6",
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "TCS05",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "10BG6/4",
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "TCS06",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "5PB6/8",
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "TCS07",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "2.5P6/8",
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "TCS08",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "10P6/8",
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "TCS09",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "4.5R4/13",
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "TCS10",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "5Y8/10",
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "TCS11",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "4.5G5/8",
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "TCS12",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "3PB3/11",
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "TCS13",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "5YR8/4",
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "TCS14",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "5GY4/4",
+				"wavelength_first": 360,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			}
+		]
+	},
+	"schemaName": "CIEmetaDigitalProduct",
+	"schemaVersion": 4,
+	"schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+}

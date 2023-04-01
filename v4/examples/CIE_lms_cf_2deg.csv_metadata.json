@@ -1,6 +1,6 @@
 {
 	"identifier": {
-		"identifier": "10.25039/CIE.DS.r4gcnrzc",
+		"identifier": "10.25039/CIE.DS.tijidesg",
 		"identifierType": "DOI"
 	},
 	"creators": [
@@ -11,11 +11,11 @@
 	],
 	"titles": [
 		{
-			"title": "CIE indoor daylight illuminant ID50"
+			"title": "CIE 2006 LMS cone fundamentals for 2° field size in terms of energy"
 		}
 	],
 	"publisher": "International Commission on Illumination (CIE), Vienna, AT",
-	"publicationYear": "2009",
+	"publicationYear": "2006",
 	"subjects": [
 		{
 			"subject": "Influence of the colour of the light"
@@ -27,18 +27,18 @@
 	"language": "en",
 	"alternateIdentifiers": [
 		{
-			"alternateIdentifier": "CIE_illum_ID50.csv",
+			"alternateIdentifier": "CIE_lms_cf_2deg.csv",
 			"alternateIdentifierType": "fileName"
 		}
 	],
 	"relatedItems": [
 		{
-			"relatedItemIdentifier": "10.25039/tr.184.2009",
+			"relatedItemIdentifier": "10.25039/tr.170-1.2006",
 			"relatedItemIdentifierType": "DOI",
 			"relationType": "IsPartOf",
 			"relatedItemType": "Report",
 			"titles": [
-				"CIE 184:2009 Indoor daylight illuminants"
+				"CIE 170-1:2006 Fundamental chromaticity diagram with physiological axes - Part 1"
 			]
 		}
 	],
@@ -51,7 +51,7 @@
 	},
 	"descriptions": [
 		{
-			"description": "Relative spectral power distribution of the daylight indoor illuminant ID50, wavelength range: 380 nm to 780 nm, wavelength increment: 5 nm, original source: CIE 184:2009 Table 2",
+			"description": "CIE 2006 LMS cone fundamentals for 2° field size in terms of energy, wavelength range: 390 nm to 830 nm, wavelength increment: 5 nm, original source: CIE 170-1:2006 table 6.7",
 			"descriptionType": "Abstract"
 		}
 	],
@@ -65,23 +65,23 @@
 	"checksums": [
 		{
 			"hashMethod": "md5",
-			"checksum": "fed40bf7ffc86b054b497f645d9f8fc3"
+			"checksum": "cc3bddcf208185ee607ffc7a9e8324b3"
 		},
 		{
 			"hashMethod": "sha256",
-			"checksum": "70541ed195eb91066d3a986d8d5cdd3cbfb2ab963f713022d2a88dfd59b849e2"
+			"checksum": "5bf3a226ef2baf01cef31820fe27932412c3979c6f28c2a613c44bf7d9c0ca40"
 		}
 	],
 	"datatableInfo": {
 		"validations": [
 			{
 				"validationType": "sumOfColumns",
-				"validationValue": "[52380,6820.49]"
+				"validationValue": "[54290,23.1959438599792,18.96436981202556,11.688018240482]"
 			},
 			{
 				"validationType": "sampleRow",
-				"validationParameter": "14",
-				"validationValue": "365,22.50"
+				"validationParameter": "32",
+				"validationValue": "545,0.919073,0.9971948,0.003168911"
 			}
 		],
 		"interpolationMethod": "linear",
@@ -92,16 +92,32 @@
 				"title": "lambda",
 				"unit": "nm",
 				"quantity": "wavelength",
-				"wavelength_first": 300,
-				"wavelength_last": 780,
+				"wavelength_first": 390,
+				"wavelength_last": 830,
 				"wavelength_step": 5
 			},
 			{
-				"title": "S_ID50(lambda)",
+				"title": "l_bar(lambda)",
 				"unit": "dimensionless",
-				"quantity": "spectral distribution",
-				"wavelength_first": 300,
-				"wavelength_last": 780,
+				"quantity": "spectral sensitivity",
+				"wavelength_first": 390,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "m_bar(lambda)",
+				"unit": "dimensionless",
+				"quantity": "spectral sensitivity",
+				"wavelength_first": 390,
+				"wavelength_last": 830,
+				"wavelength_step": 5
+			},
+			{
+				"title": "s_bar(lambda)",
+				"unit": "dimensionless",
+				"quantity": "spectral sensitivity",
+				"wavelength_first": 390,
+				"wavelength_last": 615,
 				"wavelength_step": 5
 			}
 		]

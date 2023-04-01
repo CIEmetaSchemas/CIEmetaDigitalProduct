@@ -1,0 +1,1014 @@
+{
+	"identifier": {
+		"identifier": "10.25039/CIE.DS.8svs5rqd",
+		"identifierType": "DOI"
+	},
+	"creators": [
+		{
+			"name": "International Commission on Illumination (CIE)",
+			"nameType": "Organizational"
+		}
+	],
+	"titles": [
+		{
+			"title": "Spectral radiance factors of 99 test samples for the CIE colour fidelity index calculation, 1nm wavelength steps"
+		}
+	],
+	"publisher": "International Commission on Illumination (CIE), Vienna, AT",
+	"publicationYear": "2017",
+	"subjects": [
+		{
+			"subject": "Perception of Colour"
+		},
+		{
+			"subject": "Colour of Objects"
+		},
+		{
+			"subject": "Colour Vision"
+		},
+		{
+			"subject": "Colorimetry"
+		}
+	],
+	"language": "en",
+	"alternateIdentifiers": [
+		{
+			"alternateIdentifier": "CIE_srf_cfi_1nm.csv",
+			"alternateIdentifierType": "fileName"
+		}
+	],
+	"relatedItems": [
+		{
+			"relatedItemIdentifier": "10.25039/tr.224.2017",
+			"relatedItemIdentifierType": "DOI",
+			"relationType": "IsSupplementTo",
+			"relatedItemType": "Report",
+			"titles": [
+				"CIE 224:2017 CIE 2017 Colour Fidelity Index for accurate scientific use"
+			]
+		},
+		{
+			"relatedItemIdentifier": "10.25039/CIE.DS.wi5idbqu",
+			"relatedItemIdentifierType": "DOI",
+			"relationType": "IsDerivedFrom",
+			"relatedItemType": "Dataset",
+			"titles": [
+				""
+			]
+		}
+	],
+	"formats": [
+		"text/csv"
+	],
+	"types": {
+		"resourceType": "dataTable",
+		"resourceTypeGeneral": "Dataset"
+	},
+	"descriptions": [
+		{
+			"description": "Spectral radiance factors of 99 test samples for the CIE colour fidelity index calculation, wavelength range: 380 nm to 780 nm, wavelength increment: 1 nm, original source: CIE 224:2017 toolbox (CIE 2017 Colour Fidelity Index Calculator 1 nm - V.3(2017-07-15).xlsx)",
+			"descriptionType": "Abstract"
+		}
+	],
+	"rightsList": [
+		{
+			"rights": "Creative Commons Attribution-ShareAlike 4.0 International",
+			"rightsURI": "https://creativecommons.org/licenses/by-sa/4.0/",
+			"rightsIdentifier": "CC BY-SA 4.0"
+		}
+	],
+	"checksums": [
+		{
+			"hashMethod": "md5",
+			"checksum": "5f8f0b2e6a30a8630bda424b85a1806d"
+		},
+		{
+			"hashMethod": "sha256",
+			"checksum": "32327de84b4bb8715a2b2f1bce3f5d2eca6276a44bde19c93c6faad5742db63"
+		}
+	],
+	"datatableInfo": {
+		"validations": [
+			{
+				"validationType": "sumOfColumns",
+				"validationValue": "[232580,287.137700000,172.439700000,44.781921792,161.916536240,160.052721872,131.790016288,90.089400000,109.033480000,21.361997632,210.979570000,142.775201216,152.554655520,61.122336736,171.833350000,174.113142896,108.385234512,119.885686496,98.727900000,142.293350000,178.134932736,239.449042752,199.762087040,292.562820448,257.683600000,139.059027040,255.285450000,150.931398560,37.964460096,232.724685104,111.074379856,237.535793328,183.498800000,260.962568928,83.923680000,36.929370000,187.198414128,99.126765120,227.790010736,29.811736000,62.484718368,282.862850000,129.633459264,111.690450000,19.863850000,70.809632512,99.594400000,182.174250000,126.438610800,44.927612464,68.574488640,84.833378432,35.145222896,49.577850000,250.302250000,226.429435312,127.660210000,71.694600000,64.746733232,244.428250000,280.568742624,180.278573136,180.799516032,37.432464416,90.865680000,29.469154064,52.081550000,61.291350000,119.942382080,81.036061856,169.293860416,43.121650000,190.715303904,144.200335584,61.879790144,37.406500000,86.560850000,81.600743648,108.953850640,241.703438928,198.066271984,114.400135120,301.824100000,214.821700000,21.974086320,78.303730976,216.592889888,60.241890032,196.454712448,106.988773712,78.310800000,206.445593152,154.211378688,190.916824688,122.936129776,214.680758192,256.230433024,87.246100000,187.079670000,138.931850000]"
+			},
+			{
+				"validationType": "sampleRow",
+				"validationParameter": "70",
+				"validationValue": "449,0.631978128,0.245216192,0.054528752,0.31530648,0.10013608,0.132872384,0.05740648,0.0570896,0.047526064,0.182880256,0.078749856,0.094080352,0.046426592,0.355958944,0.258503088,0.051193408,0.057661904,0.11193488,0.123711792,0.017874784,0.170595824,0.098769568,0.532660784,0.282809232,0.053046144,0.185744784,0.252462176,0.048244768,0.141923216,0.1218856,0.161224176,0.059953984,0.310354736,0.046888992,0.048831744,0.46982776,0.056595392,0.36486424,0.052677056,0.085629328,0.528328448,0.0700436,0.05707344,0.046958704,0.072631808,0.148870016,0.212137872,0.265366496,0.053451456,0.13928848,0.177691568,0.064153248,0.107259712,0.65488584,0.596696416,0.372023632,0.220134224,0.203563584,0.686129904,0.717720064,0.526523232,0.343522816,0.070260624,0.347658528,0.131238144,0.209766432,0.258225456,0.436160352,0.246835728,0.691786608,0.161973088,0.541124896,0.572074048,0.05340384,0.155905968,0.479926128,0.28933784,0.44658168,0.644808112,0.576378944,0.334390272,0.78803368,0.596017648,0.0614604,0.169571152,0.567652352,0.238682848,0.457309968,0.179856976,0.226465968,0.583717616,0.298743328,0.406746064,0.147163264,0.46335424,0.578037264,0.23227472,0.337451536,0.194289616"
+			},
+			{
+				"validationType": "numberOfColumns",
+				"validationValue": "100"
+			}
+		],
+		"interpolationMethod": "linear",
+		"extrapolationMethod": "zero",
+		"dataQuality": "approximated",
+		"columnHeaders": [
+			{
+				"title": "lambda",
+				"unit": "nm",
+				"quantity": "wavelength",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #1",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #2",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #3",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #4",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #5",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Paints",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #6",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #7",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Plastic",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #8",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Paints",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #9",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #10",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Color System",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #11",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #12",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #13",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #14",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Plastic",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #15",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Skin",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #16",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #17",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #18",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Skin",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #19",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Plastic",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #20",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #21",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Paints",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #22",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Paints",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #23",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Color System",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #24",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Plastic",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #25",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #26",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #27",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #28",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Color System",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #29",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #30",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #31",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Paints",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #32",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #33",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Paints",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #34",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Color System",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #35",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Color System",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #36",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #37",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #38",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #39",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #40",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #41",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #42",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #43",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #44",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #45",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Color System",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #46",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Plastic",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #47",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #48",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Paints",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #49",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Paints",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #50",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #51",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #52",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #53",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Plastic",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #54",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #55",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Color System",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #56",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Color System",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #57",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #58",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Paints",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #59",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Plastic",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #60",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Color System",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #61",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #62",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #63",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #64",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Plastic",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #65",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #66",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Plastic",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #67",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Plastic",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #68",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #69",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #70",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #71",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #72",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #73",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #74",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #75",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #76",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #77",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #78",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #79",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #80",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Color System",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #81",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #82",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #83",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #84",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #85",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #86",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #87",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #88",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #89",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #90",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Plastic",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #91",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #92",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #93",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Paints",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #94",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #95",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #96",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Nature",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #97",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Printed",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #98",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Textiles",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			},
+			{
+				"title": "Sample #99",
+				"unit": "dimensionless",
+				"quantity": "spectral radiance factor",
+				"descrition": "Sample Type:  Plastic",
+				"wavelength_first": 380,
+				"wavelength_last": 780,
+				"wavelength_step": 1
+			}
+		]
+	},
+	"schemaName": "CIEmetaDigitalProduct",
+	"schemaVersion": 4,
+	"schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+}
