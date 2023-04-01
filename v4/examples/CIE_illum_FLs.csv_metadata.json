@@ -61,6 +61,13 @@
 			"descriptionType": "Abstract"
 		}
 	],
+	"rightsList": [
+		{
+			"validationType": "Creative Commons Attribution-ShareAlike 4.0 International",
+			"validationParameter": "https://creativecommons.org/licenses/by-sa/4.0/",
+			"validationValue": "CC BY-SA 4.0"
+		}
+	],
 	"checksums": [
 		{
 			"hashMethod": "md5",
