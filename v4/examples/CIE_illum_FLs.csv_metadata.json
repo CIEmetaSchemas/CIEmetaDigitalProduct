@@ -43,7 +43,9 @@
 			"relationType": "IsPartOf",
 			"relatedItemIdentifier": "10.25039/tr.015.2018",
 			"relatedItemIdentifierType": "DOI",
-			"title":"Colorimetry, 4th edition"
+			"titles": [ 
+				"Colorimetry, 4th edition"
+				]
 		}
 	],
 	"formats": [
