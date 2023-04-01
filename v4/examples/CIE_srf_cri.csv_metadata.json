@@ -88,7 +88,7 @@
 			},
 			{
 				"validationType": "numberOfColumns",
-				"validationValue": "100"
+				"validationValue": "15"
 			}
 		],
 		"interpolationMethod": "linear",
