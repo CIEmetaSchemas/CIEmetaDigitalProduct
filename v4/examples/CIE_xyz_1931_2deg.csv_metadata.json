@@ -39,7 +39,7 @@
 			"relatedItemIdentifier": "10.25039/IS.ISO_CIE.11664-1.2019",
 			"relatedItemIdentifierType": "DOI",
 			"relationType": "IsPartOf",
-			"relatedItemType": "Report",
+			"relatedItemType": "Standard",
 			"titles": [
 				"ISO/CIE 11664-1:2019 Colorimetry — Part 1: CIE standard colorimetric observers"
 			]
@@ -50,7 +50,7 @@
 			"relationType": "IsPartOf",
 			"relatedItemType": "Report",
 			"titles": [
-				""
+				"CIE 018:2019 The Basis of Physical Photometry, 3rd Edition"
 			]
 		},
 		{
@@ -59,7 +59,7 @@
 			"relationType": "IsReferencedBy",
 			"relatedItemType": "Report",
 			"titles": [
-				""
+				"CIE 015:2018 Colorimetry, 4th Edition"
 			]
 		}
 	],
