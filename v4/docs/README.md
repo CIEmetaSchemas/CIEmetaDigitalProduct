@@ -290,7 +290,7 @@ The property can have the following values:
 |CIE 2.4.1|title|R|
 |CIE 2.4.2|quantity|R|
 |CIE 2.4.3|unit|R|
-|CIE 2.4.4|descrition|O|
+|CIE 2.4.4|description|O|
 |CIE 2.4.5|wavelength_first|O|
 |CIE 2.4.6|wavelength_last|O|
 |CIE 2.4.7|wavelength_step|O|
