@@ -135,7 +135,7 @@ Use MIME type where possible (see https://www.iana.org/assignments/media-types/m
 Example:
 ![image](https://user-images.githubusercontent.com/102721116/193690308-590e5880-9dba-4625-a18f-71b67288b070.png)
 
-Recommendation: The standard data format for CIE data table is CSV according RFC4180 (https://datatracker.ietf.org/doc/html/rfc4180 ), without header line. The fields are separated by comma. Other formats can be included however, a reference to the format description shall be provided.
+Recommendation: The standard data format for CIE data table is CSV according RFC4180 (https://datatracker.ietf.org/doc/html/rfc4180 ), without header line. The fields are separated by comma. Other formats can be included however, a reference to the format description shall be provided. "Nan" shall be used iIn case a value is not defined in a data-table 
 
 |ID|Property|Obligation|
 |---|---|---|
