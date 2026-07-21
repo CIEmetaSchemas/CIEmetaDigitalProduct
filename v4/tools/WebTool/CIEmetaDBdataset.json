@@ -2,8 +2,12 @@
   "dbSchemaName": "CIEmetaDB",
   "dbSchemaVersion": 1,
   "dbId": "4cd12818-04ed-4654-b9f7-dbf622b029d1",
+  "title": "CIE data-table metadatabase",
+  "description": "Curated CIEmetaDigitalProduct metadata for the CIE published data tables (https://cie.co.at/data-tables).",
   "baseHash": "452d1f81ebf0fd365b6fc04e3b166804f5f7fe5c6f761327c2a25a2b74a61290",
   "generatedAt": "2026-07-21T18:52:46.641Z",
+  "lastModifiedDate": "2026-07-21T18:52:46.641Z",
+  "lastModifiedBy": "peter.blattner@metas.ch",
   "domains": [
     {
       "code": "D1",

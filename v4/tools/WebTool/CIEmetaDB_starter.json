@@ -2,8 +2,12 @@
   "dbSchemaName": "CIEmetaDB",
   "dbSchemaVersion": 1,
   "dbId": "c4d247e0-ad8a-f983-eaf1-abd993d11eea",
+  "title": "CIE Metadatabase — starter (example records)",
+  "description": "Starter database assembled from the example CIEmetaDigitalProduct records shipped with the tool.",
   "baseHash": "e5fea3d4f479e53ae8e04694198e00825bedafcb27f426feb5b866fcd6be8458",
   "generatedAt": "2024-01-01T00:00:00.000Z",
+  "lastModifiedDate": "2024-01-01T00:00:00.000Z",
+  "lastModifiedBy": "import",
   "domains": [
     {
       "code": "D1",

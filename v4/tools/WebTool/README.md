@@ -75,8 +75,14 @@ becomes *unsaved* until you Save the entry.
 ## Data model (metadatabase envelope)
 
 The database is a single JSON object: metadata about the DB, an editable catalogue
-of **domains**, an editable **defaults** block, and an array of **entries**. Each
-entry wraps the DataCite payload with curation metadata:
+of **domains**, an editable **defaults** block, and an array of **entries**.
+
+DB-level metadata includes a **`title`** and **`description`** (free text) plus
+**`lastModifiedDate`** / **`lastModifiedBy`**, which are stamped automatically on
+every change. View them — and edit the title and description — with the **ⓘ DB info**
+button in the toolbar (next to *Save DB*).
+
+Each entry wraps the DataCite payload with curation metadata:
 
 ```
 entry
