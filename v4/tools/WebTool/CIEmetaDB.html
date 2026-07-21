@@ -65,6 +65,10 @@
   .badge.review{background:#e0ecfb;color:#0a4aa0}
   .badge.published{background:#dcf1e5;color:#12683f}
   .badge.proposed{background:#fbe6e6;color:#9a2a24}
+  .badge.dup{background:#f7d7d4;color:#8f2721;border:1px solid #e39a94}
+  .db-warning{background:#fbe6e6;color:#8f2721;border-bottom:1px solid #e6b3b0;padding:9px 16px;font-size:13px}
+  .db-warning b{font-weight:700}
+  .db-warning a{color:#8f2721;text-decoration:underline;cursor:pointer;font-family:Consolas,monospace}
   .detail-pane{overflow:auto;min-height:0;padding:0}
   .empty{color:var(--muted);padding:40px;text-align:center}
   .detail-head{position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--line);padding:12px 18px;z-index:5}
@@ -148,6 +152,8 @@
   <button id="btnExportDataCite" class="ghost">Export Metadata&hellip;</button>
   <span class="kv" id="dbStat"></span>
 </div>
+
+<div id="dbWarning" class="db-warning" style="display:none"></div>
 
 <div class="wrap">
   <div class="list-pane">
@@ -724,9 +730,28 @@ function entryFilename(e){
   const a=(e.payload&&e.payload.alternateIdentifiers)||[];
   const f=a.find(x=>x.alternateIdentifierType==="fileName"); return f?f.alternateIdentifier:"";
 }
+/* DOIs must be unique: map of doi -> [entries] for any DOI used more than once */
+function duplicateDoiMap(){
+  const m=new Map();
+  if(!DB) return m;
+  for(const e of DB.entries){ const d=entryDoi(e); if(!d) continue; if(!m.has(d)) m.set(d,[]); m.get(d).push(e); }
+  for(const [k,v] of [...m]) if(v.length<2) m.delete(k);
+  return m;
+}
+function updateDbWarning(dups){
+  const w=el("dbWarning"); if(!w) return;
+  if(!dups || dups.size===0){ w.style.display="none"; w.innerHTML=""; return; }
+  const items=[...dups.entries()].map(([doi,list])=>`<a data-doi="${esc(doi)}" title="Show these entries">${esc(doi)}</a> ×${list.length}`).join(", ");
+  const n=dups.size;
+  w.innerHTML=`⚠ <b>Duplicate DOI${n>1?"s":""} — must be fixed:</b> ${items}. Every dataset must have a unique DOI; give each conflicting entry its own identifier (or remove the duplicate).`;
+  w.style.display="block";
+  w.querySelectorAll("a[data-doi]").forEach(a=>{ a.onclick=()=>{ el("search").value=a.dataset.doi; renderList(); }; });
+}
 function renderList(){
   const q=el("search").value.trim().toLowerCase();
   const fd=el("filterDomain").value, fs=el("filterStatus").value;
+  const dups=duplicateDoiMap();
+  const dupIds=new Set(); dups.forEach(list=>list.forEach(e=>dupIds.add(e.entryId)));
   let rows=DB?DB.entries.slice():[];
   if(q) rows=rows.filter(e=>{
     const hay=[entryTitle(e),entryDoi(e),entryFilename(e),
@@ -754,12 +779,13 @@ function renderList(){
     const doms=(e.domains||[]).map(d=>`<span class="chip dom">${esc(d)}</span>`).join("");
     tr.innerHTML=`<td><div class="title-cell">${esc(entryTitle(e))}</div>
         <div class="kv">${esc(entryFilename(e))}</div>${doms}</td>
-      <td><div class="doi-cell">${esc(entryDoi(e))}</div>${e.idProposed?'<span class="badge proposed">proposed</span>':''}</td>
+      <td><div class="doi-cell">${esc(entryDoi(e))}</div>${e.idProposed?'<span class="badge proposed">proposed</span>':''}${dupIds.has(e.entryId)?'<span class="badge dup" title="Duplicate DOI — must be fixed">duplicate DOI</span>':''}</td>
       <td><span class="badge ${esc(e.status)}">${esc(e.status)}</span></td>
       <td class="kv">${esc((e.audit.modifiedDate||"").slice(0,10))}<br>${esc(e.audit.modifiedBy)}<br>rev ${e.rev}</td>`;
     tr.onclick=()=>selectEntry(e.entryId);
     tb.appendChild(tr);
   }
+  updateDbWarning(dups);
   el("listEmpty").style.display = rows.length?"none":"block";
   el("dbStat").textContent = DB?`${total} entr${total===1?"y":"ies"}${dbFileHandle?" · "+dbFileHandle.name:""}`:"";
   el("listCount").textContent = DB?(`Showing ${rows.length} of ${total} ${total===1?"entry":"entries"}`+((rows.length!==total)?" (filtered)":"")):"";
@@ -908,7 +934,14 @@ function renderForm(page,e){
   const cbp=document.createElement("input"); cbp.type="checkbox"; cbp.style.width="auto"; cbp.checked=!!editMeta.idProposed;
   cbp.onchange=()=>{ editMeta.idProposed=cbp.checked; markDirty(); };
   idProp.appendChild(cbp); idProp.appendChild(document.createTextNode(" DOI is a local proposal (not yet assigned by CIE CB)"));
-  fsId.appendChild(gi); fsId.appendChild(idHint); fsId.appendChild(idProp); page.appendChild(fsId);
+  fsId.appendChild(gi); fsId.appendChild(idHint); fsId.appendChild(idProp);
+  const curDoi=p.identifier&&p.identifier.identifier;
+  if(curDoi && DB.entries.some(x=>x.entryId!==e.entryId && entryDoi(x)===curDoi)){
+    const dw=document.createElement("div"); dw.className="hint"; dw.style.color="var(--err)"; dw.style.fontWeight="600"; dw.style.marginTop="4px";
+    dw.textContent="⚠ This DOI is already used by another entry — DOIs must be unique. Change it before saving.";
+    fsId.appendChild(dw);
+  }
+  page.appendChild(fsId);
 
   // core fields
   const fsCore=document.createElement("fieldset"); fsCore.innerHTML='<legend>Core (DataCite mandatory)</legend>';
@@ -1274,6 +1307,10 @@ function saveEntry(){
   const e=findEntry(selectedId); if(!e) return;
   const errs=validate(editModel,CIE_SCHEMA);
   if(errs.length){ if(!confirm("The entry has "+errs.length+" schema issue(s):\n\n"+errs.slice(0,10).join("\n")+(errs.length>10?"\n…":"")+"\n\nSave anyway?")) return; }
+  const curDoi=editModel.identifier&&editModel.identifier.identifier;
+  if(curDoi && DB.entries.some(x=>x.entryId!==e.entryId && entryDoi(x)===curDoi)){
+    if(!confirm("Another entry already uses this DOI:\n"+curDoi+"\n\nDOIs must be unique. Save anyway (the database will flag it as a duplicate to fix)?")) return;
+  }
   const patch=diffPatch(e.payload,editModel,"");
   const meta=metaChanged(e);
   if(patch.length===0 && !meta){ toast("No changes to save"); editDirty=false; renderDetail(); return; }
@@ -1472,22 +1509,74 @@ function migrateDb(obj){
   return obj;
 }
 
-/* import individual DataCite metadata files as new entries (or merge) */
+/* import individual DataCite metadata files as new entries, checking DOI conflicts */
 function importDataCiteObjects(objs){
-  let added=0;
+  const byDoi=new Map(); DB.entries.forEach(e=>{ const d=entryDoi(e); if(d) byDoi.set(d,e); });
+  const conflicts=[]; let added=0, noId=0;
   for(const o of objs){
+    const doi=o&&o.identifier&&o.identifier.identifier;
+    if(!doi){ noId++; }
+    if(doi && byDoi.has(doi)){ conflicts.push({inc:o, existing:byDoi.get(doi), doi}); continue; } // DOI already present (DB or earlier in this batch)
     const e=createEntry(o,{status:"published",idProposed:false,comment:"Imported from DataCite file"});
-    // infer domains from subjects? leave empty; curator assigns
     DB.entries.push(e); added++;
+    if(doi) byDoi.set(doi,e);
   }
-  persist(); refreshDomainFilter(); renderList(); toast(`Imported ${added} DataCite file(s) as entries`,"ok");
+  persist(); refreshDomainFilter(); renderList();
+  if(noId) toast(`${noId} imported file(s) had no DOI identifier`,"err");
+  if(conflicts.length) openImportConflictDialog(conflicts, added);
+  else toast(`Imported ${added} DataCite file(s) as entries`,"ok");
+}
+
+/* resolve DataCite-import files whose DOI already exists in the database */
+function openImportConflictDialog(conflicts, added){
+  let i=0; const resolutions=[];
+  const body=document.createElement("div");
+  const warn=document.createElement("div"); warn.className="warnrow";
+  warn.textContent="These imported files carry a DOI that already exists in the database. Choose what to do with each.";
+  body.appendChild(warn);
+  const nav=document.createElement("p"); nav.className="hint"; body.appendChild(nav);
+  const area=document.createElement("div"); body.appendChild(area);
+  function payloadBox(title,payload){
+    const d=document.createElement("div"); d.className="conflict";
+    d.innerHTML=`<h4>${esc(title)}</h4>`;
+    const s=document.createElement("div"); s.className="side"; const pre=document.createElement("pre");
+    pre.textContent=JSON.stringify(payload,null,1); s.appendChild(pre); d.appendChild(s); return d;
+  }
+  function paint(){
+    const c=conflicts[i];
+    nav.innerHTML=`DOI conflict ${i+1} of ${conflicts.length}: <span class="mono">${esc(c.doi)}</span>`;
+    area.innerHTML="";
+    const cols=document.createElement("div"); cols.className="cols2";
+    cols.appendChild(payloadBox(`Existing entry (rev ${c.existing.rev}, ${esc(c.existing.status)})`, c.existing.payload));
+    cols.appendChild(payloadBox("Imported file", c.inc));
+    area.appendChild(cols);
+    const pick=document.createElement("div"); pick.style.marginTop="10px"; pick.style.display="flex"; pick.style.gap="8px"; pick.style.flexWrap="wrap";
+    pick.appendChild(mkBtn("Skip (keep existing)","ghost",()=>{ resolutions[i]="skip"; next(); }));
+    pick.appendChild(mkBtn("Update existing (new revision)","sec",()=>{ resolutions[i]="update"; next(); }));
+    pick.appendChild(mkBtn("Import anyway (duplicate DOI)","ghost",()=>{ resolutions[i]="dup"; next(); }));
+    area.appendChild(pick);
+  }
+  function next(){ i++; if(i>=conflicts.length) finish(); else paint(); }
+  function finish(){
+    let updated=0, dup=0, skipped=0;
+    conflicts.forEach((c,idx)=>{
+      const r=resolutions[idx]||"skip";
+      if(r==="update"){ if(commitEdit(c.existing, c.inc, "Updated from imported DataCite file")) updated++; else skipped++; }
+      else if(r==="dup"){ const e=createEntry(c.inc,{status:"published",idProposed:false,comment:"Imported (duplicate DOI kept)"}); DB.entries.push(e); dup++; }
+      else skipped++;
+    });
+    persist(); refreshDomainFilter(); renderList(); if(selectedId) selectEntry(selectedId,true); closeModal();
+    toast(`Import: ${added} added, ${updated} updated, ${dup} duplicate(s), ${skipped} skipped`,"ok");
+  }
+  paint();
+  modal("Resolve import DOI conflicts",body,[mkBtn("Skip remaining","ghost",finish)]);
 }
 
 /* Import/Merge dialog: aggregate DB merge OR datacite files */
 function openImportDialog(){
   const body=document.createElement("div");
   const p=document.createElement("p"); p.className="hint";
-  p.textContent="Import one or more DataCite *.csv_metadata.json files (added as entries), or another CIEmetaDB database file (merged with per-entry conflict detection).";
+  p.textContent="Import one or more DataCite *.csv_metadata.json files (added as entries; existing DOIs are detected and you resolve each), or another CIEmetaDB database file (merged with per-entry and per-DOI conflict detection).";
   body.appendChild(p);
   const f=document.createElement("input"); f.type="file"; f.multiple=true; f.accept=".json,application/json";
   body.appendChild(f);
@@ -1514,10 +1603,15 @@ function openImportDialog(){
 function mergeDb(incoming){
   if(!DB){ DB=incoming; persist(); refreshDomainFilter(); renderList(); return; }
   const mine=new Map(DB.entries.map(e=>[e.entryId,e]));
+  const byDoi=new Map(); DB.entries.forEach(e=>{ const d=entryDoi(e); if(d) byDoi.set(d,e); });
   const conflicts=[]; let autoMerged=0, addedNew=0;
   for(const inc of incoming.entries){
     const cur=mine.get(inc.entryId);
-    if(!cur){ DB.entries.push(inc); addedNew++; continue; }
+    if(!cur){
+      const d=entryDoi(inc);
+      if(d && byDoi.has(d)){ conflicts.push({cur:byDoi.get(d), inc}); continue; } // same DOI, different entryId → conflict
+      DB.entries.push(inc); addedNew++; if(d) byDoi.set(d,inc); continue;
+    }
     if(cur.contentHash===inc.contentHash){ /* identical, keep higher history */ if(inc.history.length>cur.history.length){ cur.history=inc.history; cur.rev=inc.rev; } continue; }
     // diverged: determine common ancestor by rev/history baseHash
     const curBase=cur.history.length?cur.history[cur.history.length-1].baseHash:null;

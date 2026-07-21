@@ -107,6 +107,14 @@ For translations, which reuse the number with an appended ISO-639-1 language suf
 The DOI shown under the entry title is a link to `https://doi.org/<identifier>`
 (opens in a new tab).
 
+**DOIs must be unique.** If two entries ever share the same DOI (via a manual edit,
+an "import anyway" choice, or a merge), a red **warning banner** appears above the
+list naming the duplicated DOI(s) with a *must be fixed* message, the affected rows
+get a **duplicate DOI** badge, the editor shows an inline warning, and saving a
+colliding DOI asks for confirmation. Clicking a DOI in the banner filters the list
+to the offending entries. Note that translated datasets use a distinct
+language-suffixed identifier (e.g. `…mifmy4x4.ES`) and therefore do not collide.
+
 ### The `proposed` flag
 
 Real CIE DOIs are assigned by **CIE CB**, not by this tool. When you *generate* a
@@ -164,7 +172,23 @@ one, per entry (matched by `entryId`):
   side-by-side dialog lets you **keep mine**, **take theirs**, or **keep both**
   (the incoming version is added as a new draft copy).
 
-New entries present only in the incoming file are added.
+New entries present only in the incoming file are added — unless an incoming entry
+has a **DOI that already exists** under a different internal id, in which case it is
+raised as a conflict (same dialog) rather than silently duplicated.
+
+### Importing DataCite files — DOI check
+
+When importing individual `*.csv_metadata.json` files, each incoming DOI is checked
+against the database (and against others in the same batch). A file whose DOI is
+already present raises a **DOI-conflict** dialog per entry, with the existing entry
+and the imported file shown side by side, and three choices:
+
+- **Skip** — keep the existing entry, ignore the import.
+- **Update existing (new revision)** — apply the imported metadata to the existing
+  entry as a new tracked revision (history preserved).
+- **Import anyway (duplicate DOI)** — add it as a separate entry (use with care).
+
+Files without a DOI identifier are reported and not imported.
 
 ## Domains (CIE activity divisions)
 
