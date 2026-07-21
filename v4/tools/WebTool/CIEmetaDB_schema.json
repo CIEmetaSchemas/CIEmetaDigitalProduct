@@ -154,12 +154,28 @@
 			"type": "string",
 			"description": "Stable identity of this metadatabase instance."
 		},
+		"title": {
+			"type": "string",
+			"description": "Human-readable title of this metadatabase."
+		},
+		"description": {
+			"type": "string",
+			"description": "Free-text description of this metadatabase."
+		},
 		"baseHash": {
 			"type": "string",
 			"description": "sha256 over the ordered list of entry contentHashes at export time. Concurrency anchor: an importing app compares this to detect divergence."
 		},
 		"generatedAt": {
 			"$ref": "#/definitions/isoDateTime"
+		},
+		"lastModifiedDate": {
+			"$ref": "#/definitions/isoDateTime",
+			"description": "When the database (any entry or DB-level field) was last modified."
+		},
+		"lastModifiedBy": {
+			"type": "string",
+			"description": "Editor identity that last modified the database."
 		},
 		"domains": {
 			"type": "array",
