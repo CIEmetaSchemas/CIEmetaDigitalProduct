@@ -253,7 +253,17 @@ const DEFAULT_VALUES = {
   rightsIdentifier: "CC BY-SA 4.0",
   interpolationMethod: "linear",
   extrapolationMethod: "zero",
-  dataQuality: "nominal"
+  dataQuality: "nominal",
+  // Crossref deposit header / database-level metadata (used by "Export Crossref XML")
+  crDepositorName: "CIE",
+  crDepositorEmail: "ciecb@cie.co.at",
+  crRegistrant: "International Commission on Illumination (CIE)",
+  crDatabaseTitle: "CIEdataTableDatabase",
+  crPublisherName: "International Commission on Illumination (CIE)",
+  crInstitutionName: "International Commission on Illumination",
+  crInstitutionAcronym: "CIE",
+  crInstitutionPlace: "Vienna,AT",
+  crInstitutionDepartment: "CIE Central Bureau"
 };
 
 /* enum catalogues (from CIEmetaDigitalProduct_schema_04.json) */
@@ -285,7 +295,16 @@ const DEFAULT_FIELDS = [
   {key:"rightsIdentifier", label:"Rights identifier"},
   {key:"interpolationMethod", label:"Interpolation method", options:ENUMS.interpolationMethod},
   {key:"extrapolationMethod", label:"Extrapolation method", options:ENUMS.extrapolationMethod},
-  {key:"dataQuality", label:"Data quality", options:ENUMS.dataQuality}
+  {key:"dataQuality", label:"Data quality", options:ENUMS.dataQuality},
+  {key:"crDepositorName", label:"Crossref: depositor name"},
+  {key:"crDepositorEmail", label:"Crossref: depositor email"},
+  {key:"crRegistrant", label:"Crossref: registrant"},
+  {key:"crDatabaseTitle", label:"Crossref: database title"},
+  {key:"crPublisherName", label:"Crossref: publisher name"},
+  {key:"crInstitutionName", label:"Crossref: institution name"},
+  {key:"crInstitutionAcronym", label:"Crossref: institution acronym"},
+  {key:"crInstitutionPlace", label:"Crossref: institution place"},
+  {key:"crInstitutionDepartment", label:"Crossref: institution department"}
 ];
 /* build the default single creator / rights objects from db.defaults */
 function defaults(){ return (DB && DB.defaults) || DEFAULT_VALUES; }
@@ -640,6 +659,7 @@ function createEntry(payload, opts){
   const e={
     entryId:uuid(), rev:1, contentHash:contentHash(payload),
     status:opts.status||"draft", idProposed:!!opts.idProposed,
+    landingPage:opts.landingPage||"",
     domains:opts.domains||[],
     audit:{createdBy:user, createdDate:now, modifiedBy:user, modifiedDate:now, modifiedComment:opts.comment||"Created"},
     payload:clone(payload),
@@ -850,11 +870,11 @@ function selectEntry(id, keepTab){
   selectedId=id; editDirty=false;
   const e=findEntry(id);
   editModel = e?clone(e.payload):null;
-  editMeta = e?{status:e.status, domains:clone(e.domains||[]), idProposed:!!e.idProposed}:null;
+  editMeta = e?{status:e.status, domains:clone(e.domains||[]), idProposed:!!e.idProposed, landingPage:e.landingPage||""}:null;
   if(!keepTab) activeTab="form";
   renderList(); renderDetail();
 }
-function resetEditMeta(e){ editMeta = {status:e.status, domains:clone(e.domains||[]), idProposed:!!e.idProposed}; }
+function resetEditMeta(e){ editMeta = {status:e.status, domains:clone(e.domains||[]), idProposed:!!e.idProposed, landingPage:e.landingPage||""}; }
 function markDirty(){ editDirty=true; syncJsonView(); const s=el("saveState"); if(s) s.textContent="● unsaved"; }
 
 function renderDetail(){
@@ -867,6 +887,7 @@ function renderDetail(){
   head.innerHTML=`<h2>${esc(entryTitle(e))}</h2>
     <div class="meta">
       ${doi?`<a class="mono doi-link" href="https://doi.org/${esc(doi)}" target="_blank" rel="noopener noreferrer">https://doi.org/${esc(doi)}</a>`:'<span class="mono">(no DOI)</span>'}
+      ${e.landingPage?`<a class="mono doi-link" href="${esc(e.landingPage)}" target="_blank" rel="noopener noreferrer" title="DOI landing page (Crossref resource)">↪ landing page</a>`:'<span class="mono" style="color:var(--muted)">(no landing page)</span>'}
       <span>rev ${e.rev}</span>
       <span>created ${esc((e.audit.createdDate||"").slice(0,10))} by ${esc(e.audit.createdBy)}</span>
       <span>modified ${esc((e.audit.modifiedDate||"").slice(0,10))} by ${esc(e.audit.modifiedBy)}</span>
@@ -880,6 +901,7 @@ function renderDetail(){
       <button class="ghost" id="btnValidateCsv">Validate against CSV&hellip;</button>
       <button class="ghost" id="btnDupe">Duplicate</button>
       <button class="ghost" id="btnExportOne">Export Metadata file</button>
+      <button class="ghost" id="btnExportCrossref">Export Crossref XML&hellip;</button>
       <button class="danger" id="btnDelete">Delete</button>
     </div>`;
   pane.appendChild(head);
@@ -900,6 +922,7 @@ function renderDetail(){
   el("btnRevertDefaults").onclick=revertToDefaults;
   el("btnDupe").onclick=()=>duplicateEntry(e);
   el("btnExportOne").onclick=()=>exportDataCiteFiles([e]);
+  el("btnExportCrossref").onclick=()=>exportCrossrefXml(e);
   el("btnDelete").onclick=()=>deleteEntry(e);
   if(editDirty) el("saveState").textContent="● unsaved";
 
@@ -962,6 +985,7 @@ function renderForm(page,e){
     lab.appendChild(cb); lab.appendChild(document.createTextNode(d.code+" "+d.label)); domWrap.appendChild(lab);
   });
   gm.appendChild(field("Domains", domWrap));
+  gm.appendChild(field("DOI landing page (Crossref resource URL)", inp(editMeta,"landingPage",{placeholder:"https://cie.co.at/datatable/…"})));
   fsMeta.appendChild(gm); page.appendChild(fsMeta);
 
   // identifier
@@ -1355,6 +1379,7 @@ function metaChanged(e){
   if(!editMeta) return false;
   return editMeta.status!==e.status
     || !!editMeta.idProposed!==!!e.idProposed
+    || (editMeta.landingPage||"")!==(e.landingPage||"")
     || canonical((editMeta.domains||[]).slice().sort())!==canonical((e.domains||[]).slice().sort());
 }
 function saveEntry(){
@@ -1375,7 +1400,7 @@ function saveEntry(){
     commitEdit(e,editModel,comment);
   }
   if(meta){
-    e.status=editMeta.status; e.domains=clone(editMeta.domains); e.idProposed=editMeta.idProposed;
+    e.status=editMeta.status; e.domains=clone(editMeta.domains); e.idProposed=editMeta.idProposed; e.landingPage=editMeta.landingPage||"";
     if(!patch.length){ e.audit.modifiedBy=currentUser(); e.audit.modifiedDate=nowISO(); }
   }
   resetEditMeta(e); editDirty=false; persist(); renderList(); renderDetail();
@@ -1392,7 +1417,7 @@ function duplicateEntry(e){
   const p=clone(e.payload);
   if(p.identifier) p.identifier.identifier=doi;
   if(p.titles&&p.titles[0]) p.titles[0].title=(p.titles[0].title||"")+" (copy)";
-  const ne=createEntry(p,{status:"draft",idProposed:true,domains:clone(e.domains||[]),comment:"Duplicated from "+entryDoi(e)});
+  const ne=createEntry(p,{status:"draft",idProposed:true,domains:clone(e.domains||[]),landingPage:e.landingPage||"",comment:"Duplicated from "+entryDoi(e)});
   DB.entries.push(ne); persist(); selectEntry(ne.entryId); toast("Duplicated as new draft with proposed DOI","ok");
 }
 
@@ -1521,7 +1546,7 @@ function persist(){
   try{ localStorage.setItem(APP.LS_DB, JSON.stringify(DB)); }catch(e){ /* quota */ }
 }
 function loadWorkingCopy(){
-  try{ const s=localStorage.getItem(APP.LS_DB); if(s){ DB=JSON.parse(s); lastLoadedBaseHash=DB.baseHash; return true; } }catch(e){}
+  try{ const s=localStorage.getItem(APP.LS_DB); if(s){ DB=migrateDb(JSON.parse(s)); lastLoadedBaseHash=DB.baseHash; return true; } }catch(e){}
   return false;
 }
 const hasFSA = ("showOpenFilePicker" in window) && ("showSaveFilePicker" in window);
@@ -1555,7 +1580,7 @@ function migrateDb(obj){
   obj.domains=obj.domains||clone(DEFAULT_DOMAINS);
   obj.defaults=Object.assign(clone(DEFAULT_VALUES), obj.defaults||{}); // seed/fill missing default keys
   obj.entries=(obj.entries||[]).map(e=>{
-    e.domains=e.domains||[]; e.history=e.history||[{rev:e.rev||1,by:"import",date:e.audit?e.audit.modifiedDate:nowISO(),comment:"Imported",baseHash:null,patch:diffPatch({},e.payload,"")}];
+    e.domains=e.domains||[]; if(e.landingPage==null) e.landingPage=""; e.history=e.history||[{rev:e.rev||1,by:"import",date:e.audit?e.audit.modifiedDate:nowISO(),comment:"Imported",baseHash:null,patch:diffPatch({},e.payload,"")}];
     if(e.contentHash==null) e.contentHash=contentHash(e.payload);
     if(e.rev==null) e.rev=e.history.length;
     return e;
@@ -1775,6 +1800,180 @@ function exportDataCiteFiles(entries){
   step();
 }
 function sanitize(s){ return String(s).replace(/[^\w.-]+/g,"_").slice(0,80); }
+
+/* ============================================================================
+   Crossref XML export (DOI-registration deposit, Crossref schema 5.3.1)
+   ==========================================================================*/
+/* Map DataCite relationType -> Crossref relations.xsd relation.
+   work:"inter" => <inter_work_relation>, "intra" => <intra_work_relation>.
+   relationType values not listed here have no Crossref equivalent and are
+   skipped (and reported): IsDescribedBy, Describes, HasMetadata, IsMetadataFor,
+   IsPublishedIn. Adjust the mapping here if the desired relation differs. */
+const CROSSREF_RELATION_MAP = {
+  IsPartOf:{type:"isPartOf",work:"inter"},
+  HasPart:{type:"hasPart",work:"inter"},
+  References:{type:"references",work:"inter"},
+  IsReferencedBy:{type:"isReferencedBy",work:"inter"},
+  Cites:{type:"references",work:"inter"},
+  IsCitedBy:{type:"isReferencedBy",work:"inter"},
+  IsDerivedFrom:{type:"isDerivedFrom",work:"inter"},
+  IsSourceOf:{type:"hasDerivation",work:"inter"},
+  IsDocumentedBy:{type:"isDocumentedBy",work:"inter"},
+  Documents:{type:"documents",work:"inter"},
+  IsSupplementTo:{type:"isSupplementTo",work:"inter"},
+  IsSupplementedBy:{type:"isSupplementedBy",work:"inter"},
+  IsContinuedBy:{type:"isContinuedBy",work:"inter"},
+  Continues:{type:"continues",work:"inter"},
+  IsCompiledBy:{type:"isCompiledBy",work:"inter"},
+  Compiles:{type:"compiles",work:"inter"},
+  IsRequiredBy:{type:"isRequiredBy",work:"inter"},
+  Requires:{type:"requires",work:"inter"},
+  IsReviewedBy:{type:"hasReview",work:"inter"},
+  Reviews:{type:"isReviewOf",work:"inter"},
+  IsVersionOf:{type:"isVersionOf",work:"intra"},
+  HasVersion:{type:"hasVersion",work:"intra"},
+  IsVariantFormOf:{type:"isVariantFormOf",work:"intra"},
+  IsOriginalFormOf:{type:"isOriginalFormOf",work:"intra"},
+  IsIdenticalTo:{type:"isIdenticalTo",work:"intra"},
+  IsNewVersionOf:{type:"replaces",work:"intra"},
+  IsPreviousVersionOf:{type:"isReplacedBy",work:"intra"},
+  Obsoletes:{type:"replaces",work:"intra"},
+  IsObsoletedBy:{type:"isReplacedBy",work:"intra"}
+};
+/* DataCite relatedItemIdentifierType -> Crossref relations identifier-type */
+const CROSSREF_IDTYPE_MAP = { DOI:"doi", ISSN:"issn", ISBN:"isbn", URL:"uri", PURL:"purl", PMID:"pmid", arXiv:"arxiv" };
+function crossrefIdType(datIdType, value){
+  if(datIdType && CROSSREF_IDTYPE_MAP[datIdType]) return CROSSREF_IDTYPE_MAP[datIdType];
+  if(/^10\.\d/.test(value||"")) return "doi";
+  return "uri";
+}
+function crossrefTimestamp(){
+  const d=new Date(), p=n=>String(n).padStart(2,"0");
+  return ""+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate())+p(d.getHours())+p(d.getMinutes())+p(d.getSeconds());
+}
+/* <contributors> block (reused for database_metadata and dataset); ind = indent of <contributors> */
+function crossrefContributorLines(creators, ind){
+  const in2=ind+"  ", in3=ind+"    ", L=[ind+"<contributors>"];
+  creators.forEach((c,i)=>{
+    L.push(in2+`<person_name sequence="${i===0?"first":"additional"}" contributor_role="author">`);
+    if(c.nameType==="Personal" && (c.givenName||c.familyName)){
+      if(c.givenName) L.push(in3+`<given_name>${esc(c.givenName)}</given_name>`);
+      L.push(in3+`<surname>${esc(c.familyName||c.name||"")}</surname>`);
+    } else {
+      L.push(in3+`<surname>${esc(c.name||"")}</surname>`); // organisation name goes in <surname> (matches example files)
+    }
+    L.push(in2+"</person_name>");
+  });
+  L.push(ind+"</contributors>");
+  return L;
+}
+/* Build a Crossref deposit XML for one entry. Returns {xml, batchId, skipped}. */
+function buildCrossrefXml(e, landingPage){
+  const d=defaults(), p=e.payload||{};
+  const ts=crossrefTimestamp();
+  const base=(entryFilename(e)||sanitize(entryTitle(e))||"CIEdataset").replace(/\.csv$/i,"");
+  const batchId=base+"("+ts+")";
+  const title=(p.titles&&p.titles[0]&&p.titles[0].title)||"";
+  const desc=(p.descriptions&&p.descriptions[0]&&p.descriptions[0].description)||"";
+  const mime=(p.formats&&p.formats[0])||d.format||"text/csv";
+  const creators=(p.creators&&p.creators.length)?p.creators
+    :[{name:d.creatorName||d.crRegistrant||"",nameType:d.creatorNameType||"Organizational"}];
+
+  // relations
+  const skipped=[], relLines=[];
+  (p.relatedItems||[]).forEach(ri=>{
+    const rt=ri.relationType||"", idval=(ri.relatedItemIdentifier||"").trim(), m=CROSSREF_RELATION_MAP[rt];
+    if(!m || !idval){ if(idval && !m) skipped.push(rt||"(none)"); return; }
+    const idtype=crossrefIdType(ri.relatedItemIdentifierType, idval);
+    const tag=(m.work==="intra")?"intra_work_relation":"inter_work_relation";
+    relLines.push("          <related_item>");
+    relLines.push("            <description>Relation dataset</description>");
+    relLines.push(`            <${tag} relationship-type="${esc(m.type)}" identifier-type="${esc(idtype)}">${esc(idval)}</${tag}>`);
+    relLines.push("          </related_item>");
+  });
+
+  const L=[];
+  L.push('<?xml version="1.0" encoding="UTF-8"?>');
+  L.push('<doi_batch xsi:schemaLocation="http://www.crossref.org/schema/5.3.1 http://data.crossref.org/schemas/crossref5.3.1.xsd" version="5.3.1" xmlns="http://www.crossref.org/schema/5.3.1" xmlns:jats="http://www.ncbi.nlm.nih.gov/JATS1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">');
+  L.push("  <head>");
+  L.push(`    <doi_batch_id>${esc(batchId)}</doi_batch_id>`);
+  L.push(`    <timestamp>${ts}</timestamp>`);
+  L.push("    <depositor>");
+  L.push(`      <depositor_name>${esc(d.crDepositorName||"")}</depositor_name>`);
+  L.push(`      <email_address>${esc(d.crDepositorEmail||"")}</email_address>`);
+  L.push("    </depositor>");
+  L.push(`    <registrant>${esc(d.crRegistrant||"")}</registrant>`);
+  L.push("  </head>");
+  L.push("  <body>");
+  L.push("    <database>");
+  L.push("      <database_metadata>");
+  crossrefContributorLines(creators, "        ").forEach(x=>L.push(x));
+  L.push("        <titles>");
+  L.push(`          <title>${esc(d.crDatabaseTitle||"")}</title>`);
+  L.push("        </titles>");
+  L.push("        <publisher>");
+  L.push(`          <publisher_name>${esc(d.crPublisherName||"")}</publisher_name>`);
+  L.push("        </publisher>");
+  L.push("        <institution>");
+  L.push(`          <institution_name>${esc(d.crInstitutionName||"")}</institution_name>`);
+  L.push(`          <institution_acronym>${esc(d.crInstitutionAcronym||"")}</institution_acronym>`);
+  L.push(`          <institution_place>${esc(d.crInstitutionPlace||"")}</institution_place>`);
+  L.push(`          <institution_department>${esc(d.crInstitutionDepartment||"")}</institution_department>`);
+  L.push("        </institution>");
+  L.push("      </database_metadata>");
+  L.push('      <dataset dataset_type="collection">');
+  crossrefContributorLines(creators, "        ").forEach(x=>L.push(x));
+  L.push("        <titles>");
+  L.push(`          <title>${esc(title)}</title>`);
+  L.push("        </titles>");
+  L.push(`        <description>${esc(desc)}</description>`);
+  L.push(`        <format mime_type="${esc(mime)}"/>`);
+  if(relLines.length){
+    L.push('        <program xmlns="http://www.crossref.org/relations.xsd">');
+    relLines.forEach(x=>L.push(x));
+    L.push("        </program>");
+  }
+  L.push("        <doi_data>");
+  L.push(`          <doi>${esc(entryDoi(e)||"")}</doi>`);
+  L.push(`          <resource>${esc(landingPage||"")}</resource>`);
+  L.push("        </doi_data>");
+  L.push("      </dataset>");
+  L.push("    </database>");
+  L.push("  </body>");
+  L.push("</doi_batch>");
+  return {xml:L.join("\n")+"\n", batchId, skipped};
+}
+/* Export the selected entry as Crossref XML, prompting for a landing page if missing. */
+function exportCrossrefXml(e){
+  if(!e) return;
+  const lp=(e.landingPage||"").trim();
+  if(!lp){ openLandingPageDialog(e, url=>doCrossrefExport(e,url)); return; }
+  doCrossrefExport(e, lp);
+}
+function doCrossrefExport(e, landingPage){
+  if(!entryDoi(e)){ if(!confirm("This entry has no DOI. Export Crossref XML anyway (with an empty <doi>)?")) return; }
+  const {xml, batchId, skipped}=buildCrossrefXml(e, landingPage);
+  download(batchId+".xml", xml, "application/xml");
+  if(skipped.length) toast("Exported "+batchId+".xml — skipped unmapped relation(s): "+[...new Set(skipped)].join(", "),"err");
+  else toast("Exported "+batchId+".xml","ok");
+}
+function openLandingPageDialog(e, onOk){
+  const body=document.createElement("div");
+  const hint=document.createElement("div"); hint.className="hint";
+  hint.textContent="Crossref needs a landing-page URL for the DOI <resource>. It will be saved on this entry.";
+  body.appendChild(hint);
+  const i=document.createElement("input"); i.type="text"; i.value=e.landingPage||""; i.placeholder="https://cie.co.at/datatable/…";
+  body.appendChild(field("DOI landing page (resource URL)", i));
+  const ok=mkBtn("Save & export","sec",()=>{
+    const url=i.value.trim();
+    if(!url){ toast("Landing page URL is required","err"); return; }
+    if(!/^https?:\/\//i.test(url) && !confirm("The URL does not start with http(s)://. Use it anyway?")) return;
+    e.landingPage=url;
+    if(selectedId===e.entryId && editMeta) editMeta.landingPage=url;
+    persist(); renderDetail(); closeModal(); onOk(url);
+  });
+  modal("DOI landing page", body, [mkBtn("Cancel","ghost",closeModal), ok]);
+}
 
 function pickFile(accept, cb){
   const inp=el("hiddenFile"); inp.value=""; inp.accept=accept; inp.multiple=false;
