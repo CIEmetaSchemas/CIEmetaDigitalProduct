@@ -2,8 +2,8 @@
   "dbSchemaName": "CIEmetaDB",
   "dbSchemaVersion": 1,
   "dbId": "4cd12818-04ed-4654-b9f7-dbf622b029d1",
-  "baseHash": "cb9fe475e38f9a7696c925b8f1ee21da894118c8c4f46a868db36a87625f86fc",
-  "generatedAt": "2026-07-21T15:36:06.376Z",
+  "baseHash": "452d1f81ebf0fd365b6fc04e3b166804f5f7fe5c6f761327c2a25a2b74a61290",
+  "generatedAt": "2026-07-21T18:52:46.641Z",
   "domains": [
     {
       "code": "D1",
@@ -449,7 +449,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/values-first-deviation-function-used-calculation-cie-special-metamerism-index-change"
     },
     {
       "entryId": "ef380a5a-482c-4318-84c9-902095e2d306",
@@ -802,7 +803,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-reference-spectrum-l41"
     },
     {
       "entryId": "1668e71d-7473-44e5-9481-82b9d4dd2fee",
@@ -1249,7 +1251,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-alpha-opic-action-spectra"
     },
     {
       "entryId": "ef65a1df-6316-4826-9242-71ea739c0f48",
@@ -1682,21 +1685,22 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-1931-chromaticity-coordinates-spectrum-loci-2-degree-observer"
     },
     {
       "entryId": "d7be1e15-2afd-4347-b9d9-7645fb317ec1",
-      "rev": 1,
-      "contentHash": "2ab27fe846e62e8417f717cfd98d3e74959d3c7418a224f719c60621b77bfc2f",
+      "rev": 2,
+      "contentHash": "58caaa271b89e268881e48455b5983eab6711ae9878710c64f4191102c314493",
       "status": "published",
       "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
-        "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedBy": "peter.blattner@metas.ch",
+        "modifiedDate": "2026-07-21T15:50:38.428Z",
+        "modifiedComment": "sha256 error fixed"
       },
       "payload": {
         "identifier": {
@@ -1772,7 +1776,7 @@
           },
           {
             "hashMethod": "sha256",
-            "checksum": "7485d416ac4d6c30269b4267d739aec208d911a94711537b95c48716890e98c"
+            "checksum": "7485d416ac4d6c30269b4267d739aec208d9110a94711537b95c48716890e98c"
           }
         ],
         "datatableInfo": {
@@ -2039,6 +2043,29 @@
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
             }
           ]
+        },
+        {
+          "rev": 2,
+          "by": "peter.blattner@metas.ch",
+          "date": "2026-07-21T15:50:38.428Z",
+          "comment": "sha256 error fixed",
+          "baseHash": "2ab27fe846e62e8417f717cfd98d3e74959d3c7418a224f719c60621b77bfc2f",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "87f745ef28af679a2b61adfdc53432aa"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "7485d416ac4d6c30269b4267d739aec208d9110a94711537b95c48716890e98c"
+                }
+              ]
+            }
+          ]
         }
       ],
       "validationLog": [
@@ -2086,8 +2113,54 @@
               "detail": "col1 wavelength_last: match"
             }
           ]
+        },
+        {
+          "date": "2026-07-21T15:55:40.281Z",
+          "by": "peter.blattner@metas.ch",
+          "fileName": "CIE_cc_1964_10deg.csv",
+          "md5": "87f745ef28af679a2b61adfdc53432aa",
+          "sha256": "7485d416ac4d6c30269b4267d739aec208d9110a94711537b95c48716890e98c",
+          "passed": true,
+          "results": [
+            {
+              "check": "md5",
+              "status": "pass",
+              "detail": "md5: match"
+            },
+            {
+              "check": "sha256",
+              "status": "pass",
+              "detail": "sha256: match"
+            },
+            {
+              "check": "fileName",
+              "status": "pass",
+              "detail": "fileName: match"
+            },
+            {
+              "check": "sumOfColumns",
+              "status": "pass",
+              "detail": "sumOfColumns: match"
+            },
+            {
+              "check": "sampleRow",
+              "status": "pass",
+              "detail": "sampleRow[120]: match"
+            },
+            {
+              "check": "wavelength_first",
+              "status": "pass",
+              "detail": "col1 wavelength_first: match"
+            },
+            {
+              "check": "wavelength_last",
+              "status": "pass",
+              "detail": "col1 wavelength_last: match"
+            }
+          ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-1964-chromaticity-coordinates-spectrum-loci-10-degree-observer"
     },
     {
       "entryId": "9c52ccc2-5438-428a-ad9d-27efd4e9fa37",
@@ -2460,21 +2533,22 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-cone-fundamental-based-spectral-luminous-efficiency-function-10-field-size-terms"
     },
     {
       "entryId": "7d8e5446-fab6-4c64-8e3a-c01b5c93bef9",
-      "rev": 1,
-      "contentHash": "6a7c0bf4b09ce32f7c2e820829b67d7dc28416a75041a97667139aa6c54a86ed",
+      "rev": 2,
+      "contentHash": "c22ababe9427d818515c2409cba012b898a36cc9695a67cdf8e84bb0d53b1649",
       "status": "published",
       "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
-        "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedBy": "peter.blattner@metas.ch",
+        "modifiedDate": "2026-07-21T16:03:35.436Z",
+        "modifiedComment": "sha256 fixed"
       },
       "payload": {
         "identifier": {
@@ -2550,7 +2624,7 @@
           },
           {
             "hashMethod": "sha256",
-            "checksum": "e2a07b2bbab0dc80b35d2b070e79b87674740bd8c4ceb53ae78c6053ce2316"
+            "checksum": "e2a07b2bbab0dc800b35d2b070e79b87674740bd8c4ceb53ae78c6053c0e2316"
           }
         ],
         "datatableInfo": {
@@ -2785,6 +2859,29 @@
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
             }
           ]
+        },
+        {
+          "rev": 2,
+          "by": "peter.blattner@metas.ch",
+          "date": "2026-07-21T16:03:35.436Z",
+          "comment": "sha256 fixed",
+          "baseHash": "6a7c0bf4b09ce32f7c2e820829b67d7dc28416a75041a97667139aa6c54a86ed",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "8e01f4ab6639ee85523ee102970a53df"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "e2a07b2bbab0dc800b35d2b070e79b87674740bd8c4ceb53ae78c6053c0e2316"
+                }
+              ]
+            }
+          ]
         }
       ],
       "validationLog": [
@@ -2832,8 +2929,54 @@
               "detail": "col1 wavelength_last: match"
             }
           ]
+        },
+        {
+          "date": "2026-07-21T16:03:16.801Z",
+          "by": "peter.blattner@metas.ch",
+          "fileName": "CIE_cfb_sle_2deg.csv",
+          "md5": "8e01f4ab6639ee85523ee102970a53df",
+          "sha256": "e2a07b2bbab0dc800b35d2b070e79b87674740bd8c4ceb53ae78c6053c0e2316",
+          "passed": true,
+          "results": [
+            {
+              "check": "md5",
+              "status": "pass",
+              "detail": "md5: match"
+            },
+            {
+              "check": "sha256",
+              "status": "pass",
+              "detail": "sha256: match"
+            },
+            {
+              "check": "fileName",
+              "status": "pass",
+              "detail": "fileName: match"
+            },
+            {
+              "check": "sumOfColumns",
+              "status": "pass",
+              "detail": "sumOfColumns: match"
+            },
+            {
+              "check": "sampleRow",
+              "status": "pass",
+              "detail": "sampleRow[120]: match"
+            },
+            {
+              "check": "wavelength_first",
+              "status": "pass",
+              "detail": "col1 wavelength_first: match"
+            },
+            {
+              "check": "wavelength_last",
+              "status": "pass",
+              "detail": "col1 wavelength_last: match"
+            }
+          ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-cone-fundamental-based-spectral-luminous-efficiency-function-2-field-size-terms-energy"
     },
     {
       "entryId": "4d6fc561-cab2-458b-9d09-af87ee92faaa",
@@ -3238,7 +3381,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-cone-fundamental-based-spectral-tristimulus-values-10-field-size"
     },
     {
       "entryId": "3a2166a3-91ec-4b93-bd27-88d6ba1170d7",
@@ -3643,7 +3787,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-cone-fundamental-based-spectral-tristimulus-values-2-degree-field-size"
     },
     {
       "entryId": "9afa2e4c-4812-45e2-b546-2b7d6ca39496",
@@ -4022,7 +4167,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/relative-spectral-power-distributions-cie-illuminant-c"
     },
     {
       "entryId": "02fa7b50-31e1-418a-b345-750f0af013ee",
@@ -4401,7 +4547,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/relative-spectral-power-distributions-cie-illuminant-d55"
     },
     {
       "entryId": "0f13447e-9229-4279-be5b-539910ef4bb7",
@@ -4780,21 +4927,22 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/relative-spectral-power-distributions-cie-illuminant-d75"
     },
     {
       "entryId": "71689b69-76d2-430b-afe6-fce220a9cf38",
-      "rev": 1,
-      "contentHash": "aedcd38879a527a1480f89a3adcfef8d59640db5065f419b435edbfba88838b7",
+      "rev": 2,
+      "contentHash": "73913237162df12dae612fc238a2cad96378b0f3739b9bfb537a73b4ffc65999",
       "status": "published",
       "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
-        "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedBy": "peter.blattner@metas.ch",
+        "modifiedDate": "2026-07-21T16:11:01.495Z",
+        "modifiedComment": "upper wvl limit fixed"
       },
       "payload": {
         "identifier": {
@@ -4897,7 +5045,7 @@
               "unit": "nm",
               "quantity": "wavelength",
               "wavelength_first": 300,
-              "wavelength_last": 780,
+              "wavelength_last": 830,
               "wavelength_step": 5
             },
             {
@@ -5119,6 +5267,41 @@
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
             }
           ]
+        },
+        {
+          "rev": 2,
+          "by": "peter.blattner@metas.ch",
+          "date": "2026-07-21T16:11:01.495Z",
+          "comment": "upper wvl limit fixed",
+          "baseHash": "aedcd38879a527a1480f89a3adcfef8d59640db5065f419b435edbfba88838b7",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/datatableInfo/columnHeaders",
+              "value": [
+                {
+                  "title": "lambda",
+                  "unit": "nm",
+                  "quantity": "wavelength",
+                  "wavelength_first": 300,
+                  "wavelength_last": 830,
+                  "wavelength_step": 5
+                },
+                {
+                  "title": "S_0(lambda)",
+                  "unit": "dimensionless"
+                },
+                {
+                  "title": "S_1(lambda)",
+                  "unit": "dimensionless"
+                },
+                {
+                  "title": "S_2(lambda)",
+                  "unit": "dimensionless"
+                }
+              ]
+            }
+          ]
         }
       ],
       "validationLog": [
@@ -5166,8 +5349,54 @@
               "detail": "col1 wavelength_last: MISMATCH (meta 780, file 830)"
             }
           ]
+        },
+        {
+          "date": "2026-07-21T16:10:44.376Z",
+          "by": "peter.blattner@metas.ch",
+          "fileName": "CIE_illum_Dxx_comp.csv",
+          "md5": "3068737bc5e8561bd8b3ef9639578d18",
+          "sha256": "4056cf7c1afb23fb8820ff9cbc383a80005acdffe1c0a6945c6032616e08c6be",
+          "passed": true,
+          "results": [
+            {
+              "check": "md5",
+              "status": "pass",
+              "detail": "md5: match"
+            },
+            {
+              "check": "sha256",
+              "status": "pass",
+              "detail": "sha256: match"
+            },
+            {
+              "check": "fileName",
+              "status": "pass",
+              "detail": "fileName: match"
+            },
+            {
+              "check": "sumOfColumns",
+              "status": "pass",
+              "detail": "sumOfColumns: match"
+            },
+            {
+              "check": "sampleRow",
+              "status": "pass",
+              "detail": "sampleRow[30]: match"
+            },
+            {
+              "check": "wavelength_first",
+              "status": "pass",
+              "detail": "col1 wavelength_first: match"
+            },
+            {
+              "check": "wavelength_last",
+              "status": "pass",
+              "detail": "col1 wavelength_last: match"
+            }
+          ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/components-relative-spectral-distribution-daylight"
     },
     {
       "entryId": "09a4ebd0-cbc4-47aa-802f-f9998a82b765",
@@ -6029,7 +6258,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-lamps"
     },
     {
       "entryId": "60ae9dea-8473-4ee0-b2a6-fd8c9b01ca7d",
@@ -6891,7 +7121,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-fluorescent-lamps-0"
     },
     {
       "entryId": "7a4b58c2-3d2e-42f3-9203-c386f9be89cd",
@@ -7344,7 +7575,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/relative-spectral-power-distributions-high-pressure-discharge-lamp-illuminants"
     },
     {
       "entryId": "f4bb3fee-99e2-4d54-a315-31a5114f7ef1",
@@ -7711,7 +7943,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-indoor-daylight-illuminant-id50"
     },
     {
       "entryId": "6c7d55ee-5743-4b92-9a21-4f7c034f6f85",
@@ -8078,7 +8311,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-indoor-daylight-illuminant-id65"
     },
     {
       "entryId": "f82d0656-040a-4318-b4e8-4101c9461ff7",
@@ -8603,7 +8837,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-led-lamps"
     },
     {
       "entryId": "e49b6446-2747-4485-8a96-b34c74c3c0e9",
@@ -9128,21 +9363,22 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/relative-spectral-power-distributions-illuminants-representing-typical-led-lamps-1nm"
     },
     {
       "entryId": "e350a9a4-c885-40b5-835e-dfea29a33a7c",
-      "rev": 1,
-      "contentHash": "55535a7e7f87bc0ebdff08d4b7577d6dfabff531a3b8209578a054e16a83aea5",
+      "rev": 2,
+      "contentHash": "e48f67f52158ee072b7d953cf8fc47d412ebf5e14cb8242d35300aab1a4be2c9",
       "status": "published",
       "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
-        "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedBy": "peter.blattner@metas.ch",
+        "modifiedDate": "2026-07-21T16:02:22.576Z",
+        "modifiedComment": "checksum fixed"
       },
       "payload": {
         "identifier": {
@@ -9215,7 +9451,7 @@
           },
           {
             "hashMethod": "sha256",
-            "checksum": "bd64f1f688a4b319c6d3fa6b3177a32eaaaaea0eed532befd0424f96304db18"
+            "checksum": "bd64f1f688a4b319c6d3fa6b31770a32eaaaaea0eed532befd0424f96304db18"
           }
         ],
         "datatableInfo": {
@@ -9479,6 +9715,29 @@
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
             }
           ]
+        },
+        {
+          "rev": 2,
+          "by": "peter.blattner@metas.ch",
+          "date": "2026-07-21T16:02:22.576Z",
+          "comment": "checksum fixed",
+          "baseHash": "55535a7e7f87bc0ebdff08d4b7577d6dfabff531a3b8209578a054e16a83aea5",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "c2e606fddac441d032c389317e6de80b"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "bd64f1f688a4b319c6d3fa6b31770a32eaaaaea0eed532befd0424f96304db18"
+                }
+              ]
+            }
+          ]
         }
       ],
       "validationLog": [
@@ -9526,8 +9785,54 @@
               "detail": "col1 wavelength_last: match"
             }
           ]
+        },
+        {
+          "date": "2026-07-21T16:02:12.348Z",
+          "by": "peter.blattner@metas.ch",
+          "fileName": "CIE_lms_cf_10deg.csv",
+          "md5": "c2e606fddac441d032c389317e6de80b",
+          "sha256": "bd64f1f688a4b319c6d3fa6b31770a32eaaaaea0eed532befd0424f96304db18",
+          "passed": true,
+          "results": [
+            {
+              "check": "md5",
+              "status": "pass",
+              "detail": "md5: match"
+            },
+            {
+              "check": "sha256",
+              "status": "pass",
+              "detail": "sha256: match"
+            },
+            {
+              "check": "fileName",
+              "status": "pass",
+              "detail": "fileName: match"
+            },
+            {
+              "check": "sumOfColumns",
+              "status": "pass",
+              "detail": "sumOfColumns: match"
+            },
+            {
+              "check": "sampleRow",
+              "status": "pass",
+              "detail": "sampleRow[32]: match"
+            },
+            {
+              "check": "wavelength_first",
+              "status": "pass",
+              "detail": "col1 wavelength_first: match"
+            },
+            {
+              "check": "wavelength_last",
+              "status": "pass",
+              "detail": "col1 wavelength_last: match"
+            }
+          ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-2006-lms-cone-fundamentals-10-field-size-terms-energy"
     },
     {
       "entryId": "e5ade036-e6ba-47cc-bf31-fb366369d050",
@@ -9926,7 +10231,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-2006-lms-cone-fundamentals-2-field-size-terms-energy"
     },
     {
       "entryId": "9e3359aa-92cd-4843-8bc6-1fce79d241a5",
@@ -10303,21 +10609,22 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-maximum-luminous-efficacy-mesopic-vision-varied-adaptation-coefficient-values"
     },
     {
       "entryId": "b97812bb-e5d7-4ce7-9f21-4308326929a6",
-      "rev": 1,
-      "contentHash": "c71088c901772d50b11a30e79af441133febca96b051caef9db650c56bc5ed2d",
+      "rev": 2,
+      "contentHash": "14a239d887619d34068f7d79288f2c13ed5c1e2fde475841320495d15f601e91",
       "status": "published",
       "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
-        "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedBy": "peter.blattner@metas.ch",
+        "modifiedDate": "2026-07-21T16:06:48.122Z",
+        "modifiedComment": "sha256 fixed"
       },
       "payload": {
         "identifier": {
@@ -10393,7 +10700,7 @@
           },
           {
             "hashMethod": "sha256",
-            "checksum": "e67ec48406bdb6cef7ce03c42bd66f9dfc8601fb0a60837f8971973d4b960c9"
+            "checksum": "e67e0c48406bdb6cef7ce03c42bd66f9dfc8601fb0a60837f8971973d4b960c9"
           }
         ],
         "datatableInfo": {
@@ -10628,6 +10935,29 @@
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
             }
           ]
+        },
+        {
+          "rev": 2,
+          "by": "peter.blattner@metas.ch",
+          "date": "2026-07-21T16:06:48.122Z",
+          "comment": "sha256 fixed",
+          "baseHash": "c71088c901772d50b11a30e79af441133febca96b051caef9db650c56bc5ed2d",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "b702e2c81f87115f151e9e0603925834"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "e67e0c48406bdb6cef7ce03c42bd66f9dfc8601fb0a60837f8971973d4b960c9"
+                }
+              ]
+            }
+          ]
         }
       ],
       "validationLog": [
@@ -10675,22 +11005,68 @@
               "detail": "col1 wavelength_last: match"
             }
           ]
+        },
+        {
+          "date": "2026-07-21T16:06:30.401Z",
+          "by": "peter.blattner@metas.ch",
+          "fileName": "CIE_sle_10deg.csv",
+          "md5": "b702e2c81f87115f151e9e0603925834",
+          "sha256": "e67e0c48406bdb6cef7ce03c42bd66f9dfc8601fb0a60837f8971973d4b960c9",
+          "passed": true,
+          "results": [
+            {
+              "check": "md5",
+              "status": "pass",
+              "detail": "md5: match"
+            },
+            {
+              "check": "sha256",
+              "status": "pass",
+              "detail": "sha256: match"
+            },
+            {
+              "check": "fileName",
+              "status": "pass",
+              "detail": "fileName: match"
+            },
+            {
+              "check": "sumOfColumns",
+              "status": "pass",
+              "detail": "sumOfColumns: match"
+            },
+            {
+              "check": "sampleRow",
+              "status": "pass",
+              "detail": "sampleRow[120]: match"
+            },
+            {
+              "check": "wavelength_first",
+              "status": "pass",
+              "detail": "col1 wavelength_first: match"
+            },
+            {
+              "check": "wavelength_last",
+              "status": "pass",
+              "detail": "col1 wavelength_last: match"
+            }
+          ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-spectral-luminous-efficiency-10-degree-photopic-vision"
     },
     {
       "entryId": "85a2057c-dce0-4232-82f4-1d2539e8664c",
-      "rev": 1,
-      "contentHash": "14674732405008ceefe5af384b8cbc40e031123707d64e8d6ea82824f484b7dc",
+      "rev": 2,
+      "contentHash": "8ab9efe671b9721487c3b68f45e15ce3bb7c00269917a3e8a2b0e4e35046bb11",
       "status": "published",
       "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
-        "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedBy": "peter.blattner@metas.ch",
+        "modifiedDate": "2026-07-21T16:07:38.987Z",
+        "modifiedComment": "sha256 fixed"
       },
       "payload": {
         "identifier": {
@@ -10766,7 +11142,7 @@
           },
           {
             "hashMethod": "sha256",
-            "checksum": "fa643111e81c16661cb7c2d3b9dca6d71ef1c3a4b602a8211a1e3f4aa1f8cd"
+            "checksum": "fa643111e81c16661cb7c2d30b9dca6d71ef1c3a4b602a82110a1e3f4aa1f8cd"
           }
         ],
         "datatableInfo": {
@@ -11001,6 +11377,29 @@
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
             }
           ]
+        },
+        {
+          "rev": 2,
+          "by": "peter.blattner@metas.ch",
+          "date": "2026-07-21T16:07:38.987Z",
+          "comment": "sha256 fixed",
+          "baseHash": "14674732405008ceefe5af384b8cbc40e031123707d64e8d6ea82824f484b7dc",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "1334d87f46b11922eaaf655530787abf"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "fa643111e81c16661cb7c2d30b9dca6d71ef1c3a4b602a82110a1e3f4aa1f8cd"
+                }
+              ]
+            }
+          ]
         }
       ],
       "validationLog": [
@@ -11048,8 +11447,54 @@
               "detail": "col1 wavelength_last: match"
             }
           ]
+        },
+        {
+          "date": "2026-07-21T16:07:27.113Z",
+          "by": "peter.blattner@metas.ch",
+          "fileName": "CIE_sle_mesopic_m_0.8.csv",
+          "md5": "1334d87f46b11922eaaf655530787abf",
+          "sha256": "fa643111e81c16661cb7c2d30b9dca6d71ef1c3a4b602a82110a1e3f4aa1f8cd",
+          "passed": true,
+          "results": [
+            {
+              "check": "md5",
+              "status": "pass",
+              "detail": "md5: match"
+            },
+            {
+              "check": "sha256",
+              "status": "pass",
+              "detail": "sha256: match"
+            },
+            {
+              "check": "fileName",
+              "status": "pass",
+              "detail": "fileName: match"
+            },
+            {
+              "check": "sumOfColumns",
+              "status": "pass",
+              "detail": "sumOfColumns: match"
+            },
+            {
+              "check": "sampleRow",
+              "status": "pass",
+              "detail": "sampleRow[120]: match"
+            },
+            {
+              "check": "wavelength_first",
+              "status": "pass",
+              "detail": "col1 wavelength_first: match"
+            },
+            {
+              "check": "wavelength_last",
+              "status": "pass",
+              "detail": "col1 wavelength_last: match"
+            }
+          ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-spectral-luminous-efficiency-mesopic-vision-adaptation-coefficient-m-08"
     },
     {
       "entryId": "eed5ac4a-ebef-45a2-bcf8-1d2e7ba9511a",
@@ -11460,7 +11905,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-spectral-luminous-efficiency-photopic-vision"
     },
     {
       "entryId": "48b6aefd-ecac-45d9-9f8f-b78bcc063006",
@@ -11837,21 +12283,22 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-spectral-luminous-efficiency-scotopic-vision"
     },
     {
       "entryId": "91b5c255-bee7-4824-8ba5-bde671673855",
-      "rev": 1,
-      "contentHash": "a47a942a4620705701fef73e4a205d6472e5992a9f0a91402c318d531be0711e",
+      "rev": 2,
+      "contentHash": "fc8af48106bbb8c62ca7247a20a445aa690cf04046c7abd3c7d767710f9025da",
       "status": "published",
       "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
-        "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedBy": "peter.blattner@metas.ch",
+        "modifiedDate": "2026-07-21T16:08:40.500Z",
+        "modifiedComment": "sha256 fixed"
       },
       "payload": {
         "identifier": {
@@ -11927,7 +12374,7 @@
           },
           {
             "hashMethod": "sha256",
-            "checksum": "57a53ce67409cd69853acf9dc14bb6aa91f51b94dd9544e8aaf224895c141b"
+            "checksum": "570a53ce67409cd698530acf9dc14bb6aa91f51b94dd9544e8aaf224895c141b"
           }
         ],
         "datatableInfo": {
@@ -12200,6 +12647,29 @@
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
             }
           ]
+        },
+        {
+          "rev": 2,
+          "by": "peter.blattner@metas.ch",
+          "date": "2026-07-21T16:08:40.500Z",
+          "comment": "sha256 fixed",
+          "baseHash": "a47a942a4620705701fef73e4a205d6472e5992a9f0a91402c318d531be0711e",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "b608343496f5e03d711f436d063b11ce"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "570a53ce67409cd698530acf9dc14bb6aa91f51b94dd9544e8aaf224895c141b"
+                }
+              ]
+            }
+          ]
         }
       ],
       "validationLog": [
@@ -12247,22 +12717,68 @@
               "detail": "col1 wavelength_last: match"
             }
           ]
+        },
+        {
+          "date": "2026-07-21T16:08:26.293Z",
+          "by": "peter.blattner@metas.ch",
+          "fileName": "CIE_smb_cc_2deg.csv",
+          "md5": "b608343496f5e03d711f436d063b11ce",
+          "sha256": "570a53ce67409cd698530acf9dc14bb6aa91f51b94dd9544e8aaf224895c141b",
+          "passed": true,
+          "results": [
+            {
+              "check": "md5",
+              "status": "pass",
+              "detail": "md5: match"
+            },
+            {
+              "check": "sha256",
+              "status": "pass",
+              "detail": "sha256: match"
+            },
+            {
+              "check": "fileName",
+              "status": "pass",
+              "detail": "fileName: match"
+            },
+            {
+              "check": "sumOfColumns",
+              "status": "pass",
+              "detail": "sumOfColumns: match"
+            },
+            {
+              "check": "sampleRow",
+              "status": "pass",
+              "detail": "sampleRow[19]: match"
+            },
+            {
+              "check": "wavelength_first",
+              "status": "pass",
+              "detail": "col1 wavelength_first: match"
+            },
+            {
+              "check": "wavelength_last",
+              "status": "pass",
+              "detail": "col1 wavelength_last: match"
+            }
+          ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-spectral-macleod-boynton-chromaticity-coordinates-2-degree-field-size"
     },
     {
       "entryId": "2aae303c-2e93-4964-a817-487e448ac682",
-      "rev": 1,
-      "contentHash": "4c156ea2c8f790835eabbf93ba72c8465f81dfa42fddf29b76774eccdea140f0",
+      "rev": 2,
+      "contentHash": "bc21125470e3df266344f4c867a1ad2c8682b3c1a6c235202fefef6d97056437",
       "status": "published",
       "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
-        "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedBy": "peter.blattner@metas.ch",
+        "modifiedDate": "2026-07-21T16:12:41.330Z",
+        "modifiedComment": "sample row corrected (trailing 0)"
       },
       "payload": {
         "alternateIdentifiers": [
@@ -12444,7 +12960,7 @@
             {
               "validationParameter": "13",
               "validationType": "sampleRow",
-              "validationValue": "440,0.048,0.0822,0.0559,0.0512,0.0786,0.0722,0.0924,0.1896,0.3201,0.3309,0.3074,0.3290,0.3945,0.3657,0.1774"
+              "validationValue": "440,0.048,0.0822,0.0559,0.0512,0.0786,0.0722,0.0924,0.1896,0.3201,0.3309,0.3074,0.329,0.3945,0.3657,0.1774"
             }
           ]
         },
@@ -12807,6 +13323,30 @@
               }
             }
           ]
+        },
+        {
+          "rev": 2,
+          "by": "peter.blattner@metas.ch",
+          "date": "2026-07-21T16:12:41.330Z",
+          "comment": "sample row corrected (trailing 0)",
+          "baseHash": "4c156ea2c8f790835eabbf93ba72c8465f81dfa42fddf29b76774eccdea140f0",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/datatableInfo/validations",
+              "value": [
+                {
+                  "validationType": "sumOfColumns",
+                  "validationValue": "[46980,26.501,30.2533,30.7831,34.9971,27.9252,18.1323,12.0283,15.0495,18.3601,14.7984,11.1533,12.4068,31.7127,36.1257,30.2462]"
+                },
+                {
+                  "validationParameter": "13",
+                  "validationType": "sampleRow",
+                  "validationValue": "440,0.048,0.0822,0.0559,0.0512,0.0786,0.0722,0.0924,0.1896,0.3201,0.3309,0.3074,0.329,0.3945,0.3657,0.1774"
+                }
+              ]
+            }
+          ]
         }
       ],
       "validationLog": [
@@ -12854,22 +13394,68 @@
               "detail": "col1 wavelength_last: match"
             }
           ]
+        },
+        {
+          "date": "2026-07-21T16:12:26.708Z",
+          "by": "peter.blattner@metas.ch",
+          "fileName": "CIE_srf_CQS_5nm.csv",
+          "md5": "c4ba3c6c293bc099eee9ab9e26d2a2a9",
+          "sha256": "ea607d6f7a93f4d18bb051eefc68ae2f4bbc948bb92526f5bf0624284047e18c",
+          "passed": true,
+          "results": [
+            {
+              "check": "md5",
+              "status": "pass",
+              "detail": "md5: match"
+            },
+            {
+              "check": "sha256",
+              "status": "pass",
+              "detail": "sha256: match"
+            },
+            {
+              "check": "fileName",
+              "status": "pass",
+              "detail": "fileName: match"
+            },
+            {
+              "check": "sumOfColumns",
+              "status": "pass",
+              "detail": "sumOfColumns: match"
+            },
+            {
+              "check": "sampleRow",
+              "status": "pass",
+              "detail": "sampleRow[13]: match"
+            },
+            {
+              "check": "wavelength_first",
+              "status": "pass",
+              "detail": "col1 wavelength_first: match"
+            },
+            {
+              "check": "wavelength_last",
+              "status": "pass",
+              "detail": "col1 wavelength_last: match"
+            }
+          ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/spectral-radiance-factors-15-test-colour-samples-cqs-90-5nm-wavelength-steps"
     },
     {
       "entryId": "05645f9a-8c38-4861-8d58-8927f940eeb0",
-      "rev": 1,
-      "contentHash": "04f1d0537ffa9cdde95688118886a8a58dcab11b6cd29575dd28b975fa1a5209",
+      "rev": 2,
+      "contentHash": "a76c5dc2b1d9f19ab9922d0f705257b3bebb57484d98351ab03755cbbf7d65d1",
       "status": "published",
       "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
-        "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedBy": "peter.blattner@metas.ch",
+        "modifiedDate": "2026-07-21T16:13:59.632Z",
+        "modifiedComment": "sample row fixed: spaces removed"
       },
       "payload": {
         "alternateIdentifiers": [
@@ -12948,7 +13534,7 @@
             {
               "validationParameter": "13",
               "validationType": "sampleRow",
-              "validationValue": "440, 0.058, 0.111, 0.125, 0.154"
+              "validationValue": "440,0.058,0.111,0.125,0.154"
             }
           ]
         },
@@ -13208,6 +13794,30 @@
               }
             }
           ]
+        },
+        {
+          "rev": 2,
+          "by": "peter.blattner@metas.ch",
+          "date": "2026-07-21T16:13:59.632Z",
+          "comment": "sample row fixed: spaces removed",
+          "baseHash": "04f1d0537ffa9cdde95688118886a8a58dcab11b6cd29575dd28b975fa1a5209",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/datatableInfo/validations",
+              "value": [
+                {
+                  "validationType": "sumOfColumns",
+                  "validationValue": "[46980,27.499,41.977,11.152,7.519]"
+                },
+                {
+                  "validationParameter": "13",
+                  "validationType": "sampleRow",
+                  "validationValue": "440,0.058,0.111,0.125,0.154"
+                }
+              ]
+            }
+          ]
         }
       ],
       "validationLog": [
@@ -13255,22 +13865,68 @@
               "detail": "col1 wavelength_last: match"
             }
           ]
+        },
+        {
+          "date": "2026-07-21T16:13:44.670Z",
+          "by": "peter.blattner@metas.ch",
+          "fileName": "CIE_srf_FCI_5nm.csv",
+          "md5": "968e50cbcc15c6776fcb3e17444e7906",
+          "sha256": "dabe597a962fffc9afe3e50f79bc5fc325fbc28075fd2aa7c28df3a12c557202",
+          "passed": true,
+          "results": [
+            {
+              "check": "md5",
+              "status": "pass",
+              "detail": "md5: match"
+            },
+            {
+              "check": "sha256",
+              "status": "pass",
+              "detail": "sha256: match"
+            },
+            {
+              "check": "fileName",
+              "status": "pass",
+              "detail": "fileName: match"
+            },
+            {
+              "check": "sumOfColumns",
+              "status": "pass",
+              "detail": "sumOfColumns: match"
+            },
+            {
+              "check": "sampleRow",
+              "status": "pass",
+              "detail": "sampleRow[13]: match"
+            },
+            {
+              "check": "wavelength_first",
+              "status": "pass",
+              "detail": "col1 wavelength_first: match"
+            },
+            {
+              "check": "wavelength_last",
+              "status": "pass",
+              "detail": "col1 wavelength_last: match"
+            }
+          ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/spectral-radiance-factors-each-colour-rygb-four-colour-combination-5nm-wavelength-steps"
     },
     {
       "entryId": "e6791f20-92a5-4057-a821-ea68cfac0621",
-      "rev": 1,
-      "contentHash": "9b5c14af8a87046947f1e514b410652a2836b365ef21ec48af38ec011afaffaf",
+      "rev": 2,
+      "contentHash": "a1abf3c1a9b627dd337396b229f73a0d491220248f144c311f9be4d272fe2657",
       "status": "published",
       "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
-        "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedBy": "peter.blattner@metas.ch",
+        "modifiedDate": "2026-07-21T16:15:05.911Z",
+        "modifiedComment": "sample row spaces removed"
       },
       "payload": {
         "alternateIdentifiers": [
@@ -13325,7 +13981,7 @@
             {
               "validationParameter": "13",
               "validationType": "sampleRow",
-              "validationValue": "440, 0.203"
+              "validationValue": "440,0.203"
             }
           ]
         },
@@ -13561,6 +14217,30 @@
               }
             }
           ]
+        },
+        {
+          "rev": 2,
+          "by": "peter.blattner@metas.ch",
+          "date": "2026-07-21T16:15:05.911Z",
+          "comment": "sample row spaces removed",
+          "baseHash": "9b5c14af8a87046947f1e514b410652a2836b365ef21ec48af38ec011afaffaf",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/datatableInfo/validations",
+              "value": [
+                {
+                  "validationType": "sumOfColumns",
+                  "validationValue": "[46980,32.292]"
+                },
+                {
+                  "validationParameter": "13",
+                  "validationType": "sampleRow",
+                  "validationValue": "440,0.203"
+                }
+              ]
+            }
+          ]
         }
       ],
       "validationLog": [
@@ -13608,8 +14288,54 @@
               "detail": "col1 wavelength_last: match"
             }
           ]
+        },
+        {
+          "date": "2026-07-21T16:14:54.953Z",
+          "by": "peter.blattner@metas.ch",
+          "fileName": "CIE_srf_PS_5nm.csv",
+          "md5": "7dfe53cf9a4064ec9dd8988edea5b7e2",
+          "sha256": "1630cd6a7396ec23e5cf29bc72a6c63cddf1c7934764d143f11c292d7c52715f",
+          "passed": true,
+          "results": [
+            {
+              "check": "md5",
+              "status": "pass",
+              "detail": "md5: match"
+            },
+            {
+              "check": "sha256",
+              "status": "pass",
+              "detail": "sha256: match"
+            },
+            {
+              "check": "fileName",
+              "status": "pass",
+              "detail": "fileName: match"
+            },
+            {
+              "check": "sumOfColumns",
+              "status": "pass",
+              "detail": "sumOfColumns: match"
+            },
+            {
+              "check": "sampleRow",
+              "status": "pass",
+              "detail": "sampleRow[13]: match"
+            },
+            {
+              "check": "wavelength_first",
+              "status": "pass",
+              "detail": "col1 wavelength_first: match"
+            },
+            {
+              "check": "wavelength_last",
+              "status": "pass",
+              "detail": "col1 wavelength_last: match"
+            }
+          ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/spectral-radiance-factors-test-colour-sample-15-japanese-skin-complexion-5nm-wavelength"
     },
     {
       "entryId": "6043d076-fd73-4f53-b68a-5817feb6fdd9",
@@ -15785,7 +16511,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/spectral-radiance-factors-99-test-samples-cie-colour-fidelity-index-calculation"
     },
     {
       "entryId": "a2446659-e673-4417-b297-36fbe32cf044",
@@ -17961,7 +18688,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/spectral-radiance-factors-99-test-samples-cie-colour-fidelity-index-calculation-1nm"
     },
     {
       "entryId": "020236b1-90d5-4100-baaa-723f3e986df4",
@@ -18583,7 +19311,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/spectral-radiance-factors-14-test-samples-cie-colour-rendering-index-calculation"
     },
     {
       "entryId": "6eda1ee9-0ba7-4958-af18-c8b89e8418f3",
@@ -18956,7 +19685,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-standard-illuminant-1-nm"
     },
     {
       "entryId": "075b90f6-43e9-4016-a82b-7b48514eadbb",
@@ -19323,21 +20053,22 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-standard-illuminant-d50"
     },
     {
       "entryId": "94add99f-0fcf-4f00-ba99-526fa4e45f9d",
-      "rev": 1,
-      "contentHash": "9a2ddd7a0d5f8542839c60f3f0aa6c5faff2c6810f381f259dde351946c76084",
+      "rev": 2,
+      "contentHash": "e9c0d312c651bf16d764ecf55f900337ab7740a109f375316ffddb2328775af8",
       "status": "published",
       "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
-        "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedBy": "peter.blattner@metas.ch",
+        "modifiedDate": "2026-07-21T16:10:07.038Z",
+        "modifiedComment": "sha256 and lower wvl limit fixed"
       },
       "payload": {
         "identifier": {
@@ -19413,7 +20144,7 @@
           },
           {
             "hashMethod": "sha256",
-            "checksum": "e76f21bffff3d552ef7113025da5f325d5dfec200dd4b878b1a2f3a507032cb"
+            "checksum": "e76f210bffff3d552ef7113025da5f325d5dfec200dd4b878b1a2f3a507032cb"
           }
         ],
         "datatableInfo": {
@@ -19436,7 +20167,7 @@
               "title": "lambda",
               "unit": "nm",
               "quantity": "wavelength",
-              "wavelength_first": 360,
+              "wavelength_first": 300,
               "wavelength_last": 830,
               "wavelength_step": 1
             },
@@ -19648,6 +20379,51 @@
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
             }
           ]
+        },
+        {
+          "rev": 2,
+          "by": "peter.blattner@metas.ch",
+          "date": "2026-07-21T16:10:07.038Z",
+          "comment": "sha256 and lower wvl limit fixed",
+          "baseHash": "9a2ddd7a0d5f8542839c60f3f0aa6c5faff2c6810f381f259dde351946c76084",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "03d4eb9b837c60671627c946fb534deb"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "e76f210bffff3d552ef7113025da5f325d5dfec200dd4b878b1a2f3a507032cb"
+                }
+              ]
+            },
+            {
+              "op": "replace",
+              "path": "/datatableInfo/columnHeaders",
+              "value": [
+                {
+                  "title": "lambda",
+                  "unit": "nm",
+                  "quantity": "wavelength",
+                  "wavelength_first": 300,
+                  "wavelength_last": 830,
+                  "wavelength_step": 1
+                },
+                {
+                  "title": "S_D65(lambda)",
+                  "unit": "dimensionless",
+                  "quantity": "spectral distribution",
+                  "wavelength_first": 360,
+                  "wavelength_last": 830,
+                  "wavelength_step": 1
+                }
+              ]
+            }
+          ]
         }
       ],
       "validationLog": [
@@ -19695,8 +20471,54 @@
               "detail": "col1 wavelength_last: match"
             }
           ]
+        },
+        {
+          "date": "2026-07-21T16:09:53.469Z",
+          "by": "peter.blattner@metas.ch",
+          "fileName": "CIE_std_illum_D65.csv",
+          "md5": "03d4eb9b837c60671627c946fb534deb",
+          "sha256": "e76f210bffff3d552ef7113025da5f325d5dfec200dd4b878b1a2f3a507032cb",
+          "passed": true,
+          "results": [
+            {
+              "check": "md5",
+              "status": "pass",
+              "detail": "md5: match"
+            },
+            {
+              "check": "sha256",
+              "status": "pass",
+              "detail": "sha256: match"
+            },
+            {
+              "check": "fileName",
+              "status": "pass",
+              "detail": "fileName: match"
+            },
+            {
+              "check": "sumOfColumns",
+              "status": "pass",
+              "detail": "sumOfColumns: match"
+            },
+            {
+              "check": "sampleRow",
+              "status": "pass",
+              "detail": "sampleRow[120]: match"
+            },
+            {
+              "check": "wavelength_first",
+              "status": "pass",
+              "detail": "col1 wavelength_first: match"
+            },
+            {
+              "check": "wavelength_last",
+              "status": "pass",
+              "detail": "col1 wavelength_last: match"
+            }
+          ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-standard-illuminant-d65"
     },
     {
       "entryId": "decea119-6e29-4a5c-a7fb-12310bb6c29d",
@@ -20137,7 +20959,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-1931-colour-matching-functions-2-degree-observer"
     },
     {
       "entryId": "16e2c9f9-4f6e-4825-9ab9-1882ba8fb9f1",
@@ -20552,7 +21375,8 @@
             }
           ]
         }
-      ]
+      ],
+      "landingPage": "https://cie.co.at/datatable/cie-1964-colour-matching-functions-10-degree-observer"
     }
   ]
 }
