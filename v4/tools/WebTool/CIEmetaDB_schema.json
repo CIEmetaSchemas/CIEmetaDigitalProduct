@@ -108,6 +108,34 @@
 					"items": { "$ref": "#/definitions/historyRecord" },
 					"minItems": 1,
 					"description": "Append-only, oldest to newest. history[i].rev == i+1."
+				},
+				"validationLog": {
+					"type": "array",
+					"description": "Append-only log of CSV validation runs the editor chose to record (date, editor, file, computed hashes, per-check results). Independent of history.",
+					"items": {
+						"type": "object",
+						"properties": {
+							"date": { "$ref": "#/definitions/isoDateTime" },
+							"by": { "type": "string" },
+							"fileName": { "type": "string", "description": "Name of the CSV file that was validated." },
+							"md5": { "type": "string" },
+							"sha256": { "type": "string" },
+							"passed": { "type": "boolean", "description": "true when no check failed (warnings do not fail)." },
+							"results": {
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"check": { "type": "string", "description": "Check key, e.g. md5, sha256, fileName, numberOfRows, sumOfColumns, sampleRow." },
+										"status": { "type": "string", "enum": ["pass", "fail", "warn", "info"] },
+										"detail": { "type": "string" }
+									},
+									"required": ["status", "detail"]
+								}
+							}
+						},
+						"required": ["date", "by", "passed", "results"]
+					}
 				}
 			},
 			"required": ["entryId", "rev", "contentHash", "status", "domains", "audit", "payload", "history"]
@@ -137,6 +165,25 @@
 			"type": "array",
 			"items": { "$ref": "#/definitions/domain" },
 			"description": "The editable catalogue of CIE activity domains (Divisions) selectable per entry."
+		},
+		"defaults": {
+			"type": "object",
+			"description": "Editable default values (one per field) used to pre-fill auto-filled fields on new entries and available via 'Revert fields to defaults'. publicationYear is not stored here; new entries always use the current year.",
+			"properties": {
+				"publisher": { "type": "string" },
+				"language": { "type": "string", "description": "IETF BCP 47 / ISO 639-1 code." },
+				"creatorName": { "type": "string" },
+				"creatorNameType": { "type": "string", "enum": ["Organizational", "Personal"] },
+				"resourceType": { "type": "string" },
+				"resourceTypeGeneral": { "type": "string" },
+				"format": { "type": "string", "description": "MIME type." },
+				"rights": { "type": "string" },
+				"rightsURI": { "type": "string" },
+				"rightsIdentifier": { "type": "string" },
+				"interpolationMethod": { "type": "string" },
+				"extrapolationMethod": { "type": "string" },
+				"dataQuality": { "type": "string" }
+			}
 		},
 		"entries": {
 			"type": "array",

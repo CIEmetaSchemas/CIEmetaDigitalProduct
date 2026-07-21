@@ -30,6 +30,21 @@
       "label": "Image Technology"
     }
   ],
+  "defaults": {
+    "publisher": "International Commission on Illumination (CIE), Vienna, AT",
+    "language": "en",
+    "creatorName": "International Commission on Illumination (CIE)",
+    "creatorNameType": "Organizational",
+    "resourceType": "dataTable",
+    "resourceTypeGeneral": "Dataset",
+    "format": "text/csv",
+    "rights": "Creative Commons Attribution-ShareAlike 4.0 International",
+    "rightsURI": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "rightsIdentifier": "CC BY-SA 4.0",
+    "interpolationMethod": "linear",
+    "extrapolationMethod": "zero",
+    "dataQuality": "nominal"
+  },
   "entries": [
     {
       "entryId": "364e757a-5e95-6077-1093-c4136c7c5220",

@@ -7,6 +7,8 @@ metadata records, with full git-like change history and safe concurrent-edit mer
 Modelled on the termdat curation workflow. Runs entirely in the browser from a
 local file — **no server, no network access, no external/CDN dependencies.**
 
+**Interface version 1.1.0** (shown in the header).
+
 ## Files
 
 | File | Purpose |
@@ -33,11 +35,35 @@ session survives a reload; use **Save DB** to write the file back to disk.
 > **Save DB** writes straight back to the opened file. Firefox falls back to a
 > normal download.
 
+## Browsing the list
+
+The entry list can be sorted by **Title (A–Z)**, **Publication year** or
+**Modification date** via the *Sort* dropdown (the ▲/▼ button toggles ascending /
+descending; clicking a column header also sorts). Search and the domain/status
+filters narrow the list, and a counter shows **how many entries are shown of the
+total** (e.g. *Showing 12 of 36 entries (filtered)*).
+
+## Default values
+
+The fields auto-filled on a new entry (publisher, language, creator, resource type,
+format, rights, and the data-table interpolation/extrapolation/data-quality methods)
+come from an editable **`defaults`** block stored in the database — one value per
+field. Manage them with **Edit defaults…** in the toolbar (*Restore built-in
+defaults* resets them to the CIE standard values). Publication year is not stored;
+new entries always use the current year.
+
+In the entry editor, **Revert to defaults** (in the action bar at the top, next to
+*Update DOI*) resets **all** default-managed fields of the current entry — creators,
+publisher, language, resource type, format, rights and the data-table methods — to
+the database defaults. Title, identifier, publication year, subjects, descriptions,
+related items, checksums and validations are left untouched. Like other edits it
+becomes *unsaved* until you Save the entry.
+
 ## Data model (metadatabase envelope)
 
 The database is a single JSON object: metadata about the DB, an editable catalogue
-of **domains**, and an array of **entries**. Each entry wraps the DataCite payload
-with curation metadata:
+of **domains**, an editable **defaults** block, and an array of **entries**. Each
+entry wraps the DataCite payload with curation metadata:
 
 ```
 entry
@@ -75,10 +101,23 @@ drawn from alphanumerics **excluding the confusable characters `o O l L 1 I 0`**
 
 The **Update DOI** action (and the **New entry** dialog) generates a compliant
 suffix, checks uniqueness within the database, and marks the entry `proposed`.
-Real DOIs are assigned by **CIE CB** — clear the *proposed* flag once the official
-DOI is in place. For translations, which reuse the number with an appended
-ISO-639-1 language suffix (e.g. `10.25039/CIE.DS.mifmy4x4.ES`), enter the DOI
-manually in the identifier field.
+For translations, which reuse the number with an appended ISO-639-1 language suffix
+(e.g. `10.25039/CIE.DS.mifmy4x4.ES`), enter the DOI manually in the identifier field.
+
+The DOI shown under the entry title is a link to `https://doi.org/<identifier>`
+(opens in a new tab).
+
+### The `proposed` flag
+
+Real CIE DOIs are assigned by **CIE CB**, not by this tool. When you *generate* a
+DOI locally the entry is flagged `idProposed: true` (envelope field, per entry) and
+a **proposed** badge appears in the list — a reminder that the identifier is a local
+placeholder, not yet an official registered DOI. Once CIE CB assigns the real DOI,
+enter it and clear the *"DOI is a local proposal"* checkbox in the editor; the badge
+disappears. Entries imported from published DataCite files are **not** proposed. In
+the shipped `CIEmetaDB_starter.json` every entry has `idProposed: false`, so a fresh
+load shows no proposed badges — if you see one, it is from a locally created/edited
+working copy (the tool auto-saves to browser storage).
 
 ## Validation against the CSV data file
 
@@ -92,16 +131,25 @@ computes, from the file:
 - a sample row (1-based),
 - the wavelength range (first / last / step) from column 1.
 
-You can then either:
+On selection it immediately **checks** the computed values against the stored
+metadata (matches/mismatches highlighted), including the **file name** against the
+`fileName` alternate identifier, plus md5/sha256, row/column counts, column sums,
+the stored sample row and the column-1 wavelength range. Numeric comparisons use a
+relative tolerance to absorb floating-point formatting; checksums, file name and
+the sample row are compared exactly.
 
-- **Check** the computed values against the stored metadata (matches and
-  mismatches are highlighted), or
+You can then:
+
 - **Generate / fill** the `checksums`, `datatableInfo.validations`
   (`sumOfColumns`, `sampleRow`, `numberOfRows`, `numberOfColumns`) and the
-  column-1 `wavelength_first/last/step` fields directly into the entry.
-
-Numeric comparisons use a relative tolerance to absorb floating-point formatting;
-checksums and the sample row are compared exactly.
+  column-1 `wavelength_first/last/step` fields directly into the entry. The sample
+  row defaults to the one **already stored** in the metadata if present; otherwise
+  it is auto-chosen — row 120, or the **middle row** for files with fewer than 120
+  rows — so short files get a valid representative row.
+- **Log this validation to the entry** — records the run (date, editor, file name,
+  md5, sha256, overall pass/fail and every per-check result) into the entry's
+  append-only `validationLog`, stored in the database. Past logged validations are
+  listed under **Logged validations** in the same tab.
 
 ## Concurrency — optimistic per-entry merge
 
@@ -127,7 +175,7 @@ more per entry. Entries can be filtered by domain in the list.
 ## Export
 
 - **Save DB** / **Save DB As…** — the whole metadatabase (with history and audit).
-- **Export DataCite…** (toolbar) or **Export DataCite file** (per entry) — emits
+- **Export Metadata…** (toolbar) or **Export Metadata file** (per entry) — emits
   standard `*.csv_metadata.json` files matching the format in `../../examples/`
   (envelope, history and audit stripped), ready for publication.
 
