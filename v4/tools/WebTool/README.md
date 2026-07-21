@@ -7,7 +7,10 @@ metadata records, with full git-like change history and safe concurrent-edit mer
 Modelled on the termdat curation workflow. Runs entirely in the browser from a
 local file — **no server, no network access, no external/CDN dependencies.**
 
-**Interface version 1.1.0** (shown in the header).
+**Interface version 1.2.0** (shown in the header).
+
+A **? Help** button in the toolbar opens an in-app summary of the features below,
+including the link to the Crossref deposit validator.
 
 ## Files
 
@@ -57,6 +60,11 @@ field. Manage them with **Edit defaults…** in the toolbar (*Restore built-in
 defaults* resets them to the CIE standard values). Publication year is not stored;
 new entries always use the current year.
 
+The same dialog also holds the **Crossref deposit-header defaults** — depositor name
+and email, registrant, database title, publisher name and the institution fields
+(name, acronym, place, department). These are organisation-wide values used by
+**Export Crossref XML** (see below); set them once and they apply to every deposit.
+
 In the entry editor, **Revert to defaults** (in the action bar at the top, next to
 *Update DOI*) resets **all** default-managed fields of the current entry — creators,
 publisher, language, resource type, format, rights and the data-table methods — to
@@ -77,6 +85,7 @@ entry
 ├─ contentHash    sha256 of the canonical payload (concurrency/merge anchor)
 ├─ status         draft | review | published
 ├─ idProposed     true when the DOI was generated locally, not yet assigned by CIE CB
+├─ landingPage    URL the DOI resolves to (Crossref <resource>); envelope-level, per entry
 ├─ domains        [ CIE-division codes ]
 ├─ audit          createdBy/Date, modifiedBy/Date, modifiedComment
 ├─ payload        the CIEmetaDigitalProduct (DataCite) record
@@ -131,6 +140,20 @@ disappears. Entries imported from published DataCite files are **not** proposed.
 the shipped `CIEmetaDB_starter.json` every entry has `idProposed: false`, so a fresh
 load shows no proposed badges — if you see one, it is from a locally created/edited
 working copy (the tool auto-saves to browser storage).
+
+### DOI landing page
+
+Every entry carries a **DOI landing page** — the URL the DOI resolves to, i.e. the
+Crossref `<resource>`. It is an **envelope-level** field (stored per entry, kept out
+of exported DataCite `*.csv_metadata.json` files), shown as a link next to the DOI
+in the entry header and editable in the **Database entry** section of the Form tab.
+Like other envelope changes (status, domains) it saves without a version bump.
+
+It is required for Crossref deposit: if it is empty when you **Export Crossref XML**,
+the tool prompts for the URL and saves it on the entry. Existing landing pages can be
+recovered from a registered DOI via the Crossref REST API
+(`https://api.crossref.org/works/<doi>` → `resource.primary.URL`) or by following
+`https://doi.org/<doi>`.
 
 ## Validation against the CSV data file
 
@@ -207,6 +230,35 @@ more per entry. Entries can be filtered by domain in the list.
 - **Export Metadata…** (toolbar) or **Export Metadata file** (per entry) — emits
   standard `*.csv_metadata.json` files matching the format in `../../examples/`
   (envelope, history and audit stripped), ready for publication.
+- **Export Crossref XML…** (per entry) — see below.
+
+### Export to Crossref XML (DOI registration)
+
+The per-entry **Export Crossref XML…** button (entry action bar) generates a
+**Crossref 5.3.1 `<doi_batch>`** deposit file for the selected entry, ready to
+register the DOI. The file is named `<dataset>(<YYYYMMDDHHMMSS>).xml`.
+
+- The **deposit header** (`depositor` name/email, `registrant`) and the
+  **`<database_metadata>`** block (database title, publisher, institution) are filled
+  from the Crossref defaults in **Edit defaults…**.
+- The entry maps to a `<dataset dataset_type="collection">`: title, description,
+  format (MIME), contributors (from `creators` — organisations go in `<surname>`,
+  people as `<given_name>`/`<surname>`), the DOI, and the `<resource>` landing page.
+- **Related items** are emitted under the Crossref relations `<program>`, mapping each
+  DataCite `relationType` to the correct `inter_work_relation` / `intra_work_relation`
+  (e.g. `IsPartOf`, `IsReferencedBy`, `IsDerivedFrom` → inter; `IsVersionOf`,
+  `IsIdenticalTo` → intra). Relations with **no Crossref equivalent** (`IsDescribedBy`,
+  `Describes`, `HasMetadata`, `IsMetadataFor`, `IsPublishedIn`) are **skipped and
+  reported** in a message so the file still generates. The mapping table lives in
+  `CIEmetaDB.html` (`CROSSREF_RELATION_MAP`) and is easy to adjust.
+- If the entry has no **DOI landing page**, you are prompted for it first (and it is
+  saved on the entry).
+
+**Validate** a generated file with the Crossref deposit parser:
+<https://data.crossref.org/reports/parser.html>. Reference schemas:
+[`crossref5.3.1.xsd`](https://data.crossref.org/schemas/crossref5.3.1.xsd),
+[`common5.3.1.xsd`](https://data.crossref.org/schemas/common5.3.1.xsd),
+[`relations.xsd`](https://data.crossref.org/schemas/relations.xsd).
 
 ## Notes
 
