@@ -172,6 +172,10 @@
         <select id="filterPublication" title="Filter by related publication"><option value="">All related publications</option></select>
       </div>
       <div class="row">
+        <select id="filterRev" multiple title="Filter by revision — Ctrl/Cmd-click to select several; none selected = all"></select>
+        <button id="filterRevClear" class="ghost small" title="Clear revision filter" style="white-space:nowrap">All revs</button>
+      </div>
+      <div class="row">
         <select id="sortBy" title="Sort entries by">
           <option value="title">Sort: Title (A–Z)</option>
           <option value="pubyear">Sort: Publication year</option>
@@ -771,10 +775,21 @@ function updateDbWarning(dups){
   w.style.display="block";
   w.querySelectorAll("a[data-doi]").forEach(a=>{ a.onclick=()=>{ el("search").value=a.dataset.doi; renderList(); }; });
 }
+/* populate the revision multi-select from the revisions present, preserving selection */
+function refreshRevFilter(){
+  const sel=el("filterRev"); if(!sel) return;
+  const chosen=new Set([...sel.selectedOptions].map(o=>o.value));
+  const revs=DB?[...new Set(DB.entries.map(e=>e.rev))].sort((a,b)=>a-b):[];
+  sel.innerHTML=revs.map(r=>`<option value="${r}">rev ${r}</option>`).join("");
+  sel.size=Math.min(5,Math.max(2,revs.length));
+  [...sel.options].forEach(o=>{ if(chosen.has(o.value)) o.selected=true; });
+}
 function renderList(){
   refreshPublicationFilter();
+  refreshRevFilter();
   const q=el("search").value.trim().toLowerCase();
   const fd=el("filterDomain").value, fs=el("filterStatus").value, fp=el("filterPublication").value;
+  const fr=el("filterRev")?[...el("filterRev").selectedOptions].map(o=>o.value):[];
   const dups=duplicateDoiMap();
   const dupIds=new Set(); dups.forEach(list=>list.forEach(e=>dupIds.add(e.entryId)));
   let rows=DB?DB.entries.slice():[];
@@ -786,6 +801,7 @@ function renderList(){
   if(fd) rows=rows.filter(e=>(e.domains||[]).includes(fd));
   if(fs) rows=rows.filter(e=>e.status===fs);
   if(fp) rows=rows.filter(e=>entryRelatedPubs(e).some(pub=>pub.key===fp));
+  if(fr.length) rows=rows.filter(e=>fr.includes(String(e.rev)));
   const total = DB?DB.entries.length:0;
   rows.sort((a,b)=>{
     let va,vb;
@@ -807,7 +823,7 @@ function renderList(){
         <div class="kv">${esc(entryFilename(e))}</div>${doms}</td>
       <td><div class="doi-cell">${esc(entryDoi(e))}</div>${e.idProposed?'<span class="badge proposed">proposed</span>':''}${dupIds.has(e.entryId)?'<span class="badge dup" title="Duplicate DOI — must be fixed">duplicate DOI</span>':''}</td>
       <td><span class="badge ${esc(e.status)}">${esc(e.status)}</span></td>
-      <td class="kv">${esc((e.audit.modifiedDate||"").slice(0,10))}<br>${esc(e.audit.modifiedBy)}<br>rev ${e.rev}</td>`;
+      <td class="kv">${esc((e.audit.modifiedDate||"").replace("T"," ").slice(0,19))}<br>${esc(e.audit.modifiedBy)}<br>rev ${e.rev}</td>`;
     tr.onclick=()=>selectEntry(e.entryId);
     tb.appendChild(tr);
   }
@@ -1120,6 +1136,18 @@ function renderValidate(page,e){
   const fsel=document.createElement("div"); fsel.className="filesel"; fsel.style.marginBottom="12px";
   const file=document.createElement("input"); file.type="file"; file.accept=".csv,text/csv"; file.style.maxWidth="360px";
   fsel.appendChild(file); page.appendChild(fsel);
+
+  // Expected file name (from the fileName alternateIdentifier), if known.
+  // Browsers do not allow pre-selecting/defaulting a path in the native Open
+  // dialog, so we surface it as a hint instead and warn if the pick differs.
+  const expected=entryFilename(e);
+  const nameHint=document.createElement("div"); nameHint.className="hint"; nameHint.style.marginBottom="12px";
+  if(expected){
+    nameHint.innerHTML=`Expected file name: <code>${esc(expected)}</code> `+
+      `<button class="ghost" type="button" style="padding:2px 8px">Copy name</button>`;
+    nameHint.querySelector("button").onclick=()=>{ navigator.clipboard&&navigator.clipboard.writeText(expected); toast("File name copied","ok"); };
+    page.appendChild(nameHint);
+  }
 
   const out=document.createElement("div"); page.appendChild(out);
 
@@ -1774,6 +1802,8 @@ function wire(){
   el("filterDomain").onchange=renderList;
   el("filterStatus").onchange=renderList;
   el("filterPublication").onchange=renderList;
+  el("filterRev").onchange=renderList;
+  el("filterRevClear").onclick=()=>{ const s=el("filterRev"); [...s.options].forEach(o=>o.selected=false); renderList(); };
   el("sortBy").onchange=()=>{ sort.key=el("sortBy").value; sort.dir=1; renderList(); };
   el("sortDir").onclick=()=>{ sort.dir*=-1; renderList(); };
   document.querySelectorAll("table.entries th").forEach(th=>{
