@@ -169,6 +169,9 @@
         </select>
       </div>
       <div class="row">
+        <select id="filterPublication" title="Filter by related publication"><option value="">All related publications</option></select>
+      </div>
+      <div class="row">
         <select id="sortBy" title="Sort entries by">
           <option value="title">Sort: Title (A–Z)</option>
           <option value="pubyear">Sort: Publication year</option>
@@ -730,6 +733,27 @@ function entryFilename(e){
   const a=(e.payload&&e.payload.alternateIdentifiers)||[];
   const f=a.find(x=>x.alternateIdentifierType==="fileName"); return f?f.alternateIdentifier:"";
 }
+/* related publications of an entry, as {key,label}: keyed by identifier (DOI) when present, else title */
+function entryRelatedPubs(e){
+  const items=(e.payload&&e.payload.relatedItems)||[];
+  return items.map(it=>{
+    const title=(it.titles&&it.titles[0])||"";
+    const id=it.relatedItemIdentifier||"";
+    const key=id||title;
+    const label=title||id;
+    return {key,label};
+  }).filter(x=>x.key);
+}
+function refreshPublicationFilter(){
+  const sel=el("filterPublication"); if(!sel) return;
+  const cur=sel.value;
+  const map=new Map();
+  if(DB) for(const e of DB.entries) for(const pub of entryRelatedPubs(e)) if(!map.has(pub.key)) map.set(pub.key,pub.label);
+  const opts=[...map.entries()].sort((a,b)=>a[1].toLowerCase()<b[1].toLowerCase()?-1:a[1].toLowerCase()>b[1].toLowerCase()?1:0);
+  sel.innerHTML='<option value="">All related publications</option>'+
+    opts.map(([k,l])=>`<option value="${esc(k)}">${esc(l)}</option>`).join("");
+  sel.value=cur; // preserved if still present; otherwise browser resets to "" (All)
+}
 /* DOIs must be unique: map of doi -> [entries] for any DOI used more than once */
 function duplicateDoiMap(){
   const m=new Map();
@@ -748,8 +772,9 @@ function updateDbWarning(dups){
   w.querySelectorAll("a[data-doi]").forEach(a=>{ a.onclick=()=>{ el("search").value=a.dataset.doi; renderList(); }; });
 }
 function renderList(){
+  refreshPublicationFilter();
   const q=el("search").value.trim().toLowerCase();
-  const fd=el("filterDomain").value, fs=el("filterStatus").value;
+  const fd=el("filterDomain").value, fs=el("filterStatus").value, fp=el("filterPublication").value;
   const dups=duplicateDoiMap();
   const dupIds=new Set(); dups.forEach(list=>list.forEach(e=>dupIds.add(e.entryId)));
   let rows=DB?DB.entries.slice():[];
@@ -760,6 +785,7 @@ function renderList(){
   });
   if(fd) rows=rows.filter(e=>(e.domains||[]).includes(fd));
   if(fs) rows=rows.filter(e=>e.status===fs);
+  if(fp) rows=rows.filter(e=>entryRelatedPubs(e).some(pub=>pub.key===fp));
   const total = DB?DB.entries.length:0;
   rows.sort((a,b)=>{
     let va,vb;
@@ -1747,6 +1773,7 @@ function wire(){
   el("search").oninput=renderList;
   el("filterDomain").onchange=renderList;
   el("filterStatus").onchange=renderList;
+  el("filterPublication").onchange=renderList;
   el("sortBy").onchange=()=>{ sort.key=el("sortBy").value; sort.dir=1; renderList(); };
   el("sortDir").onclick=()=>{ sort.dir*=-1; renderList(); };
   document.querySelectorAll("table.entries th").forEach(th=>{

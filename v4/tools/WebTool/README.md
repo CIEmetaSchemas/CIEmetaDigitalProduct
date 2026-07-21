@@ -43,6 +43,11 @@ descending; clicking a column header also sorts). Search and the domain/status
 filters narrow the list, and a counter shows **how many entries are shown of the
 total** (e.g. *Showing 12 of 36 entries (filtered)*).
 
+The **related-publication** filter is a dropdown listing the titles of every
+related item (publication) referenced across the database; picking one shows only
+the datasets related to that publication. It is keyed by the publication's DOI (so
+identical titles group correctly) and combines with the other filters and search.
+
 ## Default values
 
 The fields auto-filled on a new entry (publisher, language, creator, resource type,
