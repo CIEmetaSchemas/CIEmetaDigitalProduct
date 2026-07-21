@@ -72,12 +72,13 @@ revision number, author, date and change comment.
 
 CIE dataset DOIs follow `10.25039/CIE.DS.$$$$$$$$` where the 8-character suffix is
 drawn from alphanumerics **excluding the confusable characters `o O l L 1 I 0`**.
-Translations reuse the number with an appended ISO-639-1 language suffix, e.g.
-`10.25039/CIE.DS.mifmy4x4.ES`.
 
-The **Generate DOI** action produces a compliant suffix, checks uniqueness within
-the database, and marks the entry `proposed`. Real DOIs are assigned by **CIE CB** —
-clear the *proposed* flag once the official DOI is in place.
+The **Update DOI** action (and the **New entry** dialog) generates a compliant
+suffix, checks uniqueness within the database, and marks the entry `proposed`.
+Real DOIs are assigned by **CIE CB** — clear the *proposed* flag once the official
+DOI is in place. For translations, which reuse the number with an appended
+ISO-639-1 language suffix (e.g. `10.25039/CIE.DS.mifmy4x4.ES`), enter the DOI
+manually in the identifier field.
 
 ## Validation against the CSV data file
 

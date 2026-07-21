@@ -523,6 +523,7 @@ function buildCieSchema(){
 let DB = null;          // current metadatabase
 let selectedId = null;  // selected entryId
 let editModel = null;   // working payload copy of selected entry
+let editMeta = null;    // working copy of entry envelope (status/domains/idProposed)
 let editDirty = false;
 let sort = {key:"title", dir:1};
 let dbFileHandle = null; // File System Access API handle (if used)
@@ -608,10 +609,10 @@ function genDoiSuffix(){
   let s=""; for(let i=0;i<APP.DOI_LEN;i++) s+=APP.DOI_ALPHABET[randInt(APP.DOI_ALPHABET.length)];
   return s;
 }
-function generateDoi(lang){
+function generateDoi(){
   const existing=new Set(DB.entries.map(e=>e.payload&&e.payload.identifier&&e.payload.identifier.identifier));
   for(let tries=0;tries<1000;tries++){
-    const doi=APP.DOI_PREFIX+genDoiSuffix()+(lang?"."+lang.toUpperCase():"");
+    const doi=APP.DOI_PREFIX+genDoiSuffix();
     if(!existing.has(doi)) return doi;
   }
   return APP.DOI_PREFIX+genDoiSuffix();
@@ -719,9 +720,11 @@ function selectEntry(id, keepTab){
   selectedId=id; editDirty=false;
   const e=findEntry(id);
   editModel = e?clone(e.payload):null;
+  editMeta = e?{status:e.status, domains:clone(e.domains||[]), idProposed:!!e.idProposed}:null;
   if(!keepTab) activeTab="form";
   renderList(); renderDetail();
 }
+function resetEditMeta(e){ editMeta = {status:e.status, domains:clone(e.domains||[]), idProposed:!!e.idProposed}; }
 function markDirty(){ editDirty=true; syncJsonView(); const s=el("saveState"); if(s) s.textContent="● unsaved"; }
 
 function renderDetail(){
@@ -742,7 +745,7 @@ function renderDetail(){
       <button id="btnSaveEntry">Save entry</button>
       <button class="ghost" id="btnRevert">Revert</button>
       <button class="ghost" id="btnValidateCsv">Validate against CSV&hellip;</button>
-      <button class="ghost" id="btnGenDoi">Generate DOI</button>
+      <button class="ghost" id="btnGenDoi">Update DOI</button>
       <button class="ghost" id="btnDupe">Duplicate</button>
       <button class="ghost" id="btnExportOne">Export DataCite file</button>
       <button class="danger" id="btnDelete">Delete</button>
@@ -759,7 +762,7 @@ function renderDetail(){
   const page=document.createElement("div"); page.className="tabpage"; page.id="tabpage"; pane.appendChild(page);
 
   el("btnSaveEntry").onclick=saveEntry;
-  el("btnRevert").onclick=()=>{ editModel=clone(e.payload); editDirty=false; renderDetail(); toast("Reverted to saved version"); };
+  el("btnRevert").onclick=()=>{ editModel=clone(e.payload); resetEditMeta(e); editDirty=false; renderDetail(); toast("Reverted to saved version"); };
   el("btnValidateCsv").onclick=()=>{ activeTab="validate"; renderDetail(); };
   el("btnGenDoi").onclick=()=>openDoiDialog(e);
   el("btnDupe").onclick=()=>duplicateEntry(e);
@@ -816,18 +819,16 @@ function renderForm(page,e){
   const fsMeta=document.createElement("fieldset");
   fsMeta.innerHTML='<legend>Database entry</legend>';
   const gm=document.createElement("div"); gm.className="grid";
-  gm.appendChild(field("Status", sel(e,"status",["draft","review","published"]))); // status edits entry directly
-  // domains
+  // status/domains/idProposed edit the envelope buffer (editMeta); committed via Save entry
+  gm.appendChild(field("Status", sel(editMeta,"status",["draft","review","published"])));
   const domWrap=document.createElement("div");
   DB.domains.forEach(d=>{
     const lab=document.createElement("label"); lab.style.display="inline-flex"; lab.style.alignItems="center"; lab.style.gap="4px"; lab.style.marginRight="12px"; lab.style.padding="0";
-    const cb=document.createElement("input"); cb.type="checkbox"; cb.style.width="auto"; cb.checked=(e.domains||[]).includes(d.code);
-    cb.onchange=()=>{ e.domains=e.domains||[]; if(cb.checked){ if(!e.domains.includes(d.code)) e.domains.push(d.code);} else e.domains=e.domains.filter(x=>x!==d.code); persist(); renderList(); };
+    const cb=document.createElement("input"); cb.type="checkbox"; cb.style.width="auto"; cb.checked=(editMeta.domains||[]).includes(d.code);
+    cb.onchange=()=>{ editMeta.domains=editMeta.domains||[]; if(cb.checked){ if(!editMeta.domains.includes(d.code)) editMeta.domains.push(d.code);} else editMeta.domains=editMeta.domains.filter(x=>x!==d.code); markDirty(); };
     lab.appendChild(cb); lab.appendChild(document.createTextNode(d.code+" "+d.label)); domWrap.appendChild(lab);
   });
   gm.appendChild(field("Domains", domWrap));
-  // status select rebinding (sel bound to e, but we need re-render list)
-  gm.querySelector("select").onchange=function(){ e.status=this.value; persist(); renderList(); };
   fsMeta.appendChild(gm); page.appendChild(fsMeta);
 
   // identifier
@@ -837,10 +838,10 @@ function renderForm(page,e){
   gi.appendChild(field("Identifier (DOI)", inp(p.identifier,"identifier",{placeholder:APP.DOI_PREFIX+"xxxxxxxx"})));
   gi.appendChild(field("Identifier type", inp(p.identifier,"identifierType")));
   const idHint=document.createElement("div"); idHint.className="hint";
-  idHint.textContent="Format 10.25039/CIE.DS.①②③④⑤⑥⑦⑧ (8 chars, excludes o O l L 1 I 0). DOIs are normally assigned by CIE CB — use \"Generate DOI\" for a draft proposal.";
+  idHint.textContent="Format 10.25039/CIE.DS.①②③④⑤⑥⑦⑧ (8 chars, excludes o O l L 1 I 0). DOIs are normally assigned by CIE CB — use \"Update DOI\" for a draft proposal.";
   const idProp=document.createElement("label"); idProp.style.padding="0";
-  const cbp=document.createElement("input"); cbp.type="checkbox"; cbp.style.width="auto"; cbp.checked=!!e.idProposed;
-  cbp.onchange=()=>{ e.idProposed=cbp.checked; persist(); renderList(); };
+  const cbp=document.createElement("input"); cbp.type="checkbox"; cbp.style.width="auto"; cbp.checked=!!editMeta.idProposed;
+  cbp.onchange=()=>{ editMeta.idProposed=cbp.checked; markDirty(); };
   idProp.appendChild(cbp); idProp.appendChild(document.createTextNode(" DOI is a local proposal (not yet assigned by CIE CB)"));
   fsId.appendChild(gi); fsId.appendChild(idHint); fsId.appendChild(idProp); page.appendChild(fsId);
 
@@ -1111,7 +1112,8 @@ function renderHistory(page,e){
     head.innerHTML=`<span class="rev">rev ${h.rev}</span><span class="who">${esc(h.by)} · ${esc((h.date||"").replace("T"," ").slice(0,19))}</span>`;
     box.appendChild(head);
     if(h.comment){ const c=document.createElement("div"); c.className="cmt"; c.textContent=h.comment; box.appendChild(c); }
-    const diff=document.createElement("div"); diff.className="diff"; diff.innerHTML=renderDiff(h.patch,h.rev); box.appendChild(diff);
+    const prev = h.rev>1 ? reconstruct(e.history, h.rev-1) : {};
+    const diff=document.createElement("div"); diff.className="diff"; diff.innerHTML=renderDiff(h.patch,h.rev,prev); box.appendChild(diff);
     if(h.rev<e.rev){
       const rb=document.createElement("button"); rb.className="ghost small"; rb.style.marginTop="6px"; rb.textContent="Restore this revision";
       rb.onclick=()=>{ const old=reconstruct(e.history,h.rev); editModel=old; markDirty(); toast(`Loaded rev ${h.rev} into editor — Save to commit as new revision`,"ok"); activeTab="form"; renderDetail(); };
@@ -1120,30 +1122,50 @@ function renderHistory(page,e){
     page.appendChild(box);
   }
 }
-function renderDiff(patch,rev){
+function getAtPointer(doc, path){
+  const toks=ptrTokens(path); let cur=doc;
+  for(const t of toks){ if(cur==null) return undefined; cur=Array.isArray(cur)?cur[parseInt(t,10)]:cur[t]; }
+  return cur;
+}
+function renderDiff(patch,rev,prev){
   if(rev===1) return '<span class="op-add">+ initial content imported/created</span>';
   return patch.map(op=>{
     const path=esc(op.path);
+    const old=getAtPointer(prev, op.path);
     if(op.op==="add") return `<span class="op-add">+ add ${path} = ${esc(shortVal(op.value))}</span>`;
-    if(op.op==="remove") return `<span class="op-remove">− remove ${path}</span>`;
-    if(op.op==="replace") return `<span class="op-replace">~ ${path} → ${esc(shortVal(op.value))}</span>`;
+    if(op.op==="remove") return `<span class="op-remove">− remove ${path} (was: ${esc(shortVal(old))})</span>`;
+    if(op.op==="replace") return `<span class="op-replace">~ ${path}: ${esc(shortVal(old))} → ${esc(shortVal(op.value))}</span>`;
     return esc(JSON.stringify(op));
   }).join("\n");
 }
-function shortVal(v){ const s=typeof v==="string"?v:JSON.stringify(v); return s.length>120?s.slice(0,117)+"…":s; }
+function shortVal(v){ if(v===undefined) return "∅"; const s=typeof v==="string"?v:JSON.stringify(v); return s.length>120?s.slice(0,117)+"…":s; }
 
 /* ---- entry actions ---- */
+function metaChanged(e){
+  if(!editMeta) return false;
+  return editMeta.status!==e.status
+    || !!editMeta.idProposed!==!!e.idProposed
+    || canonical((editMeta.domains||[]).slice().sort())!==canonical((e.domains||[]).slice().sort());
+}
 function saveEntry(){
   const e=findEntry(selectedId); if(!e) return;
   const errs=validate(editModel,CIE_SCHEMA);
   if(errs.length){ if(!confirm("The entry has "+errs.length+" schema issue(s):\n\n"+errs.slice(0,10).join("\n")+(errs.length>10?"\n…":"")+"\n\nSave anyway?")) return; }
   const patch=diffPatch(e.payload,editModel,"");
-  if(patch.length===0){ toast("No changes to save"); editDirty=false; renderDetail(); return; }
-  const comment=prompt("Change comment (what changed and why):","");
-  if(comment===null) return; // cancelled
-  commitEdit(e,editModel,comment);
-  editDirty=false; persist(); renderList(); renderDetail();
-  toast("Saved rev "+e.rev,"ok");
+  const meta=metaChanged(e);
+  if(patch.length===0 && !meta){ toast("No changes to save"); editDirty=false; renderDetail(); return; }
+  // payload changes are versioned in history (with a comment); envelope changes are not
+  if(patch.length){
+    const comment=prompt("Change comment (what changed and why):","");
+    if(comment===null) return; // cancelled
+    commitEdit(e,editModel,comment);
+  }
+  if(meta){
+    e.status=editMeta.status; e.domains=clone(editMeta.domains); e.idProposed=editMeta.idProposed;
+    if(!patch.length){ e.audit.modifiedBy=currentUser(); e.audit.modifiedDate=nowISO(); }
+  }
+  resetEditMeta(e); editDirty=false; persist(); renderList(); renderDetail();
+  toast(patch.length?("Saved rev "+e.rev):"Saved entry changes","ok");
 }
 function deleteEntry(e){
   if(!confirm(`Delete entry "${entryTitle(e)}" (${entryDoi(e)})?\nThis removes it from the database.`)) return;
@@ -1181,23 +1203,20 @@ function mkBtn(label,cls,fn){ const b=document.createElement("button"); b.textCo
 function openNewEntryDialog(){
   const body=document.createElement("div");
   const g=document.createElement("div"); g.className="grid";
-  const langInp=document.createElement("input"); langInp.placeholder="(optional) translation language code, e.g. ES";
   const doiInp=document.createElement("input");
-  const regen=mkBtn("Generate","ghost small",()=>{ doiInp.value=generateDoi(langInp.value.trim()); });
+  const regen=mkBtn("Generate","ghost small",()=>{ doiInp.value=generateDoi(); });
   const doiWrap=document.createElement("div"); doiWrap.style.display="flex"; doiWrap.style.gap="6px"; doiWrap.appendChild(doiInp); doiWrap.appendChild(regen);
-  doiInp.value=generateDoi("");
+  doiInp.value=generateDoi();
   const titleInp=document.createElement("input");
   const fileInp=document.createElement("input"); fileInp.placeholder="CIE_xxx.csv";
   g.appendChild(field("Title",titleInp));
   g.appendChild(field("DOI",doiWrap));
-  g.appendChild(field("Language suffix",langInp));
   g.appendChild(field("File name",fileInp));
   body.appendChild(g);
   const hint=document.createElement("p"); hint.className="hint"; hint.textContent="A draft DOI is generated locally (marked \"proposed\"). Real DOIs are assigned by CIE CB.";
   body.appendChild(hint);
-  langInp.oninput=()=>{ /* keep current suffix in sync only via Generate */ };
   const create=mkBtn("Create entry","sec",()=>{
-    const doi=doiInp.value.trim()||generateDoi(langInp.value.trim());
+    const doi=doiInp.value.trim()||generateDoi();
     const p=blankPayload(doi, fileInp.value.trim());
     if(p.titles&&p.titles[0]) p.titles[0].title=titleInp.value.trim();
     const e=createEntry(p,{status:"draft",idProposed:true,comment:"Created"});
@@ -1209,19 +1228,17 @@ function openNewEntryDialog(){
 function openDoiDialog(e){
   const body=document.createElement("div");
   const g=document.createElement("div"); g.className="grid";
-  const langInp=document.createElement("input"); langInp.placeholder="e.g. ES (optional)";
-  const doiInp=document.createElement("input"); doiInp.value=generateDoi("");
-  const regen=mkBtn("Regenerate","ghost small",()=>{ doiInp.value=generateDoi(langInp.value.trim()); });
+  const doiInp=document.createElement("input"); doiInp.value=generateDoi();
+  const regen=mkBtn("Regenerate","ghost small",()=>{ doiInp.value=generateDoi(); });
   const w=document.createElement("div"); w.style.display="flex"; w.style.gap="6px"; w.appendChild(doiInp); w.appendChild(regen);
   g.appendChild(field("Proposed DOI",w));
-  g.appendChild(field("Language suffix",langInp));
   body.appendChild(g);
   const apply=mkBtn("Apply to entry","sec",()=>{
     editModel.identifier=editModel.identifier||{identifierType:"DOI"};
     editModel.identifier.identifier=doiInp.value.trim();
-    e.idProposed=true; markDirty(); closeModal(); renderDetail(); toast("DOI applied (proposed) — Save to commit");
+    editMeta.idProposed=true; markDirty(); closeModal(); renderDetail(); toast("DOI applied (proposed) — Save to commit");
   });
-  modal("Generate DOI",body,[mkBtn("Cancel","ghost",closeModal),apply]);
+  modal("Update DOI",body,[mkBtn("Cancel","ghost",closeModal),apply]);
 }
 
 function openDomainsDialog(){
