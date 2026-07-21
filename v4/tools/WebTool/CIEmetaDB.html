@@ -108,6 +108,12 @@
   .modal{background:#fff;border-radius:10px;box-shadow:var(--shadow);max-width:820px;width:100%;max-height:86vh;overflow:auto;padding:20px 22px}
   .modal h3{margin:0 0 12px;color:var(--cie-main)}
   .modal .foot{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+  .helpdoc{font-size:13px;line-height:1.5;color:var(--ink)}
+  .helpdoc h4{margin:15px 0 4px;color:var(--cie-main)}
+  .helpdoc ul{margin:4px 0;padding-left:20px}
+  .helpdoc li{margin:3px 0}
+  .helpdoc code{background:#f0f4fa;padding:1px 4px;border-radius:4px;font-size:12px}
+  .helpdoc a{color:var(--cie-sec1)}
   .cols2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
   .conflict{border:1px solid var(--line);border-radius:8px;padding:10px;margin:10px 0}
   .conflict h4{margin:0 0 6px}
@@ -150,6 +156,7 @@
   <button id="btnDomains" class="ghost">Domains&hellip;</button>
   <button id="btnDefaults" class="ghost">Edit defaults&hellip;</button>
   <button id="btnExportDataCite" class="ghost">Export Metadata&hellip;</button>
+  <button id="btnHelp" class="ghost" title="Help &amp; information">? Help</button>
   <span class="kv" id="dbStat"></span>
 </div>
 
@@ -216,7 +223,7 @@
 
 /* ---------- constants ---------- */
 const APP = {
-  VERSION: "1.1.0",
+  VERSION: "1.2.0",
   DB_SCHEMA_NAME: "CIEmetaDB",
   DB_SCHEMA_VERSION: 1,
   DOI_PREFIX: "10.25039/CIE.DS.",
@@ -1984,6 +1991,71 @@ function pickFile(accept, cb){
 /* ============================================================================
    wiring
    ==========================================================================*/
+function openHelpDialog(){
+  const body=document.createElement("div");
+  body.className="helpdoc";
+  body.innerHTML=`
+    <p style="margin-top:0">CIE Metadatabase web tool — a self-contained, offline curator for
+      <b>CIEmetaDigitalProduct</b> (DataCite v4) dataset metadata. No server, no network calls,
+      no external dependencies. Interface v${esc(APP.VERSION)} · CIE schema v${APP.CIE_SCHEMA_VERSION}.</p>
+
+    <h4>Toolbar</h4>
+    <ul>
+      <li><b>New DB</b> / <b>Open DB…</b> / <b>Save DB</b> / <b>Save DB As…</b> — manage the whole
+        metadatabase JSON. The working copy auto-saves to browser storage and survives a reload.</li>
+      <li><b>Import / Merge…</b> — reconcile another database or import individual
+        <code>*.csv_metadata.json</code> files, with per-entry conflict resolution and DOI checks.</li>
+      <li><b>+ New entry</b>, <b>Domains…</b>, <b>Edit defaults…</b>, <b>Export Metadata…</b>.</li>
+      <li><b>? Help</b> — this dialog.</li>
+    </ul>
+
+    <h4>Editing an entry</h4>
+    <ul>
+      <li><b>Form / JSON / Validation / History</b> tabs. Payload changes are versioned (RFC-6902
+        patches) and require a change comment on save; envelope changes (status, domains, DOI
+        landing page) are saved without a version bump.</li>
+      <li><b>Validation</b> tab — pick the CSV data file to check checksums, row/column counts,
+        column sums, sample row and the wavelength range against the stored metadata, then fill or
+        log the results.</li>
+      <li><b>Update DOI</b> generates a compliant <code>10.25039/CIE.DS.$$$$$$$$</code> suffix
+        (marked <i>proposed</i> until CIE CB assigns the real DOI).</li>
+    </ul>
+
+    <h4>DOI landing page <span class="kv">(new)</span></h4>
+    <p style="margin:4px 0">Each entry has a <b>DOI landing page</b> (the URL a DOI resolves to). It
+      is shown next to the DOI in the entry header and is editable in the <b>Database entry</b>
+      section of the Form tab. Crossref requires it for the <code>&lt;resource&gt;</code> element;
+      if it is empty when you export, the tool prompts for it and saves it on the entry.</p>
+
+    <h4>Export to Crossref XML <span class="kv">(new)</span></h4>
+    <p style="margin:4px 0">The per-entry <b>Export Crossref XML…</b> button (entry action bar)
+      generates a Crossref 5.3.1 <code>&lt;doi_batch&gt;</code> deposit file for the selected entry,
+      ready for DOI registration.</p>
+    <ul>
+      <li>Deposit-header and database-level fields (<b>depositor</b> name/email, <b>registrant</b>,
+        <b>database title</b>, <b>publisher</b>, <b>institution</b>) come from
+        <b>Edit defaults…</b> — set them once for your organisation.</li>
+      <li>DataCite <code>relationType</code>s on related items are mapped to Crossref
+        <code>inter_work_relation</code> / <code>intra_work_relation</code> (per the Crossref
+        relations schema). Relations with no Crossref equivalent (e.g. <code>Describes</code>,
+        <code>HasMetadata</code>, <code>IsPublishedIn</code>) are skipped and reported in a message.</li>
+      <li>The file is named <code>&lt;dataset&gt;(&lt;timestamp&gt;).xml</code>.</li>
+    </ul>
+    <p style="margin:4px 0"><b>Validate the generated XML</b> with the Crossref deposit parser:<br>
+      <a href="https://data.crossref.org/reports/parser.html" target="_blank" rel="noopener noreferrer">https://data.crossref.org/reports/parser.html</a></p>
+
+    <h4>Reference links</h4>
+    <ul>
+      <li>Crossref schema: <a href="https://data.crossref.org/schemas/crossref5.3.1.xsd" target="_blank" rel="noopener noreferrer">crossref5.3.1.xsd</a>,
+        <a href="https://data.crossref.org/schemas/common5.3.1.xsd" target="_blank" rel="noopener noreferrer">common5.3.1.xsd</a></li>
+      <li>Crossref relations: <a href="https://data.crossref.org/schemas/relations.xsd" target="_blank" rel="noopener noreferrer">relations.xsd</a></li>
+      <li>CIE data tables: <a href="https://cie.co.at/data-tables" target="_blank" rel="noopener noreferrer">cie.co.at/data-tables</a></li>
+      <li>DOI resolver: <a href="https://doi.org" target="_blank" rel="noopener noreferrer">doi.org</a></li>
+    </ul>
+    <p class="kv" style="margin-bottom:0">Full documentation: see <code>README.md</code> next to this file.</p>`;
+  modal("Help & information", body, [mkBtn("Close","sec",closeModal)]);
+}
+
 function wire(){
   el("appVersion").textContent="v"+APP.VERSION;
   ensureUser(false);
@@ -1997,6 +2069,7 @@ function wire(){
   el("btnDomains").onclick=openDomainsDialog;
   el("btnDefaults").onclick=()=>{ if(!DB) DB=newDB(); openDefaultsDialog(); };
   el("btnExportDataCite").onclick=()=>{ if(DB&&DB.entries.length) exportDataCiteFiles(DB.entries); else toast("No entries to export"); };
+  el("btnHelp").onclick=openHelpDialog;
   el("search").oninput=renderList;
   el("filterDomain").onchange=renderList;
   el("filterStatus").onchange=renderList;
