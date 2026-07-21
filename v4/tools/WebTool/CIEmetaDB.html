@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CIE Metadatabase</title>
+<style>
+  :root{
+    --cie-main:#004EBC;
+    --cie-sec1:#0072CF;
+    --cie-sec2:#679BDE;
+    --cie-sec3:#A1BDEA;
+    --ink:#12233b;
+    --muted:#5b6b7f;
+    --line:#d8e2f0;
+    --bg:#f2f6fc;
+    --panel:#ffffff;
+    --ok:#1a7f4b;
+    --warn:#b26a00;
+    --err:#c0322b;
+    --shadow:0 1px 3px rgba(0,32,80,.12),0 4px 16px rgba(0,32,80,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font:14px/1.45 "Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  header{background:var(--cie-main);color:#fff;display:flex;align-items:center;gap:14px;padding:8px 16px;box-shadow:var(--shadow);position:sticky;top:0;z-index:20}
+  header img{height:34px;width:auto;background:#fff;border-radius:4px;padding:2px 4px}
+  header h1{font-size:16px;margin:0;font-weight:600;letter-spacing:.2px}
+  header .sub{font-size:11px;opacity:.85;margin-top:1px}
+  header .spacer{flex:1}
+  header .user{font-size:12px;display:flex;align-items:center;gap:8px}
+  header .user b{font-weight:600}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line)}
+  button{font:inherit;cursor:pointer;border:1px solid var(--cie-main);background:var(--cie-main);color:#fff;border-radius:6px;padding:6px 12px;line-height:1.2}
+  button:hover{background:var(--cie-sec1);border-color:var(--cie-sec1)}
+  button.ghost{background:#fff;color:var(--cie-main)}
+  button.ghost:hover{background:#eef4fd}
+  button.sec{background:var(--cie-sec1);border-color:var(--cie-sec1)}
+  button.danger{background:#fff;color:var(--err);border-color:var(--err)}
+  button.danger:hover{background:#fbeeee}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  button.small{padding:3px 8px;font-size:12px}
+  input,select,textarea{font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px 8px;background:#fff;width:100%}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--cie-sec2);border-color:var(--cie-sec1)}
+  textarea{resize:vertical;font-family:"Cascadia Code",Consolas,monospace;font-size:12.5px;line-height:1.4}
+  .wrap{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:0;height:calc(100vh - 96px)}
+  .list-pane{border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;min-height:0}
+  .list-filters{padding:10px 12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+  .list-filters .row{display:flex;gap:8px}
+  .list-scroll{overflow:auto;min-height:0;flex:1}
+  table.entries{width:100%;border-collapse:collapse}
+  table.entries th{position:sticky;top:0;background:#eaf1fb;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);padding:7px 10px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none}
+  table.entries td{padding:7px 10px;border-bottom:1px solid #eef2f8;vertical-align:top}
+  table.entries tr{cursor:pointer}
+  table.entries tr:hover td{background:#f6f9fe}
+  table.entries tr.sel td{background:#e4eefb}
+  .title-cell{font-weight:600;color:var(--ink)}
+  .doi-cell{font-family:Consolas,monospace;font-size:11.5px;color:var(--muted)}
+  .chip{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:10px;background:var(--cie-sec3);color:#0a2a52;margin:1px 3px 1px 0}
+  .chip.dom{background:#e3ecfb;border:1px solid var(--cie-sec2)}
+  .badge{display:inline-block;font-size:10px;padding:1px 7px;border-radius:4px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+  .badge.draft{background:#fdf0d8;color:#8a5b00}
+  .badge.review{background:#e0ecfb;color:#0a4aa0}
+  .badge.published{background:#dcf1e5;color:#12683f}
+  .badge.proposed{background:#fbe6e6;color:#9a2a24}
+  .detail-pane{overflow:auto;min-height:0;padding:0}
+  .empty{color:var(--muted);padding:40px;text-align:center}
+  .detail-head{position:sticky;top:0;background:var(--panel);border-bottom:1px solid var(--line);padding:12px 18px;z-index:5}
+  .detail-head h2{margin:0 0 4px;font-size:17px}
+  .detail-head .meta{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:12px}
+  .detail-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+  .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);padding:0 18px;background:var(--panel);position:sticky;top:0;z-index:4}
+  .tabs button{border:none;background:none;color:var(--muted);border-radius:0;border-bottom:3px solid transparent;padding:9px 12px;font-weight:600}
+  .tabs button.active{color:var(--cie-main);border-bottom-color:var(--cie-main)}
+  .tabs button:hover{background:#f3f7fd}
+  .tabpage{padding:16px 18px 60px}
+  fieldset{border:1px solid var(--line);border-radius:8px;margin:0 0 16px;padding:12px 14px 14px;background:#fcfdff}
+  legend{font-weight:600;color:var(--cie-main);padding:0 6px;font-size:13px}
+  .grid{display:grid;grid-template-columns:180px 1fr;gap:8px 12px;align-items:start}
+  .grid label{color:var(--muted);padding-top:6px;font-size:12.5px}
+  .arr-item{border:1px solid var(--line);border-radius:7px;padding:10px;margin:8px 0;background:#fff;position:relative}
+  .arr-item .rm{position:absolute;top:8px;right:8px}
+  .arr-grid{display:grid;grid-template-columns:150px 1fr;gap:6px 10px;align-items:start}
+  .arr-grid label{color:var(--muted);padding-top:6px;font-size:12px}
+  .add-btn{margin-top:6px}
+  .hint{font-size:11.5px;color:var(--muted);margin:2px 0 0}
+  .val-list{list-style:none;margin:0;padding:0}
+  .val-list li{padding:6px 10px;border-radius:6px;margin:4px 0;font-size:12.5px}
+  .val-list li.e{background:#fbeeee;color:#8f2721;border:1px solid #f0cfcd}
+  .val-list li.w{background:#fdf5e3;color:#7a5300;border:1px solid #f0e2bf}
+  .val-ok{background:#e7f6ee;color:#12683f;border:1px solid #bfe6cf;padding:8px 12px;border-radius:6px;font-weight:600}
+  .hist-item{border-left:3px solid var(--cie-sec2);padding:6px 12px;margin:8px 0;background:#fafcff}
+  .hist-item .h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .hist-item .rev{font-weight:700;color:var(--cie-main)}
+  .hist-item .who{color:var(--muted);font-size:12px}
+  .hist-item .cmt{margin:3px 0 0}
+  .diff{font-family:Consolas,monospace;font-size:12px;background:#f4f7fc;border:1px solid var(--line);border-radius:6px;padding:6px 8px;margin-top:6px;white-space:pre-wrap;word-break:break-word}
+  .diff .op-add{color:var(--ok)}
+  .diff .op-remove{color:var(--err)}
+  .diff .op-replace{color:var(--cie-sec1)}
+  .modal-bg{position:fixed;inset:0;background:rgba(12,30,60,.45);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px}
+  .modal{background:#fff;border-radius:10px;box-shadow:var(--shadow);max-width:820px;width:100%;max-height:86vh;overflow:auto;padding:20px 22px}
+  .modal h3{margin:0 0 12px;color:var(--cie-main)}
+  .modal .foot{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+  .cols2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .conflict{border:1px solid var(--line);border-radius:8px;padding:10px;margin:10px 0}
+  .conflict h4{margin:0 0 6px}
+  .side{border:1px solid var(--line);border-radius:6px;padding:8px;background:#fafcff;max-height:220px;overflow:auto}
+  .side pre{margin:0;font-size:11.5px;white-space:pre-wrap;word-break:break-word}
+  .side.pick{outline:2px solid var(--cie-main)}
+  .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;box-shadow:var(--shadow);z-index:200;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.show{opacity:1}
+  .toast.err{background:var(--err)}
+  .toast.ok{background:var(--ok)}
+  .kv{font-size:12px;color:var(--muted)}
+  .divmgr .arr-item{display:flex;gap:8px;align-items:center}
+  .divmgr .arr-item input{width:auto}
+  .divmgr .arr-item input.code{width:80px}
+  .filesel{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .csv-summary{font-family:Consolas,monospace;font-size:12px;background:#f4f7fc;border:1px solid var(--line);border-radius:6px;padding:8px 10px;white-space:pre-wrap}
+  .mono{font-family:Consolas,monospace}
+  .warnrow{background:#fdf5e3;border:1px solid #f0e2bf;border-radius:6px;padding:8px 10px;margin-bottom:10px;font-size:12.5px;color:#7a5300}
+</style>
+</head>
+<body>
+<header>
+  <img src="data:image/png;base64,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" alt="CIE logo">
+  <div>
+    <h1>CIE Metadatabase</h1>
+    <div class="sub">CIEmetaDigitalProduct &middot; DataCite v4 &middot; metadata curation, validation &amp; history</div>
+  </div>
+  <div class="spacer"></div>
+  <div class="user">Editor: <b id="userName">&mdash;</b> <button class="ghost small" id="btnUser">Change</button></div>
+</header>
+
+<div class="toolbar">
+  <button id="btnNewDb" class="ghost">New DB</button>
+  <button id="btnOpen" class="ghost">Open DB&hellip;</button>
+  <button id="btnImport" class="ghost">Import / Merge&hellip;</button>
+  <button id="btnSave">Save DB</button>
+  <button id="btnSaveAs" class="ghost">Save DB As&hellip;</button>
+  <span style="flex:1"></span>
+  <button id="btnNewEntry" class="sec">+ New entry</button>
+  <button id="btnDomains" class="ghost">Domains&hellip;</button>
+  <button id="btnExportDataCite" class="ghost">Export DataCite&hellip;</button>
+  <span class="kv" id="dbStat"></span>
+</div>
+
+<div class="wrap">
+  <div class="list-pane">
+    <div class="list-filters">
+      <input id="search" type="search" placeholder="Search title, DOI, filename, description&hellip;">
+      <div class="row">
+        <select id="filterDomain"><option value="">All domains</option></select>
+        <select id="filterStatus">
+          <option value="">All statuses</option>
+          <option value="draft">Draft</option>
+          <option value="review">Review</option>
+          <option value="published">Published</option>
+        </select>
+      </div>
+    </div>
+    <div class="list-scroll">
+      <table class="entries">
+        <thead><tr>
+          <th data-sort="title">Title</th>
+          <th data-sort="doi">DOI / ID</th>
+          <th data-sort="status">Status</th>
+          <th data-sort="modified">Modified</th>
+        </tr></thead>
+        <tbody id="entryRows"></tbody>
+      </table>
+      <div class="empty" id="listEmpty">No entries. Create one or import a DB / DataCite files.</div>
+    </div>
+  </div>
+
+  <div class="detail-pane" id="detailPane">
+    <div class="empty">Select an entry on the left, or create a new one.</div>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<input type="file" id="hiddenFile" style="display:none">
+
+<script>
+"use strict";
+/* ============================================================================
+   CIE Metadatabase — single-file curation tool
+   Self-contained: no external/CDN dependencies, runs from file://
+   ==========================================================================*/
+
+/* ---------- constants ---------- */
+const APP = {
+  DB_SCHEMA_NAME: "CIEmetaDB",
+  DB_SCHEMA_VERSION: 1,
+  DOI_PREFIX: "10.25039/CIE.DS.",
+  DOI_ALPHABET: "abcdefghijkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789", // excludes o O l L 1 I 0
+  DOI_LEN: 8,
+  SCHEMA_URL: "https://doi.org/10.25039/CIE.SC.4taqevcd",
+  CIE_SCHEMA_NAME: "CIEmetaDigitalProduct",
+  CIE_SCHEMA_VERSION: 4,
+  LS_DB: "ciemetadb.workingcopy",
+  LS_USER: "ciemetadb.user"
+};
+
+const DEFAULT_DOMAINS = [
+  {code:"D1", label:"Vision and Colour"},
+  {code:"D2", label:"Physical Measurement of Light and Radiation"},
+  {code:"D3", label:"Interior Environment and Lighting Design"},
+  {code:"D4", label:"Transportation and Exterior Applications"},
+  {code:"D6", label:"Photobiology and Photochemistry"},
+  {code:"D8", label:"Image Technology"}
+];
+
+const CIE_DEFAULTS = {
+  creator: {name:"International Commission on Illumination (CIE)", nameType:"Organizational"},
+  publisher: "International Commission on Illumination (CIE), Vienna, AT",
+  language: "en",
+  rights: {rights:"Creative Commons Attribution-ShareAlike 4.0 International",
+           rightsURI:"https://creativecommons.org/licenses/by-sa/4.0/",
+           rightsIdentifier:"CC BY-SA 4.0"},
+  format: "text/csv",
+  types: {resourceType:"dataTable", resourceTypeGeneral:"Dataset"}
+};
+
+/* enum catalogues (from CIEmetaDigitalProduct_schema_04.json) */
+const ENUMS = {
+  nameType:["Organizational","Personal"],
+  titleType:["","AlternativeTitle","Subtitle","TranslatedTitle","Other"],
+  resourceTypeGeneral:["Audiovisual","Book","Bookchapter","Collection","ComputationalNotebook","ConferencePaper","ConferenceProceeding","DataPaper","Dataset","Dissertation","Event","Image","InteractiveResource","Journal","JournalArticle","Model","OutputManagementPlan","PeerReview","PhysicalObject","Preprint","Report","Service","Software","Sound","Standard","Text","Workflow","Other"],
+  relatedIdentifierType:["ARK","arXiv","bibcode","DOI","EAN13","EISSN","Handle","IGSN","ISBN","ISSN","ISTC","LISSN","LSID","PMID","PURL","UPC","URL","URN","w3id"],
+  relationType:["IsCitedBy","Cites","IsSupplementTo","IsSupplementedBy","IsContinuedBy","Continues","IsDescribedBy","Describes","HasMetadata","IsMetadataFor","HasVersion","IsVersionOf","IsNewVersionOf","IsPreviousVersionOf","IsPartOf","HasPart","IsPublishedIn","IsReferencedBy","References","IsDocumentedBy","Documents","IsCompiledBy","Compiles","IsVariantFormOf","IsOriginalFormOf","IsIdenticalTo","IsReviewedBy","Reviews","IsDerivedFrom","IsSourceOf","IsRequiredBy","Requires","IsObsoletedBy","Obsoletes"],
+  descriptionType:["Abstract","Methods","SeriesInformation","TableOfContents","TechnicalInfo","Other"],
+  interpolationMethod:["",":unal",":unap",":unas","nearest","linear","cubic-spline","cubic-Hermite","Sprague","Lagrange","useRelatedDataset","useRelatedFormula","other"],
+  extrapolationMethod:["",":unal",":unap",":unas","nearest","zero","useRelatedDataset","useRelatedFormula","other"],
+  dataQuality:["",":unap",":unas","nominal","fromFormula","approximated","other"],
+  validationType:["sumOfColumns","sampleRow","numberOfRows","numberOfColumns",":unap","other"],
+  hashMethod:["md5","sha256"]
+};
+
+/* ============================================================================
+   Hashers (pure JS, work on raw bytes — reliable from file://)
+   ==========================================================================*/
+const MD5_K = [
+  0xd76aa478,0xe8c7b756,0x242070db,0xc1bdceee,0xf57c0faf,0x4787c62a,0xa8304613,0xfd469501,
+  0x698098d8,0x8b44f7af,0xffff5bb1,0x895cd7be,0x6b901122,0xfd987193,0xa679438e,0x49b40821,
+  0xf61e2562,0xc040b340,0x265e5a51,0xe9b6c7aa,0xd62f105d,0x02441453,0xd8a1e681,0xe7d3fbc8,
+  0x21e1cde6,0xc33707d6,0xf4d50d87,0x455a14ed,0xa9e3e905,0xfcefa3f8,0x676f02d9,0x8d2a4c8a,
+  0xfffa3942,0x8771f681,0x6d9d6122,0xfde5380c,0xa4beea44,0x4bdecfa9,0xf6bb4b60,0xbebfbc70,
+  0x289b7ec6,0xeaa127fa,0xd4ef3085,0x04881d05,0xd9d4d039,0xe6db99e5,0x1fa27cf8,0xc4ac5665,
+  0xf4292244,0x432aff97,0xab9423a7,0xfc93a039,0x655b59c3,0x8f0ccc92,0xffeff47d,0x85845dd1,
+  0x6fa87e4f,0xfe2ce6e0,0xa3014314,0x4e0811a1,0xf7537e82,0xbd3af235,0x2ad7d2bb,0xeb86d391];
+const MD5_S = [7,12,17,22,7,12,17,22,7,12,17,22,7,12,17,22,
+  5,9,14,20,5,9,14,20,5,9,14,20,5,9,14,20,
+  4,11,16,23,4,11,16,23,4,11,16,23,4,11,16,23,
+  6,10,15,21,6,10,15,21,6,10,15,21,6,10,15,21];
+
+function md5Bytes(data){
+  const rol=(x,c)=>(x<<c)|(x>>>(32-c));
+  const ml=data.length, total=Math.ceil((ml+9)/64)*64;
+  const msg=new Uint8Array(total); msg.set(data); msg[ml]=0x80;
+  const dv=new DataView(msg.buffer);
+  dv.setUint32(total-8,(ml*8)>>>0,true);
+  dv.setUint32(total-4,Math.floor(ml/0x20000000),true);
+  let a0=0x67452301,b0=0xefcdab89,c0=0x98badcfe,d0=0x10325476;
+  const M=new Uint32Array(16);
+  for(let off=0;off<total;off+=64){
+    for(let j=0;j<16;j++)M[j]=dv.getUint32(off+j*4,true);
+    let A=a0,B=b0,C=c0,D=d0;
+    for(let i=0;i<64;i++){
+      let F,g;
+      if(i<16){F=(B&C)|((~B)&D);g=i;}
+      else if(i<32){F=(D&B)|((~D)&C);g=(5*i+1)&15;}
+      else if(i<48){F=B^C^D;g=(3*i+5)&15;}
+      else{F=C^(B|(~D));g=(7*i)&15;}
+      F=(F+A+MD5_K[i]+M[g])|0;
+      A=D;D=C;C=B;B=(B+rol(F,MD5_S[i]))|0;
+    }
+    a0=(a0+A)|0;b0=(b0+B)|0;c0=(c0+C)|0;d0=(d0+D)|0;
+  }
+  const le=n=>{n>>>=0;let s="";for(let i=0;i<4;i++)s+=("0"+((n>>>(i*8))&0xff).toString(16)).slice(-2);return s;};
+  return le(a0)+le(b0)+le(c0)+le(d0);
+}
+
+const SHA_K=[0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
+  0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,
+  0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,
+  0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,
+  0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,
+  0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,
+  0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,
+  0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+
+function sha256Bytes(data){
+  const rr=(x,n)=>(x>>>n)|(x<<(32-n));
+  const H=[0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19];
+  const ml=data.length, total=Math.ceil((ml+9)/64)*64;
+  const msg=new Uint8Array(total); msg.set(data); msg[ml]=0x80;
+  const dv=new DataView(msg.buffer);
+  dv.setUint32(total-8,Math.floor(ml/0x20000000),false);
+  dv.setUint32(total-4,(ml*8)>>>0,false);
+  const w=new Uint32Array(64);
+  for(let off=0;off<total;off+=64){
+    for(let j=0;j<16;j++)w[j]=dv.getUint32(off+j*4,false);
+    for(let j=16;j<64;j++){
+      const s0=rr(w[j-15],7)^rr(w[j-15],18)^(w[j-15]>>>3);
+      const s1=rr(w[j-2],17)^rr(w[j-2],19)^(w[j-2]>>>10);
+      w[j]=(w[j-16]+s0+w[j-7]+s1)>>>0;
+    }
+    let a=H[0],b=H[1],c=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7];
+    for(let j=0;j<64;j++){
+      const S1=rr(e,6)^rr(e,11)^rr(e,25);
+      const ch=(e&f)^((~e)&g);
+      const t1=(h+S1+ch+SHA_K[j]+w[j])>>>0;
+      const S0=rr(a,2)^rr(a,13)^rr(a,22);
+      const maj=(a&b)^(a&c)^(b&c);
+      const t2=(S0+maj)>>>0;
+      h=g;g=f;f=e;e=(d+t1)>>>0;d=c;c=b;b=a;a=(t1+t2)>>>0;
+    }
+    H[0]=(H[0]+a)>>>0;H[1]=(H[1]+b)>>>0;H[2]=(H[2]+c)>>>0;H[3]=(H[3]+d)>>>0;
+    H[4]=(H[4]+e)>>>0;H[5]=(H[5]+f)>>>0;H[6]=(H[6]+g)>>>0;H[7]=(H[7]+h)>>>0;
+  }
+  return H.map(x=>("00000000"+(x>>>0).toString(16)).slice(-8)).join("");
+}
+
+const _enc = new TextEncoder();
+function sha256Str(s){ return sha256Bytes(_enc.encode(s)); }
+
+/* ============================================================================
+   small utilities
+   ==========================================================================*/
+function uuid(){
+  if(window.crypto && crypto.randomUUID){ try{ return crypto.randomUUID(); }catch(e){} }
+  const b=new Uint8Array(16);
+  if(window.crypto && crypto.getRandomValues) crypto.getRandomValues(b);
+  else for(let i=0;i<16;i++) b[i]=Math.floor(Math.random()*256);
+  b[6]=(b[6]&0x0f)|0x40; b[8]=(b[8]&0x3f)|0x80;
+  const h=[...b].map(x=>("0"+x.toString(16)).slice(-2));
+  return `${h[0]}${h[1]}${h[2]}${h[3]}-${h[4]}${h[5]}-${h[6]}${h[7]}-${h[8]}${h[9]}-${h[10]}${h[11]}${h[12]}${h[13]}${h[14]}${h[15]}`;
+}
+function nowISO(){ return new Date().toISOString(); }
+function clone(o){ return o==null?o:JSON.parse(JSON.stringify(o)); }
+function el(id){ return document.getElementById(id); }
+function randInt(n){
+  if(window.crypto && crypto.getRandomValues){ const a=new Uint32Array(1); crypto.getRandomValues(a); return a[0]%n; }
+  return Math.floor(Math.random()*n);
+}
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+/* canonical stringify (stable key order) for hashing */
+function canonical(v){
+  if(v===null||typeof v!=="object") return JSON.stringify(v);
+  if(Array.isArray(v)) return "["+v.map(canonical).join(",")+"]";
+  const keys=Object.keys(v).sort();
+  return "{"+keys.map(k=>JSON.stringify(k)+":"+canonical(v[k])).join(",")+"}";
+}
+function contentHash(payload){ return sha256Str(canonical(payload)); }
+
+/* ============================================================================
+   JSON Pointer + RFC-6902 patch (apply + generate diff)
+   ==========================================================================*/
+function ptrTokens(path){
+  if(path==="") return [];
+  return path.split("/").slice(1).map(t=>t.replace(/~1/g,"/").replace(/~0/g,"~"));
+}
+function applyPatch(doc, patch){
+  let root = clone(doc);
+  for(const op of patch){
+    const toks=ptrTokens(op.path);
+    if(toks.length===0){
+      if(op.op==="add"||op.op==="replace"){ root=clone(op.value); continue; }
+      if(op.op==="remove"){ root=null; continue; }
+    }
+    let parent=root;
+    for(let i=0;i<toks.length-1;i++){
+      const k=Array.isArray(parent)?parseInt(toks[i],10):toks[i];
+      parent=parent[k];
+    }
+    const last=toks[toks.length-1];
+    if(Array.isArray(parent)){
+      const idx = last==="-"?parent.length:parseInt(last,10);
+      if(op.op==="add") parent.splice(idx,0,clone(op.value));
+      else if(op.op==="replace") parent[idx]=clone(op.value);
+      else if(op.op==="remove") parent.splice(idx,1);
+    }else{
+      if(op.op==="add"||op.op==="replace") parent[last]=clone(op.value);
+      else if(op.op==="remove") delete parent[last];
+    }
+  }
+  return root;
+}
+/* generate a readable field-level diff. Objects recurse; arrays & scalars replaced whole. */
+function diffPatch(a, b, base){
+  base = base||"";
+  const ops=[];
+  const isObj=x=>x&&typeof x==="object"&&!Array.isArray(x);
+  if(isObj(a)&&isObj(b)){
+    for(const k of Object.keys(a)){
+      if(!(k in b)) ops.push({op:"remove",path:base+"/"+esc6902(k)});
+    }
+    for(const k of Object.keys(b)){
+      const p=base+"/"+esc6902(k);
+      if(!(k in a)) ops.push({op:"add",path:p,value:clone(b[k])});
+      else ops.push(...diffPatch(a[k],b[k],p));
+    }
+  }else{
+    if(canonical(a)!==canonical(b)) ops.push({op:"replace",path:base,value:clone(b)});
+  }
+  return ops;
+}
+function esc6902(k){ return String(k).replace(/~/g,"~0").replace(/\//g,"~1"); }
+/* reconstruct payload at revision rev (1-based) from history forward patches */
+function reconstruct(history, rev){
+  let doc={};
+  for(let i=0;i<rev && i<history.length;i++) doc=applyPatch(doc, history[i].patch);
+  return doc;
+}
+
+/* ============================================================================
+   Minimal draft-07 validator for the embedded CIE schema
+   ==========================================================================*/
+function validate(payload, schema){
+  const root=schema;
+  function resolve(ref){
+    const parts=ref.replace(/^#\//,"").split("/");
+    let s=root; for(const p of parts) s=s[p]; return s;
+  }
+  function typeOf(v){
+    if(v===null) return "null";
+    if(Array.isArray(v)) return "array";
+    return typeof v;
+  }
+  function typeOk(v, t){
+    if(t==="integer") return typeof v==="number" && Number.isInteger(v);
+    if(t==="number") return typeof v==="number";
+    return typeOf(v)===t;
+  }
+  function chk(v, sch, path){
+    if(!sch) return [];
+    if(sch.$ref) return chk(v, resolve(sch.$ref), path);
+    const errs=[];
+    if(sch.anyOf){
+      for(const s of sch.anyOf){ if(chk(v,s,path).length===0) return []; }
+      return [`${path||"(root)"}: value not allowed here`];
+    }
+    if(sch.const!==undefined && canonical(v)!==canonical(sch.const))
+      errs.push(`${path||"(root)"}: must equal ${JSON.stringify(sch.const)}`);
+    if(sch.enum && !sch.enum.some(e=>canonical(e)===canonical(v)))
+      errs.push(`${path||"(root)"}: "${v}" is not an allowed value`);
+    if(sch.type){
+      if(!typeOk(v, sch.type)){
+        errs.push(`${path||"(root)"}: expected ${sch.type}, got ${typeOf(v)}`);
+        return errs;
+      }
+    }
+    if(Array.isArray(v)){
+      if(sch.minItems!=null && v.length<sch.minItems) errs.push(`${path}: needs at least ${sch.minItems} item(s)`);
+      if(sch.uniqueItems){
+        const seen=new Set();
+        for(const it of v){ const c=canonical(it); if(seen.has(c)){ errs.push(`${path}: items must be unique`); break; } seen.add(c); }
+      }
+      if(sch.items) v.forEach((it,i)=>errs.push(...chk(it,sch.items,`${path}[${i}]`)));
+    }
+    if(v&&typeof v==="object"&&!Array.isArray(v)){
+      if(sch.required) for(const r of sch.required) if(!(r in v)) errs.push(`${path||"(root)"}: missing required "${r}"`);
+      if(sch.properties) for(const k of Object.keys(v)) if(sch.properties[k]) errs.push(...chk(v[k],sch.properties[k],`${path?path+".":""}${k}`));
+    }
+    return errs;
+  }
+  return chk(payload, root, "");
+}
+
+/* embedded CIEmetaDigitalProduct schema (structural subset for validation) */
+const CIE_SCHEMA = buildCieSchema();
+function buildCieSchema(){
+  const D=ENUMS;
+  const strEnum=arr=>({type:"string",enum:arr});
+  // wavelength fields are numeric, but the CIE README allows sentinel strings for non-spectral tables
+  const wlField={anyOf:[{type:"number"},{type:"string",enum:[":unap",":null",":unal",":unas"]}]};
+  const nameIds={type:"array",items:{type:"object",properties:{nameIdentifier:{type:"string"},nameIdentifierScheme:{type:"string"},schemeURI:{type:"string"}},required:["nameIdentifier","nameIdentifierScheme"]}};
+  const affils={type:"array",items:{type:"object",properties:{affiliation:{type:"string"}},required:["affiliation"]}};
+  const agent={type:"object",properties:{name:{type:"string"},nameType:strEnum(D.nameType),givenName:{type:"string"},familyName:{type:"string"},nameIdentifiers:nameIds,affiliations:affils,lang:{type:"string"}},required:["name"]};
+  return {
+    type:"object",
+    properties:{
+      types:{type:"object",properties:{resourceType:{type:"string"},resourceTypeGeneral:strEnum(D.resourceTypeGeneral)},required:["resourceType","resourceTypeGeneral"]},
+      identifier:{type:"object",properties:{identifier:{type:"string"},identifierType:{type:"string"}},required:["identifier","identifierType"]},
+      creators:{type:"array",minItems:1,items:agent},
+      titles:{type:"array",minItems:1,items:{type:"object",properties:{title:{type:"string"},titleType:strEnum(D.titleType),lang:{type:"string"}},required:["title"]}},
+      publisher:{type:"string"},
+      publicationYear:{type:"string"},
+      subjects:{type:"array",items:{type:"object",properties:{subject:{type:"string"},subjectScheme:{type:"string"},schemeURI:{type:"string"},valueURI:{type:"string"},classificationCode:{type:"string"},lang:{type:"string"}},required:["subject"]}},
+      contributors:{type:"array",items:Object.assign({},agent)},
+      dates:{type:"array",items:{type:"object",properties:{date:{type:"string"},dateType:{type:"string"},dateInformation:{type:"string"}},required:["date","dateType"]}},
+      language:{type:"string"},
+      alternateIdentifiers:{type:"array",items:{type:"object",properties:{alternateIdentifier:{type:"string"},alternateIdentifierType:{type:"string"}},required:["alternateIdentifier","alternateIdentifierType"]}},
+      relatedIdentifiers:{type:"array",items:{type:"object",properties:{relatedIdentifier:{type:"string"},relatedIdentifierType:strEnum(D.relatedIdentifierType),relationType:strEnum(D.relationType),resourceTypeGeneral:strEnum(D.resourceTypeGeneral)},required:["relatedIdentifier","relatedIdentifierType","relationType"]}},
+      sizes:{type:"array",items:{type:"string"}},
+      formats:{type:"array",items:{type:"string"}},
+      version:{type:"string"},
+      rightsList:{type:"array",items:{type:"object",properties:{rights:{type:"string"},rightsURI:{type:"string"},rightsIdentifier:{type:"string"},rightsIdentifierScheme:{type:"string"},schemeURI:{type:"string"},lang:{type:"string"}}}},
+      descriptions:{type:"array",items:{type:"object",properties:{description:{type:"string"},descriptionType:strEnum(D.descriptionType),lang:{type:"string"}},required:["description","descriptionType"]}},
+      relatedItems:{type:"array",items:{type:"object",properties:{relatedItemType:strEnum(D.resourceTypeGeneral),relationType:strEnum(D.relationType),relatedItemIdentifier:{type:"string"},relatedItemIdentifierType:strEnum(D.relatedIdentifierType),titles:{type:"array",items:{type:"string"}},resourceTypeGeneral:strEnum(D.resourceTypeGeneral)},required:["relatedItemType","relationType"]}},
+      schemaName:{type:"string",const:"CIEmetaDigitalProduct"},
+      schemaVersion:{type:"number",const:4},
+      schemaURL:{type:"string",const:APP.SCHEMA_URL},
+      datatableInfo:{type:"object",properties:{
+        interpolationMethod:strEnum(D.interpolationMethod),
+        extrapolationMethod:strEnum(D.extrapolationMethod),
+        dataQuality:strEnum(D.dataQuality),
+        validations:{type:"array",items:{type:"object",properties:{validationType:{type:"string"},validationAlgorithm:{type:"string"},validationParameter:{type:"string"},validationValue:{type:"string"}}}},
+        columnHeaders:{type:"array",items:{type:"object",properties:{title:{type:"string"},unit:{type:"string"},quantity:{type:"string"},description:{type:"string"},wavelength_first:wlField,wavelength_last:wlField,wavelength_step:wlField}}}
+      }},
+      checksums:{type:"array",items:{type:"object",properties:{hashMethod:{type:"string"},checksum:{type:"string"}},required:["hashMethod","checksum"]}}
+    },
+    required:["identifier","creators","titles","publisher","publicationYear","types","schemaName","schemaVersion","schemaURL"]
+  };
+}
+
+/* ============================================================================
+   application state
+   ==========================================================================*/
+let DB = null;          // current metadatabase
+let selectedId = null;  // selected entryId
+let editModel = null;   // working payload copy of selected entry
+let editDirty = false;
+let sort = {key:"title", dir:1};
+let dbFileHandle = null; // File System Access API handle (if used)
+let lastLoadedBaseHash = null; // baseHash of the DB as loaded (concurrency anchor)
+
+/* ---------- DB helpers ---------- */
+function newDB(){
+  return {
+    dbSchemaName:APP.DB_SCHEMA_NAME, dbSchemaVersion:APP.DB_SCHEMA_VERSION,
+    dbId:uuid(), baseHash:"", generatedAt:nowISO(),
+    domains:clone(DEFAULT_DOMAINS), entries:[]
+  };
+}
+function computeDbBaseHash(db){ return sha256Str(db.entries.map(e=>e.contentHash).join("|")); }
+function findEntry(id){ return DB.entries.find(e=>e.entryId===id); }
+
+function blankPayload(doi, filename){
+  const p={
+    identifier:{identifier:doi, identifierType:"DOI"},
+    creators:[clone(CIE_DEFAULTS.creator)],
+    titles:[{title:""}],
+    publisher:CIE_DEFAULTS.publisher,
+    publicationYear:String(new Date().getFullYear()),
+    subjects:[],
+    language:CIE_DEFAULTS.language,
+    alternateIdentifiers: filename?[{alternateIdentifier:filename, alternateIdentifierType:"fileName"}]:[],
+    relatedItems:[],
+    formats:[CIE_DEFAULTS.format],
+    types:clone(CIE_DEFAULTS.types),
+    descriptions:[{description:"", descriptionType:"Abstract"}],
+    rightsList:[clone(CIE_DEFAULTS.rights)],
+    checksums:[],
+    datatableInfo:{validations:[], interpolationMethod:"linear", extrapolationMethod:"zero", dataQuality:"nominal", columnHeaders:[]},
+    schemaName:APP.CIE_SCHEMA_NAME, schemaVersion:APP.CIE_SCHEMA_VERSION, schemaURL:APP.SCHEMA_URL
+  };
+  return p;
+}
+
+/* create a new entry committed at rev 1 */
+function createEntry(payload, opts){
+  opts=opts||{};
+  const now=nowISO(), user=currentUser();
+  const patch=diffPatch({}, payload, "");
+  const e={
+    entryId:uuid(), rev:1, contentHash:contentHash(payload),
+    status:opts.status||"draft", idProposed:!!opts.idProposed,
+    domains:opts.domains||[],
+    audit:{createdBy:user, createdDate:now, modifiedBy:user, modifiedDate:now, modifiedComment:opts.comment||"Created"},
+    payload:clone(payload),
+    history:[{rev:1, by:user, date:now, comment:opts.comment||"Created", baseHash:null, patch:patch}]
+  };
+  return e;
+}
+/* commit an edit to an existing entry */
+function commitEdit(entry, newPayload, comment){
+  const now=nowISO(), user=currentUser();
+  const oldPayload=entry.payload;
+  const patch=diffPatch(oldPayload, newPayload, "");
+  if(patch.length===0) return false;
+  entry.rev+=1;
+  entry.history.push({rev:entry.rev, by:user, date:now, comment:comment||"", baseHash:entry.contentHash, patch:patch});
+  entry.payload=clone(newPayload);
+  entry.contentHash=contentHash(newPayload);
+  entry.audit.modifiedBy=user; entry.audit.modifiedDate=now; entry.audit.modifiedComment=comment||"";
+  return true;
+}
+
+/* ---------- user identity ---------- */
+function currentUser(){ return localStorage.getItem(APP.LS_USER) || "unknown"; }
+function ensureUser(force){
+  let u=localStorage.getItem(APP.LS_USER);
+  if(!u || force){
+    const v=prompt("Your editor identity (name or initials) — stamped on all changes:", u||"");
+    if(v && v.trim()){ localStorage.setItem(APP.LS_USER, v.trim()); }
+  }
+  el("userName").textContent=currentUser();
+}
+
+/* ============================================================================
+   DOI generation
+   ==========================================================================*/
+function genDoiSuffix(){
+  let s=""; for(let i=0;i<APP.DOI_LEN;i++) s+=APP.DOI_ALPHABET[randInt(APP.DOI_ALPHABET.length)];
+  return s;
+}
+function generateDoi(lang){
+  const existing=new Set(DB.entries.map(e=>e.payload&&e.payload.identifier&&e.payload.identifier.identifier));
+  for(let tries=0;tries<1000;tries++){
+    const doi=APP.DOI_PREFIX+genDoiSuffix()+(lang?"."+lang.toUpperCase():"");
+    if(!existing.has(doi)) return doi;
+  }
+  return APP.DOI_PREFIX+genDoiSuffix();
+}
+
+/* ============================================================================
+   CSV analysis
+   ==========================================================================*/
+function parseCsv(text){
+  // strip BOM, normalise newlines, split, drop trailing empty lines
+  text=text.replace(/^﻿/,"");
+  const lines=text.split(/\r\n|\n|\r/);
+  while(lines.length && lines[lines.length-1].trim()==="") lines.pop();
+  const rows=lines.map(l=>l.split(","));
+  return {lines, rows};
+}
+function analyzeCsv(text){
+  const {lines, rows}=parseCsv(text);
+  const nRows=rows.length;
+  const nCols=nRows?rows[0].length:0;
+  const sums=new Array(nCols).fill(0);
+  const sumsValid=new Array(nCols).fill(true);
+  for(const r of rows){
+    for(let c=0;c<nCols;c++){
+      const v=parseFloat(r[c]);
+      if(Number.isFinite(v)) sums[c]+=v;
+    }
+  }
+  // wavelength info from column 0
+  let wl=null;
+  if(nCols>0 && nRows>=2){
+    const col0=rows.map(r=>parseFloat(r[0]));
+    if(col0.every(Number.isFinite)){
+      const first=col0[0], last=col0[col0.length-1];
+      let step=col0[1]-col0[0], uniform=true;
+      for(let i=1;i<col0.length;i++){ if(Math.abs((col0[i]-col0[i-1])-step)>1e-9){ uniform=false; break; } }
+      wl={first,last,step:uniform?step:null,uniform};
+    }
+  }
+  return {nRows,nCols,sums,sumsValid,lines,rows,wl};
+}
+function readFileBytes(file){
+  return new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>res(new Uint8Array(fr.result)); fr.onerror=rej; fr.readAsArrayBuffer(file); });
+}
+
+/* ============================================================================
+   rendering: entry list
+   ==========================================================================*/
+function entryTitle(e){ const t=e.payload&&e.payload.titles&&e.payload.titles[0]; return t&&t.title?t.title:"(untitled)"; }
+function entryDoi(e){ const i=e.payload&&e.payload.identifier; return i?i.identifier:""; }
+function entryFilename(e){
+  const a=(e.payload&&e.payload.alternateIdentifiers)||[];
+  const f=a.find(x=>x.alternateIdentifierType==="fileName"); return f?f.alternateIdentifier:"";
+}
+function renderList(){
+  const q=el("search").value.trim().toLowerCase();
+  const fd=el("filterDomain").value, fs=el("filterStatus").value;
+  let rows=DB?DB.entries.slice():[];
+  if(q) rows=rows.filter(e=>{
+    const hay=[entryTitle(e),entryDoi(e),entryFilename(e),
+      (e.payload.descriptions||[]).map(d=>d.description).join(" ")].join(" ").toLowerCase();
+    return hay.includes(q);
+  });
+  if(fd) rows=rows.filter(e=>(e.domains||[]).includes(fd));
+  if(fs) rows=rows.filter(e=>e.status===fs);
+  rows.sort((a,b)=>{
+    let va,vb;
+    switch(sort.key){
+      case "doi": va=entryDoi(a); vb=entryDoi(b); break;
+      case "status": va=a.status; vb=b.status; break;
+      case "modified": va=a.audit.modifiedDate; vb=b.audit.modifiedDate; break;
+      default: va=entryTitle(a).toLowerCase(); vb=entryTitle(b).toLowerCase();
+    }
+    return va<vb?-sort.dir:va>vb?sort.dir:0;
+  });
+  const tb=el("entryRows"); tb.innerHTML="";
+  for(const e of rows){
+    const tr=document.createElement("tr");
+    if(e.entryId===selectedId) tr.className="sel";
+    const doms=(e.domains||[]).map(d=>`<span class="chip dom">${esc(d)}</span>`).join("");
+    tr.innerHTML=`<td><div class="title-cell">${esc(entryTitle(e))}</div>
+        <div class="kv">${esc(entryFilename(e))}</div>${doms}</td>
+      <td><div class="doi-cell">${esc(entryDoi(e))}</div>${e.idProposed?'<span class="badge proposed">proposed</span>':''}</td>
+      <td><span class="badge ${esc(e.status)}">${esc(e.status)}</span></td>
+      <td class="kv">${esc((e.audit.modifiedDate||"").slice(0,10))}<br>${esc(e.audit.modifiedBy)}<br>rev ${e.rev}</td>`;
+    tr.onclick=()=>selectEntry(e.entryId);
+    tb.appendChild(tr);
+  }
+  el("listEmpty").style.display = rows.length?"none":"block";
+  el("dbStat").textContent = DB?`${DB.entries.length} entr${DB.entries.length===1?"y":"ies"}${dbFileHandle?" · "+dbFileHandle.name:""}`:"";
+}
+function refreshDomainFilter(){
+  const sel=el("filterDomain"); const cur=sel.value;
+  sel.innerHTML='<option value="">All domains</option>'+
+    (DB?DB.domains.map(d=>`<option value="${esc(d.code)}">${esc(d.code)} — ${esc(d.label)}</option>`).join(""):"");
+  sel.value=cur;
+}
+
+/* ============================================================================
+   rendering: detail / editor
+   ==========================================================================*/
+let activeTab="form";
+function selectEntry(id, keepTab){
+  if(editDirty && id!==selectedId && !confirm("Discard unsaved changes to the current entry?")) return;
+  selectedId=id; editDirty=false;
+  const e=findEntry(id);
+  editModel = e?clone(e.payload):null;
+  if(!keepTab) activeTab="form";
+  renderList(); renderDetail();
+}
+function markDirty(){ editDirty=true; syncJsonView(); const s=el("saveState"); if(s) s.textContent="● unsaved"; }
+
+function renderDetail(){
+  const pane=el("detailPane");
+  const e=findEntry(selectedId);
+  if(!e){ pane.innerHTML='<div class="empty">Select an entry on the left, or create a new one.</div>'; return; }
+  pane.innerHTML="";
+  const head=document.createElement("div"); head.className="detail-head";
+  head.innerHTML=`<h2>${esc(entryTitle(e))}</h2>
+    <div class="meta">
+      <span class="mono">${esc(entryDoi(e))}</span>
+      <span>rev ${e.rev}</span>
+      <span>created ${esc((e.audit.createdDate||"").slice(0,10))} by ${esc(e.audit.createdBy)}</span>
+      <span>modified ${esc((e.audit.modifiedDate||"").slice(0,10))} by ${esc(e.audit.modifiedBy)}</span>
+      <span id="saveState"></span>
+    </div>
+    <div class="detail-actions">
+      <button id="btnSaveEntry">Save entry</button>
+      <button class="ghost" id="btnRevert">Revert</button>
+      <button class="ghost" id="btnValidateCsv">Validate against CSV&hellip;</button>
+      <button class="ghost" id="btnGenDoi">Generate DOI</button>
+      <button class="ghost" id="btnDupe">Duplicate</button>
+      <button class="ghost" id="btnExportOne">Export DataCite file</button>
+      <button class="danger" id="btnDelete">Delete</button>
+    </div>`;
+  pane.appendChild(head);
+
+  const tabs=document.createElement("div"); tabs.className="tabs";
+  [["form","Form"],["json","JSON"],["validate","Validation"],["history","History ("+e.rev+")"]].forEach(([k,lbl])=>{
+    const b=document.createElement("button"); b.textContent=lbl; if(k===activeTab)b.className="active";
+    b.onclick=()=>{ activeTab=k; renderDetail(); }; tabs.appendChild(b);
+  });
+  pane.appendChild(tabs);
+
+  const page=document.createElement("div"); page.className="tabpage"; page.id="tabpage"; pane.appendChild(page);
+
+  el("btnSaveEntry").onclick=saveEntry;
+  el("btnRevert").onclick=()=>{ editModel=clone(e.payload); editDirty=false; renderDetail(); toast("Reverted to saved version"); };
+  el("btnValidateCsv").onclick=()=>{ activeTab="validate"; renderDetail(); };
+  el("btnGenDoi").onclick=()=>openDoiDialog(e);
+  el("btnDupe").onclick=()=>duplicateEntry(e);
+  el("btnExportOne").onclick=()=>exportDataCiteFiles([e]);
+  el("btnDelete").onclick=()=>deleteEntry(e);
+  if(editDirty) el("saveState").textContent="● unsaved";
+
+  if(activeTab==="form") renderForm(page,e);
+  else if(activeTab==="json") renderJson(page,e);
+  else if(activeTab==="validate") renderValidate(page,e);
+  else if(activeTab==="history") renderHistory(page,e);
+}
+
+/* ---- form building helpers ---- */
+function field(label, node){
+  const l=document.createElement("label"); l.textContent=label;
+  const frag=document.createDocumentFragment(); frag.appendChild(l); frag.appendChild(node); return frag;
+}
+function inp(obj,key,opts){
+  opts=opts||{};
+  const i=document.createElement(opts.textarea?"textarea":"input");
+  if(opts.textarea) i.rows=opts.rows||3;
+  i.value = obj[key]==null?"":obj[key];
+  if(opts.placeholder) i.placeholder=opts.placeholder;
+  i.oninput=()=>{ if(i.value==="" && opts.deleteIfEmpty) delete obj[key]; else obj[key]=opts.number?(i.value===""?undefined:parseFloat(i.value)):i.value; markDirty(); };
+  return i;
+}
+function sel(obj,key,options){
+  const s=document.createElement("select");
+  s.innerHTML=options.map(o=>`<option value="${esc(o)}"${String(obj[key]||"")===o?" selected":""}>${esc(o===""?"(none)":o)}</option>`).join("");
+  s.onchange=()=>{ obj[key]=s.value; markDirty(); };
+  return s;
+}
+function arraySection(parent, title, arr, itemRender, factory){
+  const fs=document.createElement("fieldset");
+  const lg=document.createElement("legend"); lg.textContent=`${title} (${arr.length})`; fs.appendChild(lg);
+  arr.forEach((item,idx)=>{
+    const box=document.createElement("div"); box.className="arr-item";
+    const rm=document.createElement("button"); rm.className="rm danger small"; rm.textContent="Remove";
+    rm.onclick=()=>{ arr.splice(idx,1); markDirty(); renderDetail(); }; box.appendChild(rm);
+    const g=document.createElement("div"); g.className="arr-grid"; itemRender(g,item,idx); box.appendChild(g);
+    fs.appendChild(box);
+  });
+  const add=document.createElement("button"); add.className="ghost small add-btn"; add.textContent="+ Add "+title.replace(/s$/,"");
+  add.onclick=()=>{ arr.push(factory()); markDirty(); renderDetail(); };
+  fs.appendChild(add);
+  parent.appendChild(fs);
+}
+function g2(g,label,node){ const l=document.createElement("label"); l.textContent=label; g.appendChild(l); g.appendChild(node); }
+
+function renderForm(page,e){
+  const p=editModel;
+  // sidebar meta fieldset
+  const fsMeta=document.createElement("fieldset");
+  fsMeta.innerHTML='<legend>Database entry</legend>';
+  const gm=document.createElement("div"); gm.className="grid";
+  gm.appendChild(field("Status", sel(e,"status",["draft","review","published"]))); // status edits entry directly
+  // domains
+  const domWrap=document.createElement("div");
+  DB.domains.forEach(d=>{
+    const lab=document.createElement("label"); lab.style.display="inline-flex"; lab.style.alignItems="center"; lab.style.gap="4px"; lab.style.marginRight="12px"; lab.style.padding="0";
+    const cb=document.createElement("input"); cb.type="checkbox"; cb.style.width="auto"; cb.checked=(e.domains||[]).includes(d.code);
+    cb.onchange=()=>{ e.domains=e.domains||[]; if(cb.checked){ if(!e.domains.includes(d.code)) e.domains.push(d.code);} else e.domains=e.domains.filter(x=>x!==d.code); persist(); renderList(); };
+    lab.appendChild(cb); lab.appendChild(document.createTextNode(d.code+" "+d.label)); domWrap.appendChild(lab);
+  });
+  gm.appendChild(field("Domains", domWrap));
+  // status select rebinding (sel bound to e, but we need re-render list)
+  gm.querySelector("select").onchange=function(){ e.status=this.value; persist(); renderList(); };
+  fsMeta.appendChild(gm); page.appendChild(fsMeta);
+
+  // identifier
+  const fsId=document.createElement("fieldset"); fsId.innerHTML='<legend>Identifier</legend>';
+  const gi=document.createElement("div"); gi.className="grid";
+  p.identifier=p.identifier||{identifier:"",identifierType:"DOI"};
+  gi.appendChild(field("Identifier (DOI)", inp(p.identifier,"identifier",{placeholder:APP.DOI_PREFIX+"xxxxxxxx"})));
+  gi.appendChild(field("Identifier type", inp(p.identifier,"identifierType")));
+  const idHint=document.createElement("div"); idHint.className="hint";
+  idHint.textContent="Format 10.25039/CIE.DS.①②③④⑤⑥⑦⑧ (8 chars, excludes o O l L 1 I 0). DOIs are normally assigned by CIE CB — use \"Generate DOI\" for a draft proposal.";
+  const idProp=document.createElement("label"); idProp.style.padding="0";
+  const cbp=document.createElement("input"); cbp.type="checkbox"; cbp.style.width="auto"; cbp.checked=!!e.idProposed;
+  cbp.onchange=()=>{ e.idProposed=cbp.checked; persist(); renderList(); };
+  idProp.appendChild(cbp); idProp.appendChild(document.createTextNode(" DOI is a local proposal (not yet assigned by CIE CB)"));
+  fsId.appendChild(gi); fsId.appendChild(idHint); fsId.appendChild(idProp); page.appendChild(fsId);
+
+  // core fields
+  const fsCore=document.createElement("fieldset"); fsCore.innerHTML='<legend>Core (DataCite mandatory)</legend>';
+  const gc=document.createElement("div"); gc.className="grid";
+  gc.appendChild(field("Publisher", inp(p,"publisher")));
+  gc.appendChild(field("Publication year", inp(p,"publicationYear",{placeholder:"YYYY"})));
+  gc.appendChild(field("Language", inp(p,"language",{placeholder:"en"})));
+  p.types=p.types||{resourceType:"",resourceTypeGeneral:"Dataset"};
+  gc.appendChild(field("Resource type", inp(p.types,"resourceType",{placeholder:"dataTable"})));
+  gc.appendChild(field("Resource type general", sel(p.types,"resourceTypeGeneral",ENUMS.resourceTypeGeneral)));
+  fsCore.appendChild(gc); page.appendChild(fsCore);
+
+  // titles
+  p.titles=p.titles||[];
+  arraySection(page,"Titles",p.titles,(g,it)=>{
+    g2(g,"Title",inp(it,"title"));
+    g2(g,"Title type",sel(it,"titleType",ENUMS.titleType));
+    g2(g,"Language",inp(it,"lang",{placeholder:"(optional)",deleteIfEmpty:true}));
+  },()=>({title:""}));
+
+  // creators
+  p.creators=p.creators||[];
+  arraySection(page,"Creators",p.creators,(g,it)=>{
+    g2(g,"Name",inp(it,"name"));
+    g2(g,"Name type",sel(it,"nameType",ENUMS.nameType));
+  },()=>clone(CIE_DEFAULTS.creator));
+
+  // subjects
+  p.subjects=p.subjects||[];
+  arraySection(page,"Subjects",p.subjects,(g,it)=>{
+    g2(g,"Subject",inp(it,"subject"));
+    g2(g,"Scheme",inp(it,"subjectScheme",{deleteIfEmpty:true}));
+    g2(g,"Classification code",inp(it,"classificationCode",{deleteIfEmpty:true}));
+  },()=>({subject:""}));
+
+  // descriptions
+  p.descriptions=p.descriptions||[];
+  arraySection(page,"Descriptions",p.descriptions,(g,it)=>{
+    g2(g,"Description",inp(it,"description",{textarea:true,rows:3}));
+    g2(g,"Type",sel(it,"descriptionType",ENUMS.descriptionType));
+  },()=>({description:"",descriptionType:"Abstract"}));
+
+  // alternateIdentifiers
+  p.alternateIdentifiers=p.alternateIdentifiers||[];
+  arraySection(page,"Alternate identifiers",p.alternateIdentifiers,(g,it)=>{
+    g2(g,"Value",inp(it,"alternateIdentifier"));
+    g2(g,"Type",inp(it,"alternateIdentifierType",{placeholder:"fileName"}));
+  },()=>({alternateIdentifier:"",alternateIdentifierType:"fileName"}));
+
+  // formats
+  p.formats=p.formats||[];
+  arraySection(page,"Formats",p.formats,(g,it,idx)=>{
+    const i=document.createElement("input"); i.value=it; i.oninput=()=>{ p.formats[idx]=i.value; markDirty(); };
+    g2(g,"Format",i);
+  },()=>"text/csv");
+
+  // rightsList
+  p.rightsList=p.rightsList||[];
+  arraySection(page,"Rights",p.rightsList,(g,it)=>{
+    g2(g,"Rights",inp(it,"rights"));
+    g2(g,"Rights URI",inp(it,"rightsURI",{deleteIfEmpty:true}));
+    g2(g,"Identifier",inp(it,"rightsIdentifier",{deleteIfEmpty:true}));
+  },()=>clone(CIE_DEFAULTS.rights));
+
+  // relatedItems
+  p.relatedItems=p.relatedItems||[];
+  arraySection(page,"Related items",p.relatedItems,(g,it)=>{
+    g2(g,"Identifier",inp(it,"relatedItemIdentifier",{deleteIfEmpty:true}));
+    g2(g,"Identifier type",sel(it,"relatedItemIdentifierType",ENUMS.relatedIdentifierType));
+    g2(g,"Relation type",sel(it,"relationType",ENUMS.relationType));
+    g2(g,"Item type",sel(it,"relatedItemType",ENUMS.resourceTypeGeneral));
+    it.titles=it.titles||[""];
+    const ti=document.createElement("input"); ti.value=it.titles[0]||""; ti.oninput=()=>{ it.titles[0]=ti.value; markDirty(); };
+    g2(g,"Title",ti);
+  },()=>({relatedItemIdentifier:"",relatedItemIdentifierType:"DOI",relationType:"IsPartOf",relatedItemType:"Standard",titles:[""]}));
+
+  // checksums
+  p.checksums=p.checksums||[];
+  arraySection(page,"Checksums",p.checksums,(g,it)=>{
+    g2(g,"Hash method",sel(it,"hashMethod",ENUMS.hashMethod));
+    g2(g,"Checksum",inp(it,"checksum"));
+  },()=>({hashMethod:"sha256",checksum:""}));
+
+  // datatableInfo
+  p.datatableInfo=p.datatableInfo||{};
+  const di=p.datatableInfo;
+  const fsDi=document.createElement("fieldset"); fsDi.innerHTML='<legend>Data table info</legend>';
+  const gd=document.createElement("div"); gd.className="grid";
+  gd.appendChild(field("Interpolation",sel(di,"interpolationMethod",ENUMS.interpolationMethod)));
+  gd.appendChild(field("Extrapolation",sel(di,"extrapolationMethod",ENUMS.extrapolationMethod)));
+  gd.appendChild(field("Data quality",sel(di,"dataQuality",ENUMS.dataQuality)));
+  fsDi.appendChild(gd); page.appendChild(fsDi);
+
+  di.validations=di.validations||[];
+  arraySection(page,"Validations",di.validations,(g,it)=>{
+    g2(g,"Type",sel(it,"validationType",ENUMS.validationType));
+    g2(g,"Parameter",inp(it,"validationParameter",{deleteIfEmpty:true,placeholder:"(e.g. row number)"}));
+    g2(g,"Value",inp(it,"validationValue",{textarea:true,rows:2}));
+  },()=>({validationType:"sumOfColumns",validationValue:""}));
+
+  di.columnHeaders=di.columnHeaders||[];
+  arraySection(page,"Column headers",di.columnHeaders,(g,it)=>{
+    g2(g,"Title",inp(it,"title"));
+    g2(g,"Quantity",inp(it,"quantity"));
+    g2(g,"Unit",inp(it,"unit"));
+    g2(g,"Description",inp(it,"description",{deleteIfEmpty:true}));
+    g2(g,"Wavelength first",inp(it,"wavelength_first",{number:true,deleteIfEmpty:true}));
+    g2(g,"Wavelength last",inp(it,"wavelength_last",{number:true,deleteIfEmpty:true}));
+    g2(g,"Wavelength step",inp(it,"wavelength_step",{number:true,deleteIfEmpty:true}));
+  },()=>({title:"",quantity:"",unit:""}));
+
+  // validation summary
+  const errs=validate(p,CIE_SCHEMA);
+  const box=document.createElement("fieldset"); box.innerHTML='<legend>Schema validation</legend>';
+  if(errs.length===0) box.innerHTML+='<div class="val-ok">✓ Valid against CIEmetaDigitalProduct v4 schema</div>';
+  else box.innerHTML+='<ul class="val-list">'+errs.map(x=>`<li class="e">${esc(x)}</li>`).join("")+'</ul>';
+  page.appendChild(box);
+}
+
+function renderJson(page,e){
+  const wrap=document.createElement("div");
+  const ta=document.createElement("textarea"); ta.id="jsonEditor"; ta.rows=28; ta.value=JSON.stringify(editModel,null,2);
+  const bar=document.createElement("div"); bar.style.margin="8px 0"; bar.style.display="flex"; bar.style.gap="8px";
+  const apply=document.createElement("button"); apply.textContent="Apply JSON to model"; apply.className="sec";
+  const fmt=document.createElement("button"); fmt.textContent="Format"; fmt.className="ghost";
+  const status=document.createElement("span"); status.className="kv"; status.style.alignSelf="center";
+  apply.onclick=()=>{
+    try{ const obj=JSON.parse(el("jsonEditor").value); editModel=obj; markDirty(); status.textContent="Applied."; status.style.color="var(--ok)"; }
+    catch(err){ status.textContent="Invalid JSON: "+err.message; status.style.color="var(--err)"; }
+  };
+  fmt.onclick=()=>{ try{ el("jsonEditor").value=JSON.stringify(JSON.parse(el("jsonEditor").value),null,2); }catch(err){ status.textContent="Invalid JSON: "+err.message; status.style.color="var(--err)"; } };
+  bar.appendChild(apply); bar.appendChild(fmt); bar.appendChild(status);
+  wrap.appendChild(bar); wrap.appendChild(ta);
+  const errs=validate(editModel,CIE_SCHEMA);
+  const box=document.createElement("div"); box.style.marginTop="10px";
+  if(errs.length===0) box.innerHTML='<div class="val-ok">✓ Valid against schema</div>';
+  else box.innerHTML='<ul class="val-list">'+errs.map(x=>`<li class="e">${esc(x)}</li>`).join("")+'</ul>';
+  wrap.appendChild(box);
+  page.appendChild(wrap);
+}
+function syncJsonView(){ const ta=el("jsonEditor"); if(ta && activeTab==="json") ta.value=JSON.stringify(editModel,null,2); }
+
+/* ---- validation against CSV ---- */
+function renderValidate(page,e){
+  const p=editModel;
+  const info=document.createElement("div"); info.className="warnrow";
+  info.textContent="Pick the CSV data file (header-less, comma-separated per RFC 4180). The tool computes md5+sha256, row/column counts, per-column sums, a sample row and the wavelength range from column 1, then lets you CHECK them against the metadata or GENERATE/fill the metadata fields.";
+  page.appendChild(info);
+
+  const fsel=document.createElement("div"); fsel.className="filesel"; fsel.style.marginBottom="12px";
+  const file=document.createElement("input"); file.type="file"; file.accept=".csv,text/csv"; file.style.maxWidth="360px";
+  fsel.appendChild(file); page.appendChild(fsel);
+
+  const out=document.createElement("div"); page.appendChild(out);
+
+  file.onchange=async()=>{
+    if(!file.files||!file.files[0]) return;
+    const f=file.files[0];
+    const bytes=await readFileBytes(f);
+    const md5=md5Bytes(bytes), sha=sha256Bytes(bytes);
+    const text=new TextDecoder("utf-8").decode(bytes);
+    const a=analyzeCsv(text);
+    renderCsvResult(out,e,f.name,md5,sha,a);
+  };
+}
+function numClose(a,b){ if(!Number.isFinite(a)||!Number.isFinite(b)) return false; const s=Math.max(Math.abs(a),Math.abs(b),1); return Math.abs(a-b)<=s*1e-6; }
+function renderCsvResult(out,e,filename,md5,sha,a){
+  const p=editModel;
+  out.innerHTML="";
+  const sum=document.createElement("div"); sum.className="csv-summary";
+  sum.textContent=
+    `file: ${filename}\nrows: ${a.nRows}\ncolumns: ${a.nCols}\n`+
+    `md5:    ${md5}\nsha256: ${sha}\n`+
+    `column sums: [${a.sums.map(x=>fmtNum(x)).join(", ")}]\n`+
+    (a.wl?`wavelength (col 1): first=${a.wl.first} last=${a.wl.last} step=${a.wl.uniform?a.wl.step:"(non-uniform)"}\n`:"");
+  out.appendChild(sum);
+
+  // CHECK panel
+  const chk=document.createElement("fieldset"); chk.innerHTML="<legend>Check against metadata</legend>";
+  const ul=document.createElement("ul"); ul.className="val-list";
+  const cs=(p.checksums||[]);
+  function checkHash(method,val){
+    const stored=cs.find(c=>(c.hashMethod||"").toLowerCase()===method);
+    if(!stored){ ul.appendChild(li("w",`${method}: no stored checksum`)); return; }
+    ul.appendChild(li(stored.checksum.toLowerCase()===val.toLowerCase()?"ok":"e",
+      `${method}: ${stored.checksum.toLowerCase()===val.toLowerCase()?"match":"MISMATCH (stored "+stored.checksum+")"}`));
+  }
+  checkHash("md5",md5); checkHash("sha256",sha);
+  // validations
+  const vs=(p.datatableInfo&&p.datatableInfo.validations)||[];
+  const vRows=vs.find(v=>v.validationType==="numberOfRows");
+  if(vRows) ul.appendChild(li(String(a.nRows)===String(vRows.validationValue).trim()?"ok":"e",`numberOfRows: ${String(a.nRows)===String(vRows.validationValue).trim()?"match":"MISMATCH (stored "+vRows.validationValue+")"}`));
+  const vCols=vs.find(v=>v.validationType==="numberOfColumns");
+  if(vCols) ul.appendChild(li(String(a.nCols)===String(vCols.validationValue).trim()?"ok":"e",`numberOfColumns: ${String(a.nCols)===String(vCols.validationValue).trim()?"match":"MISMATCH (stored "+vCols.validationValue+")"}`));
+  const vSum=vs.find(v=>v.validationType==="sumOfColumns");
+  if(vSum){
+    let stored=null; try{ stored=JSON.parse(vSum.validationValue); }catch(err){}
+    if(Array.isArray(stored)){
+      let ok=stored.length===a.sums.length && stored.every((x,i)=>numClose(Number(x),a.sums[i]));
+      ul.appendChild(li(ok?"ok":"e",`sumOfColumns: ${ok?"match":"MISMATCH (stored "+vSum.validationValue+")"}`));
+    }
+  }
+  const vSample=vs.find(v=>v.validationType==="sampleRow");
+  if(vSample && vSample.validationParameter){
+    const idx=parseInt(vSample.validationParameter,10)-1;
+    const line=a.lines[idx];
+    ul.appendChild(li(line!==undefined && line.trim()===String(vSample.validationValue).trim()?"ok":"e",
+      `sampleRow[${vSample.validationParameter}]: ${line!==undefined&&line.trim()===String(vSample.validationValue).trim()?"match":"MISMATCH (stored "+vSample.validationValue+", file "+(line===undefined?"(no such row)":line)+")"}`));
+  }
+  // wavelength vs columnHeaders
+  const chs=(p.datatableInfo&&p.datatableInfo.columnHeaders)||[];
+  if(a.wl && chs[0]){
+    const c0=chs[0];
+    if(c0.wavelength_first!=null) ul.appendChild(li(numClose(c0.wavelength_first,a.wl.first)?"ok":"e",`col1 wavelength_first: ${numClose(c0.wavelength_first,a.wl.first)?"match":"MISMATCH (meta "+c0.wavelength_first+", file "+a.wl.first+")"}`));
+    if(c0.wavelength_last!=null) ul.appendChild(li(numClose(c0.wavelength_last,a.wl.last)?"ok":"e",`col1 wavelength_last: ${numClose(c0.wavelength_last,a.wl.last)?"match":"MISMATCH (meta "+c0.wavelength_last+", file "+a.wl.last+")"}`));
+  }
+  if(a.nCols && chs.length && a.nCols!==chs.length) ul.appendChild(li("w",`columnHeaders count (${chs.length}) differs from CSV columns (${a.nCols})`));
+  if(ul.children.length===0) ul.appendChild(li("w","No stored checksums/validations to check — use Generate below."));
+  chk.appendChild(ul); out.appendChild(chk);
+
+  // GENERATE panel
+  const gen=document.createElement("fieldset"); gen.innerHTML="<legend>Generate / fill metadata</legend>";
+  const p1=document.createElement("p"); p1.className="hint"; p1.textContent="Sample row (1-based) used for the sampleRow validation:";
+  const rowInp=document.createElement("input"); rowInp.type="number"; rowInp.value=Math.min(120,a.nRows); rowInp.min=1; rowInp.max=a.nRows; rowInp.style.maxWidth="120px";
+  const btn=document.createElement("button"); btn.className="sec"; btn.textContent="Fill checksums, validations & wavelength range";
+  btn.onclick=()=>{
+    p.checksums=[{hashMethod:"md5",checksum:md5},{hashMethod:"sha256",checksum:sha}];
+    p.datatableInfo=p.datatableInfo||{};
+    const rowN=Math.max(1,Math.min(a.nRows,parseInt(rowInp.value,10)||1));
+    p.datatableInfo.validations=[
+      {validationType:"sumOfColumns",validationValue:"["+a.sums.map(x=>fmtNum(x)).join(",")+"]"},
+      {validationType:"sampleRow",validationParameter:String(rowN),validationValue:a.lines[rowN-1]||""},
+      {validationType:"numberOfRows",validationValue:String(a.nRows)},
+      {validationType:"numberOfColumns",validationValue:String(a.nCols)}
+    ];
+    if(a.wl){
+      p.datatableInfo.columnHeaders=p.datatableInfo.columnHeaders||[];
+      // ensure at least nCols headers
+      while(p.datatableInfo.columnHeaders.length<a.nCols) p.datatableInfo.columnHeaders.push({title:"",quantity:"",unit:""});
+      const c0=p.datatableInfo.columnHeaders[0];
+      c0.wavelength_first=a.wl.first; c0.wavelength_last=a.wl.last;
+      if(a.wl.uniform) c0.wavelength_step=a.wl.step;
+    }
+    // ensure filename alternateIdentifier
+    p.alternateIdentifiers=p.alternateIdentifiers||[];
+    if(!p.alternateIdentifiers.some(x=>x.alternateIdentifierType==="fileName"))
+      p.alternateIdentifiers.push({alternateIdentifier:filename,alternateIdentifierType:"fileName"});
+    markDirty(); toast("Metadata fields filled from CSV — review and Save entry","ok");
+    activeTab="form"; renderDetail();
+  };
+  gen.appendChild(p1); gen.appendChild(rowInp); gen.appendChild(document.createElement("br")); gen.appendChild(document.createElement("br")); gen.appendChild(btn);
+  out.appendChild(gen);
+}
+function li(cls,txt){ const x=document.createElement("li"); x.className=cls==="ok"?"":cls; if(cls==="ok"){x.style.background="#e7f6ee";x.style.color="#12683f";x.style.border="1px solid #bfe6cf";} x.textContent=(cls==="ok"?"✓ ":cls==="e"?"✗ ":"! ")+txt; return x; }
+function fmtNum(x){ if(!Number.isFinite(x)) return "0"; if(Number.isInteger(x)) return String(x); return String(Number(x.toPrecision(15))); }
+
+/* ---- history ---- */
+function renderHistory(page,e){
+  const info=document.createElement("p"); info.className="hint";
+  info.textContent="Newest first. Each revision stores the field-level change (RFC-6902 JSON-Patch) from the previous one; earlier revisions are reconstructed by replaying patches.";
+  page.appendChild(info);
+  const hist=e.history.slice().reverse();
+  for(const h of hist){
+    const box=document.createElement("div"); box.className="hist-item";
+    const head=document.createElement("div"); head.className="h";
+    head.innerHTML=`<span class="rev">rev ${h.rev}</span><span class="who">${esc(h.by)} · ${esc((h.date||"").replace("T"," ").slice(0,19))}</span>`;
+    box.appendChild(head);
+    if(h.comment){ const c=document.createElement("div"); c.className="cmt"; c.textContent=h.comment; box.appendChild(c); }
+    const diff=document.createElement("div"); diff.className="diff"; diff.innerHTML=renderDiff(h.patch,h.rev); box.appendChild(diff);
+    if(h.rev<e.rev){
+      const rb=document.createElement("button"); rb.className="ghost small"; rb.style.marginTop="6px"; rb.textContent="Restore this revision";
+      rb.onclick=()=>{ const old=reconstruct(e.history,h.rev); editModel=old; markDirty(); toast(`Loaded rev ${h.rev} into editor — Save to commit as new revision`,"ok"); activeTab="form"; renderDetail(); };
+      box.appendChild(rb);
+    }
+    page.appendChild(box);
+  }
+}
+function renderDiff(patch,rev){
+  if(rev===1) return '<span class="op-add">+ initial content imported/created</span>';
+  return patch.map(op=>{
+    const path=esc(op.path);
+    if(op.op==="add") return `<span class="op-add">+ add ${path} = ${esc(shortVal(op.value))}</span>`;
+    if(op.op==="remove") return `<span class="op-remove">− remove ${path}</span>`;
+    if(op.op==="replace") return `<span class="op-replace">~ ${path} → ${esc(shortVal(op.value))}</span>`;
+    return esc(JSON.stringify(op));
+  }).join("\n");
+}
+function shortVal(v){ const s=typeof v==="string"?v:JSON.stringify(v); return s.length>120?s.slice(0,117)+"…":s; }
+
+/* ---- entry actions ---- */
+function saveEntry(){
+  const e=findEntry(selectedId); if(!e) return;
+  const errs=validate(editModel,CIE_SCHEMA);
+  if(errs.length){ if(!confirm("The entry has "+errs.length+" schema issue(s):\n\n"+errs.slice(0,10).join("\n")+(errs.length>10?"\n…":"")+"\n\nSave anyway?")) return; }
+  const patch=diffPatch(e.payload,editModel,"");
+  if(patch.length===0){ toast("No changes to save"); editDirty=false; renderDetail(); return; }
+  const comment=prompt("Change comment (what changed and why):","");
+  if(comment===null) return; // cancelled
+  commitEdit(e,editModel,comment);
+  editDirty=false; persist(); renderList(); renderDetail();
+  toast("Saved rev "+e.rev,"ok");
+}
+function deleteEntry(e){
+  if(!confirm(`Delete entry "${entryTitle(e)}" (${entryDoi(e)})?\nThis removes it from the database.`)) return;
+  DB.entries=DB.entries.filter(x=>x.entryId!==e.entryId);
+  if(selectedId===e.entryId){ selectedId=null; editModel=null; editDirty=false; }
+  persist(); renderList(); renderDetail(); toast("Entry deleted");
+}
+function duplicateEntry(e){
+  const doi=generateDoi();
+  const p=clone(e.payload);
+  if(p.identifier) p.identifier.identifier=doi;
+  if(p.titles&&p.titles[0]) p.titles[0].title=(p.titles[0].title||"")+" (copy)";
+  const ne=createEntry(p,{status:"draft",idProposed:true,domains:clone(e.domains||[]),comment:"Duplicated from "+entryDoi(e)});
+  DB.entries.push(ne); persist(); selectEntry(ne.entryId); toast("Duplicated as new draft with proposed DOI","ok");
+}
+
+/* ============================================================================
+   dialogs
+   ==========================================================================*/
+let modalEl=null;
+function modal(title, bodyNode, footNodes){
+  closeModal();
+  const bg=document.createElement("div"); bg.className="modal-bg";
+  const m=document.createElement("div"); m.className="modal";
+  const h=document.createElement("h3"); h.textContent=title; m.appendChild(h);
+  m.appendChild(bodyNode);
+  const foot=document.createElement("div"); foot.className="foot"; (footNodes||[]).forEach(n=>foot.appendChild(n)); m.appendChild(foot);
+  bg.appendChild(m); document.body.appendChild(bg); modalEl=bg;
+  bg.onclick=(ev)=>{ if(ev.target===bg) closeModal(); };
+  return m;
+}
+function closeModal(){ if(modalEl){ modalEl.remove(); modalEl=null; } }
+function mkBtn(label,cls,fn){ const b=document.createElement("button"); b.textContent=label; if(cls)b.className=cls; b.onclick=fn; return b; }
+
+function openNewEntryDialog(){
+  const body=document.createElement("div");
+  const g=document.createElement("div"); g.className="grid";
+  const langInp=document.createElement("input"); langInp.placeholder="(optional) translation language code, e.g. ES";
+  const doiInp=document.createElement("input");
+  const regen=mkBtn("Generate","ghost small",()=>{ doiInp.value=generateDoi(langInp.value.trim()); });
+  const doiWrap=document.createElement("div"); doiWrap.style.display="flex"; doiWrap.style.gap="6px"; doiWrap.appendChild(doiInp); doiWrap.appendChild(regen);
+  doiInp.value=generateDoi("");
+  const titleInp=document.createElement("input");
+  const fileInp=document.createElement("input"); fileInp.placeholder="CIE_xxx.csv";
+  g.appendChild(field("Title",titleInp));
+  g.appendChild(field("DOI",doiWrap));
+  g.appendChild(field("Language suffix",langInp));
+  g.appendChild(field("File name",fileInp));
+  body.appendChild(g);
+  const hint=document.createElement("p"); hint.className="hint"; hint.textContent="A draft DOI is generated locally (marked \"proposed\"). Real DOIs are assigned by CIE CB.";
+  body.appendChild(hint);
+  langInp.oninput=()=>{ /* keep current suffix in sync only via Generate */ };
+  const create=mkBtn("Create entry","sec",()=>{
+    const doi=doiInp.value.trim()||generateDoi(langInp.value.trim());
+    const p=blankPayload(doi, fileInp.value.trim());
+    if(p.titles&&p.titles[0]) p.titles[0].title=titleInp.value.trim();
+    const e=createEntry(p,{status:"draft",idProposed:true,comment:"Created"});
+    DB.entries.push(e); persist(); closeModal(); selectEntry(e.entryId); toast("New draft entry created","ok");
+  });
+  modal("New entry",body,[mkBtn("Cancel","ghost",closeModal),create]);
+}
+
+function openDoiDialog(e){
+  const body=document.createElement("div");
+  const g=document.createElement("div"); g.className="grid";
+  const langInp=document.createElement("input"); langInp.placeholder="e.g. ES (optional)";
+  const doiInp=document.createElement("input"); doiInp.value=generateDoi("");
+  const regen=mkBtn("Regenerate","ghost small",()=>{ doiInp.value=generateDoi(langInp.value.trim()); });
+  const w=document.createElement("div"); w.style.display="flex"; w.style.gap="6px"; w.appendChild(doiInp); w.appendChild(regen);
+  g.appendChild(field("Proposed DOI",w));
+  g.appendChild(field("Language suffix",langInp));
+  body.appendChild(g);
+  const apply=mkBtn("Apply to entry","sec",()=>{
+    editModel.identifier=editModel.identifier||{identifierType:"DOI"};
+    editModel.identifier.identifier=doiInp.value.trim();
+    e.idProposed=true; markDirty(); closeModal(); renderDetail(); toast("DOI applied (proposed) — Save to commit");
+  });
+  modal("Generate DOI",body,[mkBtn("Cancel","ghost",closeModal),apply]);
+}
+
+function openDomainsDialog(){
+  const body=document.createElement("div");
+  const info=document.createElement("p"); info.className="hint";
+  info.textContent="CIE activity domains (typically Divisions). Editable; entries reference these by code.";
+  body.appendChild(info);
+  const list=document.createElement("div"); list.className="divmgr";
+  const draft=clone(DB.domains);
+  function paint(){
+    list.innerHTML="";
+    draft.forEach((d,idx)=>{
+      const row=document.createElement("div"); row.className="arr-item";
+      const code=document.createElement("input"); code.className="code"; code.value=d.code; code.oninput=()=>d.code=code.value;
+      const label=document.createElement("input"); label.value=d.label; label.oninput=()=>d.label=label.value;
+      const rm=mkBtn("Remove","danger small",()=>{ draft.splice(idx,1); paint(); });
+      row.appendChild(code); row.appendChild(label); row.appendChild(rm); list.appendChild(row);
+    });
+  }
+  paint(); body.appendChild(list);
+  const add=mkBtn("+ Add domain","ghost small",()=>{ draft.push({code:"",label:""}); paint(); });
+  body.appendChild(add);
+  const save=mkBtn("Save domains","sec",()=>{
+    DB.domains=draft.filter(d=>d.code.trim()); persist(); refreshDomainFilter(); closeModal(); renderDetail(); renderList(); toast("Domains updated","ok");
+  });
+  modal("Manage domains",body,[mkBtn("Cancel","ghost",closeModal),save]);
+}
+
+/* ============================================================================
+   persistence: localStorage, open/import/export, File System Access API
+   ==========================================================================*/
+function persist(){
+  if(!DB) return;
+  DB.generatedAt=nowISO(); DB.baseHash=computeDbBaseHash(DB);
+  try{ localStorage.setItem(APP.LS_DB, JSON.stringify(DB)); }catch(e){ /* quota */ }
+}
+function loadWorkingCopy(){
+  try{ const s=localStorage.getItem(APP.LS_DB); if(s){ DB=JSON.parse(s); lastLoadedBaseHash=DB.baseHash; return true; } }catch(e){}
+  return false;
+}
+const hasFSA = ("showOpenFilePicker" in window) && ("showSaveFilePicker" in window);
+
+async function openDbFile(){
+  if(editDirty && !confirm("Discard unsaved entry changes?")) return;
+  if(hasFSA){
+    try{
+      const [h]=await window.showOpenFilePicker({types:[{description:"CIE metadatabase JSON",accept:{"application/json":[".json"]}}]});
+      const f=await h.getFile(); const text=await f.text();
+      loadDbFromText(text); dbFileHandle=h;
+    }catch(e){ if(e.name!=="AbortError") toast("Open failed: "+e.message,"err"); }
+  }else{
+    pickFile(".json",async(f)=>{ loadDbFromText(await f.text()); dbFileHandle=null; });
+  }
+}
+function loadDbFromText(text){
+  let obj; try{ obj=JSON.parse(text); }catch(e){ toast("Not valid JSON: "+e.message,"err"); return; }
+  // is this an aggregate DB or a single DataCite metadata file?
+  if(obj && obj.dbSchemaName===APP.DB_SCHEMA_NAME){
+    DB=migrateDb(obj); lastLoadedBaseHash=DB.baseHash; selectedId=null; editModel=null; editDirty=false;
+    persist(); refreshDomainFilter(); renderList(); renderDetail(); toast("Database loaded — "+DB.entries.length+" entries","ok");
+  }else if(obj && obj.schemaName===APP.CIE_SCHEMA_NAME){
+    if(!DB) DB=newDB();
+    importDataCiteObjects([obj]);
+  }else{
+    toast("Unrecognised file (neither CIEmetaDB nor CIEmetaDigitalProduct)","err");
+  }
+}
+function migrateDb(obj){
+  obj.domains=obj.domains||clone(DEFAULT_DOMAINS);
+  obj.entries=(obj.entries||[]).map(e=>{
+    e.domains=e.domains||[]; e.history=e.history||[{rev:e.rev||1,by:"import",date:e.audit?e.audit.modifiedDate:nowISO(),comment:"Imported",baseHash:null,patch:diffPatch({},e.payload,"")}];
+    if(e.contentHash==null) e.contentHash=contentHash(e.payload);
+    if(e.rev==null) e.rev=e.history.length;
+    return e;
+  });
+  return obj;
+}
+
+/* import individual DataCite metadata files as new entries (or merge) */
+function importDataCiteObjects(objs){
+  let added=0;
+  for(const o of objs){
+    const e=createEntry(o,{status:"published",idProposed:false,comment:"Imported from DataCite file"});
+    // infer domains from subjects? leave empty; curator assigns
+    DB.entries.push(e); added++;
+  }
+  persist(); refreshDomainFilter(); renderList(); toast(`Imported ${added} DataCite file(s) as entries`,"ok");
+}
+
+/* Import/Merge dialog: aggregate DB merge OR datacite files */
+function openImportDialog(){
+  const body=document.createElement("div");
+  const p=document.createElement("p"); p.className="hint";
+  p.textContent="Import one or more DataCite *.csv_metadata.json files (added as entries), or another CIEmetaDB database file (merged with per-entry conflict detection).";
+  body.appendChild(p);
+  const f=document.createElement("input"); f.type="file"; f.multiple=true; f.accept=".json,application/json";
+  body.appendChild(f);
+  const go=mkBtn("Load selected","sec",async()=>{
+    if(!f.files||!f.files.length) return;
+    const files=[...f.files];
+    const texts=await Promise.all(files.map(x=>x.text()));
+    closeModal();
+    let dataciteObjs=[];
+    for(const t of texts){
+      let obj; try{ obj=JSON.parse(t); }catch(e){ toast("Skipped invalid JSON file","err"); continue; }
+      if(obj.dbSchemaName===APP.DB_SCHEMA_NAME){ mergeDb(migrateDb(obj)); }
+      else if(obj.schemaName===APP.CIE_SCHEMA_NAME){ dataciteObjs.push(obj); }
+      else toast("Skipped unrecognised file","err");
+    }
+    if(dataciteObjs.length){ if(!DB) DB=newDB(); importDataCiteObjects(dataciteObjs); }
+  });
+  modal("Import / Merge",body,[mkBtn("Cancel","ghost",closeModal),go]);
+}
+
+/* ============================================================================
+   concurrency: optimistic per-entry merge
+   ==========================================================================*/
+function mergeDb(incoming){
+  if(!DB){ DB=incoming; persist(); refreshDomainFilter(); renderList(); return; }
+  const mine=new Map(DB.entries.map(e=>[e.entryId,e]));
+  const conflicts=[]; let autoMerged=0, addedNew=0;
+  for(const inc of incoming.entries){
+    const cur=mine.get(inc.entryId);
+    if(!cur){ DB.entries.push(inc); addedNew++; continue; }
+    if(cur.contentHash===inc.contentHash){ /* identical, keep higher history */ if(inc.history.length>cur.history.length){ cur.history=inc.history; cur.rev=inc.rev; } continue; }
+    // diverged: determine common ancestor by rev/history baseHash
+    const curBase=cur.history.length?cur.history[cur.history.length-1].baseHash:null;
+    const incBase=inc.history.length?inc.history[inc.history.length-1].baseHash:null;
+    // fast-forward: if incoming's history contains cur's contentHash as an ancestor
+    if(historyContainsHash(inc, cur.contentHash)){ replaceEntry(cur, inc); autoMerged++; continue; }
+    if(historyContainsHash(cur, inc.contentHash)){ autoMerged++; continue; } // mine already ahead
+    conflicts.push({cur, inc});
+  }
+  persist(); refreshDomainFilter(); renderList();
+  if(conflicts.length){ openConflictDialog(conflicts, autoMerged, addedNew); }
+  else toast(`Merged: ${addedNew} new, ${autoMerged} updated, 0 conflicts`,"ok");
+}
+function historyContainsHash(entry, hash){
+  // reconstruct each revision and compare contentHash
+  for(let r=1;r<=entry.history.length;r++){
+    const doc=reconstruct(entry.history,r);
+    if(contentHash(doc)===hash) return true;
+  }
+  return false;
+}
+function replaceEntry(cur, inc){ Object.assign(cur, inc); }
+
+function openConflictDialog(conflicts, autoMerged, addedNew){
+  let i=0; const resolutions=[];
+  const body=document.createElement("div");
+  const nav=document.createElement("p"); nav.className="hint";
+  body.appendChild(nav);
+  const area=document.createElement("div"); body.appendChild(area);
+  function paint(){
+    const {cur,inc}=conflicts[i];
+    nav.textContent=`Conflict ${i+1} of ${conflicts.length} — entry ${entryDoi(cur)} "${entryTitle(cur)}" was changed on both sides.`;
+    area.innerHTML="";
+    const cols=document.createElement("div"); cols.className="cols2";
+    const mineBox=sideBox("Mine (current)",cur,"mine");
+    const theirsBox=sideBox("Theirs (incoming)",inc,"theirs");
+    cols.appendChild(mineBox); cols.appendChild(theirsBox); area.appendChild(cols);
+    const pick=document.createElement("div"); pick.style.marginTop="10px"; pick.style.display="flex"; pick.style.gap="8px";
+    pick.appendChild(mkBtn("Keep mine","ghost",()=>{ resolutions[i]="mine"; next(); }));
+    pick.appendChild(mkBtn("Take theirs","ghost",()=>{ resolutions[i]="theirs"; next(); }));
+    pick.appendChild(mkBtn("Keep both (theirs as new draft)","ghost",()=>{ resolutions[i]="both"; next(); }));
+    area.appendChild(pick);
+  }
+  function sideBox(title,entry,cls){
+    const d=document.createElement("div"); d.className="conflict";
+    d.innerHTML=`<h4>${title} — rev ${entry.rev}, by ${esc(entry.audit.modifiedBy)} @ ${esc((entry.audit.modifiedDate||"").slice(0,19).replace("T"," "))}</h4>`;
+    const s=document.createElement("div"); s.className="side"; const pre=document.createElement("pre");
+    pre.textContent=JSON.stringify(entry.payload,null,1); s.appendChild(pre); d.appendChild(s);
+    return d;
+  }
+  function next(){ i++; if(i>=conflicts.length) finish(); else paint(); }
+  function finish(){
+    conflicts.forEach((c,idx)=>{
+      const r=resolutions[idx]||"mine";
+      if(r==="theirs") replaceEntry(c.cur, c.inc);
+      else if(r==="both"){ const dup=clone(c.inc); dup.entryId=uuid(); dup.status="draft"; dup.audit.modifiedComment="Imported copy (conflict: kept both)"; if(dup.payload.titles&&dup.payload.titles[0]) dup.payload.titles[0].title=(dup.payload.titles[0].title||"")+" (incoming copy)"; DB.entries.push(dup); }
+      // "mine" → nothing
+    });
+    persist(); refreshDomainFilter(); renderList(); renderDetail(); closeModal();
+    toast(`Merge complete: ${addedNew} new, ${autoMerged} auto-updated, ${conflicts.length} resolved`,"ok");
+  }
+  paint();
+  modal("Resolve merge conflicts",body,[mkBtn("Cancel merge","ghost",()=>{ closeModal(); toast("Merge cancelled for remaining conflicts"); })]);
+}
+
+/* ============================================================================
+   export
+   ==========================================================================*/
+function download(filename, text, mime){
+  const blob=new Blob([text],{type:mime||"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+async function saveDb(saveAs){
+  if(!DB) return;
+  persist();
+  const text=JSON.stringify(DB,null,2);
+  if(hasFSA && (saveAs || dbFileHandle)){
+    try{
+      if(saveAs || !dbFileHandle){
+        dbFileHandle=await window.showSaveFilePicker({suggestedName:(dbFileHandle&&dbFileHandle.name)||"CIEmetaDB.json",types:[{description:"CIE metadatabase JSON",accept:{"application/json":[".json"]}}]});
+      }
+      const w=await dbFileHandle.createWritable(); await w.write(text); await w.close();
+      lastLoadedBaseHash=DB.baseHash; renderList(); toast("Saved to "+dbFileHandle.name,"ok"); return;
+    }catch(e){ if(e.name==="AbortError") return; toast("Save failed: "+e.message,"err"); }
+  }
+  download("CIEmetaDB.json", text);
+  toast("Database downloaded","ok");
+}
+/* export entries as individual DataCite files (strip envelope) */
+function exportDataCiteFiles(entries){
+  entries=entries||DB.entries;
+  if(entries.length===1){
+    const e=entries[0]; const base=entryFilename(e)||sanitize(entryTitle(e));
+    const fn=base.endsWith(".csv")?base+"_metadata.json":base+".csv_metadata.json";
+    download(fn, JSON.stringify(e.payload,null,"\t"));
+    toast("Exported "+fn,"ok"); return;
+  }
+  // multiple → offer as separate downloads
+  if(!confirm(`Export ${entries.length} DataCite files as separate downloads?`)) return;
+  let n=0;
+  const step=()=>{ if(n>=entries.length){ toast("Exported "+entries.length+" files","ok"); return; }
+    const e=entries[n++]; const base=entryFilename(e)||sanitize(entryTitle(e));
+    const fn=base.endsWith(".csv")?base+"_metadata.json":base+".csv_metadata.json";
+    download(fn, JSON.stringify(e.payload,null,"\t")); setTimeout(step,250); };
+  step();
+}
+function sanitize(s){ return String(s).replace(/[^\w.-]+/g,"_").slice(0,80); }
+
+function pickFile(accept, cb){
+  const inp=el("hiddenFile"); inp.value=""; inp.accept=accept; inp.multiple=false;
+  inp.onchange=()=>{ if(inp.files&&inp.files[0]) cb(inp.files[0]); };
+  inp.click();
+}
+
+/* ============================================================================
+   wiring
+   ==========================================================================*/
+function wire(){
+  ensureUser(false);
+  el("btnUser").onclick=()=>ensureUser(true);
+  el("btnNewDb").onclick=()=>{ if(DB && !confirm("Start a new empty database? Unsaved changes to the working copy will be replaced.")) return; DB=newDB(); selectedId=null; editModel=null; editDirty=false; persist(); refreshDomainFilter(); renderList(); renderDetail(); toast("New database created","ok"); };
+  el("btnOpen").onclick=openDbFile;
+  el("btnImport").onclick=openImportDialog;
+  el("btnSave").onclick=()=>saveDb(false);
+  el("btnSaveAs").onclick=()=>saveDb(true);
+  el("btnNewEntry").onclick=()=>{ if(!DB) DB=newDB(); openNewEntryDialog(); };
+  el("btnDomains").onclick=openDomainsDialog;
+  el("btnExportDataCite").onclick=()=>{ if(DB&&DB.entries.length) exportDataCiteFiles(DB.entries); else toast("No entries to export"); };
+  el("search").oninput=renderList;
+  el("filterDomain").onchange=renderList;
+  el("filterStatus").onchange=renderList;
+  document.querySelectorAll("table.entries th").forEach(th=>{
+    th.onclick=()=>{ const k=th.dataset.sort; if(sort.key===k) sort.dir*=-1; else{ sort.key=k; sort.dir=1; } renderList(); };
+  });
+  window.addEventListener("beforeunload",(e)=>{ if(editDirty){ e.preventDefault(); e.returnValue=""; } });
+
+  if(!loadWorkingCopy()) DB=newDB();
+  refreshDomainFilter(); renderList(); renderDetail();
+  if(!hasFSA){ el("btnSaveAs").title="File System Access API not available — downloads a file"; }
+}
+let toastTimer=null;
+function toast(msg,kind){ const t=el("toast"); t.textContent=msg; t.className="toast show "+(kind||""); clearTimeout(toastTimer); toastTimer=setTimeout(()=>{ t.className="toast "+(kind||""); },2600); }
+
+document.addEventListener("DOMContentLoaded",wire);
+</script>
+</body>
+</html>
