@@ -257,9 +257,9 @@ const DEFAULT_VALUES = {
   rights: "Creative Commons Attribution-ShareAlike 4.0 International",
   rightsURI: "https://creativecommons.org/licenses/by-sa/4.0/",
   rightsIdentifier: "CC BY-SA 4.0",
-  interpolationMethod: "linear",
-  extrapolationMethod: "zero",
-  dataQuality: "nominal",
+  interpolationMethod: ":unap",
+  extrapolationMethod: ":unap",
+  dataQuality: ":unap",
   // Crossref deposit header / database-level metadata (used by "Export Crossref XML")
   crDepositorName: "CIE",
   crDepositorEmail: "ciecb@cie.co.at",
@@ -739,13 +739,16 @@ function analyzeCsv(text){
   const nRows=rows.length;
   const nCols=nRows?rows[0].length:0;
   const sums=new Array(nCols).fill(0);
-  const sumsValid=new Array(nCols).fill(true);
+  const sumsValid=new Array(nCols).fill(true);   // true = column is numeric (every non-empty cell finite)
   for(const r of rows){
     for(let c=0;c<nCols;c++){
-      const v=parseFloat(r[c]);
+      const cell=(r[c]==null?"":String(r[c]).trim());
+      const v=parseFloat(cell);
       if(Number.isFinite(v)) sums[c]+=v;
+      else if(cell!=="") sumsValid[c]=false;      // non-empty, non-numeric cell -> column not numeric
     }
   }
+  const allNumeric=nCols>0 && sumsValid.every(Boolean);
   // wavelength info from column 0
   let wl=null;
   if(nCols>0 && nRows>=2){
@@ -757,7 +760,55 @@ function analyzeCsv(text){
       wl={first,last,step:uniform?step:null,uniform};
     }
   }
-  return {nRows,nCols,sums,sumsValid,lines,rows,wl};
+  return {nRows,nCols,sums,sumsValid,allNumeric,lines,rows,wl};
+}
+/* map a file name to a MIME type for the formats[] field */
+function mimeFromName(name, fallbackType){
+  const ext=(String(name||"").match(/\.([^.\/\\]+)$/)||[,""])[1].toLowerCase();
+  const map={csv:"text/csv", txt:"text/plain", tsv:"text/tab-separated-values",
+    json:"application/json", xml:"application/xml", pdf:"application/pdf",
+    xlsx:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    xls:"application/vnd.ms-excel", zip:"application/zip", dat:"text/plain",
+    png:"image/png", jpg:"image/jpeg", jpeg:"image/jpeg", tif:"image/tiff", tiff:"image/tiff"};
+  return map[ext] || fallbackType || "application/octet-stream";
+}
+/* fill payload fields from a CSV/file analysis; shared by the New-entry dialog and the
+   Validation tab's "Fill…" button. mode: "csvWavelength" | "csv" | "other".
+   For "other", `a` may be null (only checksums, fileName and format are set). */
+function applyCsvToPayload(p, a, opts){
+  opts=opts||{};
+  const {md5, sha, filename, mode}=opts;
+  // checksums (whenever we have hashes)
+  if(md5 && sha) p.checksums=[{hashMethod:"md5",checksum:md5},{hashMethod:"sha256",checksum:sha}];
+  // fileName alternateIdentifier
+  if(filename){
+    p.alternateIdentifiers=p.alternateIdentifiers||[];
+    if(!p.alternateIdentifiers.some(x=>x.alternateIdentifierType==="fileName"))
+      p.alternateIdentifiers.push({alternateIdentifier:filename,alternateIdentifierType:"fileName"});
+  }
+  if(mode==="other"){
+    p.formats=[mimeFromName(filename, opts.fileType)];
+    return;
+  }
+  if(!a) return;
+  p.formats=["text/csv"];
+  p.datatableInfo=p.datatableInfo||{};
+  const rowN=Math.max(1,Math.min(a.nRows, parseInt(opts.sampleRow,10)|| (a.nRows>=120?120:Math.max(1,Math.ceil(a.nRows/2)))));
+  // sums: always for wavelength/data tables; for a plain headerless CSV only when numeric
+  const wantSums = mode==="csvWavelength" || a.allNumeric;
+  const vals=[];
+  if(wantSums) vals.push({validationType:"sumOfColumns",validationValue:"["+a.sums.map(x=>fmtNum(x)).join(",")+"]"});
+  vals.push({validationType:"sampleRow",validationParameter:String(rowN),validationValue:a.lines[rowN-1]||""});
+  vals.push({validationType:"numberOfRows",validationValue:String(a.nRows)});
+  vals.push({validationType:"numberOfColumns",validationValue:String(a.nCols)});
+  p.datatableInfo.validations=vals;
+  if(mode==="csvWavelength" && a.wl){
+    p.datatableInfo.columnHeaders=p.datatableInfo.columnHeaders||[];
+    while(p.datatableInfo.columnHeaders.length<a.nCols) p.datatableInfo.columnHeaders.push({title:"",quantity:"",unit:""});
+    const c0=p.datatableInfo.columnHeaders[0];
+    c0.wavelength_first=a.wl.first; c0.wavelength_last=a.wl.last;
+    if(a.wl.uniform) c0.wavelength_step=a.wl.step;
+  }
 }
 function readFileBytes(file){
   return new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>res(new Uint8Array(fr.result)); fr.onerror=rej; fr.readAsArrayBuffer(file); });
@@ -1313,27 +1364,7 @@ function renderCsvResult(out,e,filename,md5,sha,a){
   const rowInp=document.createElement("input"); rowInp.type="number"; rowInp.value=defRow; rowInp.min=1; rowInp.max=a.nRows; rowInp.style.maxWidth="120px";
   const btn=document.createElement("button"); btn.className="sec"; btn.textContent="Fill checksums, validations & wavelength range";
   btn.onclick=()=>{
-    p.checksums=[{hashMethod:"md5",checksum:md5},{hashMethod:"sha256",checksum:sha}];
-    p.datatableInfo=p.datatableInfo||{};
-    const rowN=Math.max(1,Math.min(a.nRows,parseInt(rowInp.value,10)||1));
-    p.datatableInfo.validations=[
-      {validationType:"sumOfColumns",validationValue:"["+a.sums.map(x=>fmtNum(x)).join(",")+"]"},
-      {validationType:"sampleRow",validationParameter:String(rowN),validationValue:a.lines[rowN-1]||""},
-      {validationType:"numberOfRows",validationValue:String(a.nRows)},
-      {validationType:"numberOfColumns",validationValue:String(a.nCols)}
-    ];
-    if(a.wl){
-      p.datatableInfo.columnHeaders=p.datatableInfo.columnHeaders||[];
-      // ensure at least nCols headers
-      while(p.datatableInfo.columnHeaders.length<a.nCols) p.datatableInfo.columnHeaders.push({title:"",quantity:"",unit:""});
-      const c0=p.datatableInfo.columnHeaders[0];
-      c0.wavelength_first=a.wl.first; c0.wavelength_last=a.wl.last;
-      if(a.wl.uniform) c0.wavelength_step=a.wl.step;
-    }
-    // ensure filename alternateIdentifier
-    p.alternateIdentifiers=p.alternateIdentifiers||[];
-    if(!p.alternateIdentifiers.some(x=>x.alternateIdentifierType==="fileName"))
-      p.alternateIdentifiers.push({alternateIdentifier:filename,alternateIdentifierType:"fileName"});
+    applyCsvToPayload(p, a, {md5, sha, filename, mode:"csvWavelength", sampleRow:rowInp.value});
     markDirty(); toast("Metadata fields filled from CSV — review and Save entry","ok");
     activeTab="form"; renderDetail();
   };
@@ -1457,6 +1488,36 @@ function mkBtn(label,cls,fn){ const b=document.createElement("button"); b.textCo
 
 function openNewEntryDialog(){
   const body=document.createElement("div");
+
+  // ---- related data file (optional) ----
+  let staged=null;   // {md5, sha, filename, fileType, analysis}
+  const fset=document.createElement("fieldset"); fset.innerHTML="<legend>Related data file (optional)</legend>";
+  const picker=document.createElement("input"); picker.type="file"; picker.style.maxWidth="360px";
+  const pickInfo=document.createElement("span"); pickInfo.className="hint"; pickInfo.style.marginLeft="8px";
+  const clearBtn=document.createElement("button"); clearBtn.type="button"; clearBtn.className="ghost small";
+  clearBtn.textContent="✕"; clearBtn.title="Remove selected file"; clearBtn.style.marginLeft="8px"; clearBtn.style.display="none";
+  const pickRow=document.createElement("div"); pickRow.style.display="flex"; pickRow.style.alignItems="center";
+  pickRow.appendChild(picker); pickRow.appendChild(pickInfo); pickRow.appendChild(clearBtn);
+  fset.appendChild(pickRow);
+  const typeWrap=document.createElement("div"); typeWrap.style.marginTop="8px";
+  const TYPES=[
+    {v:"csvWavelength", label:"headerless CSV, first column wavelength"},
+    {v:"csv",           label:"headerless CSV"},
+    {v:"other",         label:"other filetype"}
+  ];
+  TYPES.forEach((t,i)=>{
+    const lab=document.createElement("label"); lab.style.display="flex"; lab.style.alignItems="center"; lab.style.justifyContent="flex-start"; lab.style.gap="6px"; lab.style.fontWeight="normal";
+    const r=document.createElement("input"); r.type="radio"; r.name="newEntryFileType"; r.value=t.v; if(i===0) r.checked=true;
+    r.style.width="16px"; r.style.flex="0 0 16px"; r.style.margin="0";
+    lab.appendChild(r); lab.appendChild(document.createTextNode(t.label)); typeWrap.appendChild(lab);
+  });
+  fset.appendChild(typeWrap);
+  const fhint=document.createElement("p"); fhint.className="hint";
+  fhint.textContent="Attach the data file to pre-fill metadata: CSV fills columns, sample row, sums (numeric only) and — for the wavelength option — the wavelength range; other filetypes set the file format. Checksums and file name are always filled. Leave empty for a blank draft.";
+  fset.appendChild(fhint);
+  body.appendChild(fset);
+
+  // ---- title / doi / file name ----
   const g=document.createElement("div"); g.className="grid";
   const doiInp=document.createElement("input");
   const regen=mkBtn("Generate","ghost small",()=>{ doiInp.value=generateDoi(); });
@@ -1470,10 +1531,37 @@ function openNewEntryDialog(){
   body.appendChild(g);
   const hint=document.createElement("p"); hint.className="hint"; hint.textContent="A draft DOI is generated locally (marked \"proposed\"). Real DOIs are assigned by CIE CB.";
   body.appendChild(hint);
+
+  picker.onchange=async()=>{
+    const f=picker.files&&picker.files[0]; if(!f){ staged=null; pickInfo.textContent=""; clearBtn.style.display="none"; return; }
+    pickInfo.textContent="reading…"; clearBtn.style.display="";
+    try{
+      const bytes=await readFileBytes(f);
+      const md5=md5Bytes(bytes), sha=sha256Bytes(bytes);
+      let analysis=null;
+      try{ analysis=analyzeCsv(new TextDecoder("utf-8").decode(bytes)); }catch(_){}
+      staged={md5, sha, filename:f.name, fileType:f.type||"", analysis};
+      if(!fileInp.value.trim()) fileInp.value=f.name;
+      pickInfo.textContent = analysis ? `${f.name} — ${analysis.nRows} rows × ${analysis.nCols} cols` : f.name;
+    }catch(err){ staged=null; pickInfo.textContent="could not read file"; }
+  };
+  clearBtn.onclick=()=>{ picker.value=""; staged=null; pickInfo.textContent=""; clearBtn.style.display="none"; };
+
   const create=mkBtn("Create entry","sec",()=>{
     const doi=doiInp.value.trim()||generateDoi();
     const p=blankPayload(doi, fileInp.value.trim());
     if(p.titles&&p.titles[0]) p.titles[0].title=titleInp.value.trim();
+    // data table info: not applicable by default for a fresh entry
+    p.datatableInfo=p.datatableInfo||{};
+    p.datatableInfo.interpolationMethod=":unap";
+    p.datatableInfo.extrapolationMethod=":unap";
+    p.datatableInfo.dataQuality=":unap";
+    if(staged){
+      const mode=(typeWrap.querySelector("input[name='newEntryFileType']:checked")||{}).value||"csvWavelength";
+      const filename=fileInp.value.trim()||staged.filename;
+      applyCsvToPayload(p, mode==="other"?null:staged.analysis,
+        {md5:staged.md5, sha:staged.sha, filename, fileType:staged.fileType, mode});
+    }
     const e=createEntry(p,{status:"draft",idProposed:true,comment:"Created"});
     DB.entries.push(e); persist(); closeModal(); selectEntry(e.entryId); toast("New draft entry created","ok");
   });
