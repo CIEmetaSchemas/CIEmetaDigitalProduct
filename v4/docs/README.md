@@ -347,6 +347,8 @@ Additional validation information can be provided (the field can be repeated):
 |":unap"|not applicable, makes no sense|
 |"other"|The method of interpolation shall be stated in the description|
 
+**Computing `sumOfColumns`:** care shall be taken to state the **exact** column sum. When a column mixes numbers of very different magnitudes — small and large values added together, as in high-resolution spectral distributions with high dynamic range — ordinary IEEE-754 floating-point accumulation introduces rounding errors, and the stated sum can drift from the true value. Each column sum shall therefore be computed with exact arithmetic (for example arbitrary-precision integer / fixed-point summation of the decimal values as written) and stored as the exact decimal result, so that validation is an exact comparison rather than a tolerance-based one.
+
 ![image](https://user-images.githubusercontent.com/102721116/193694039-b73087e7-5861-4ec6-8cb7-b5891a82d28c.png)
 
 

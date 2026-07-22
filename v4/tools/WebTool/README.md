@@ -7,7 +7,7 @@ metadata records, with full git-like change history and safe concurrent-edit mer
 Modelled on the termdat curation workflow. Runs entirely in the browser from a
 local file — **no server, no network access, no external/CDN dependencies.**
 
-**Interface version 1.3.0** (shown in the header).
+**Interface version 1.4.0** (shown in the header).
 
 A **? Help** button in the toolbar opens an in-app summary of the features below,
 including the link to the Crossref deposit validator.
@@ -182,9 +182,15 @@ computes, from the file:
 On selection it immediately **checks** the computed values against the stored
 metadata (matches/mismatches highlighted), including the **file name** against the
 `fileName` alternate identifier, plus md5/sha256, row/column counts, column sums,
-the stored sample row and the column-1 wavelength range. Numeric comparisons use a
-relative tolerance to absorb floating-point formatting; checksums, file name and
-the sample row are compared exactly.
+the stored sample row and the column-1 wavelength range. **Column sums are computed
+exactly** using arbitrary-precision integer (`BigInt`) fixed-point arithmetic — the
+decimal values are scaled to a common power of ten and summed as integers, so no
+IEEE-754 rounding error occurs even when a column mixes very small and very large
+numbers (high dynamic range) — and `sumOfColumns` is generated, displayed and compared
+at that exact precision (the stored decimal must equal the exact sum rounded to its own
+decimal places). Other numeric comparisons (wavelength range) use a relative tolerance
+to absorb floating-point formatting; checksums, file name and the sample row are
+compared exactly.
 
 You can then:
 
