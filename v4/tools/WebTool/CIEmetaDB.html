@@ -181,10 +181,6 @@
         <select id="filterPublication" title="Filter by related publication"><option value="">All related publications</option></select>
       </div>
       <div class="row">
-        <select id="filterRev" multiple title="Filter by revision — Ctrl/Cmd-click to select several; none selected = all"></select>
-        <button id="filterRevClear" class="ghost small" title="Clear revision filter" style="white-space:nowrap">All revs</button>
-      </div>
-      <div class="row">
         <select id="sortBy" title="Sort entries by">
           <option value="title">Sort: Title (A–Z)</option>
           <option value="pubyear">Sort: Publication year</option>
@@ -806,22 +802,11 @@ function updateDbWarning(dups){
   w.style.display="block";
   w.querySelectorAll("a[data-doi]").forEach(a=>{ a.onclick=()=>{ el("search").value=a.dataset.doi; renderList(); }; });
 }
-/* populate the revision multi-select from the revisions present, preserving selection */
-function refreshRevFilter(){
-  const sel=el("filterRev"); if(!sel) return;
-  const chosen=new Set([...sel.selectedOptions].map(o=>o.value));
-  const revs=DB?[...new Set(DB.entries.map(e=>e.rev))].sort((a,b)=>a-b):[];
-  sel.innerHTML=revs.map(r=>`<option value="${r}">rev ${r}</option>`).join("");
-  sel.size=Math.min(5,Math.max(2,revs.length));
-  [...sel.options].forEach(o=>{ if(chosen.has(o.value)) o.selected=true; });
-}
 function renderList(){
   applyDbTitle();
   refreshPublicationFilter();
-  refreshRevFilter();
   const q=el("search").value.trim().toLowerCase();
   const fd=el("filterDomain").value, fs=el("filterStatus").value, fp=el("filterPublication").value;
-  const fr=el("filterRev")?[...el("filterRev").selectedOptions].map(o=>o.value):[];
   const dups=duplicateDoiMap();
   const dupIds=new Set(); dups.forEach(list=>list.forEach(e=>dupIds.add(e.entryId)));
   let rows=DB?DB.entries.slice():[];
@@ -833,7 +818,6 @@ function renderList(){
   if(fd) rows=rows.filter(e=>(e.domains||[]).includes(fd));
   if(fs) rows=rows.filter(e=>e.status===fs);
   if(fp) rows=rows.filter(e=>entryRelatedPubs(e).some(pub=>pub.key===fp));
-  if(fr.length) rows=rows.filter(e=>fr.includes(String(e.rev)));
   const total = DB?DB.entries.length:0;
   rows.sort((a,b)=>{
     let va,vb;
@@ -2194,8 +2178,6 @@ function wire(){
   el("filterDomain").onchange=renderList;
   el("filterStatus").onchange=renderList;
   el("filterPublication").onchange=renderList;
-  el("filterRev").onchange=renderList;
-  el("filterRevClear").onclick=()=>{ const s=el("filterRev"); [...s.options].forEach(o=>o.selected=false); renderList(); };
   el("sortBy").onchange=()=>{ sort.key=el("sortBy").value; sort.dir=1; renderList(); };
   el("sortDir").onclick=()=>{ sort.dir*=-1; renderList(); };
   document.querySelectorAll("table.entries th").forEach(th=>{
