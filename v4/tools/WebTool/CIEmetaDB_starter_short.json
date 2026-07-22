@@ -4,9 +4,9 @@
   "dbId": "c4d247e0-ad8a-f983-eaf1-abd993d11eea",
   "title": "CIE Metadatabase — starter (short)",
   "description": "Reduced starter database with a small subset of example records for quick testing.",
-  "baseHash": "2c4817fde8d4a11036ecfaeede69f5dd1213e90359f38de74b6078335b7c69f6",
-  "generatedAt": "2026-07-22T07:36:28.055Z",
-  "lastModifiedDate": "2026-07-22T07:36:28.055Z",
+  "baseHash": "b4fe6e7c32967f86d9ea10a876afc5563b75df7b5573d8c38fc261615f395367",
+  "generatedAt": "2026-07-22T08:13:36.717Z",
+  "lastModifiedDate": "2026-07-22T08:13:36.717Z",
   "lastModifiedBy": "peter.blattner@metas.ch",
   "domains": [
     {
@@ -6917,21 +6917,21 @@
     },
     {
       "entryId": "b4d99822-72c8-fc27-376f-7097c5a4158c",
-      "rev": 1,
-      "contentHash": "568a1f9de392f43d6c1332b6cbb7ab17c7728d9dea5032e35d3c18d1b703f199",
+      "rev": 2,
+      "contentHash": "73194a8012b11031dafa761d622eb5b3cd1fd708d65bc043b04dce8abd34e1a2",
       "status": "published",
-      "idProposed": false,
+      "idProposed": true,
       "domains": [],
       "audit": {
         "createdBy": "import",
         "createdDate": "2024-01-01T00:00:00.000Z",
-        "modifiedBy": "import",
-        "modifiedDate": "2024-01-01T00:00:00.000Z",
-        "modifiedComment": "Imported from v4/examples/CIE_xyz_1931_2deg.csv_metadata.json"
+        "modifiedBy": "peter.blattner@metas.ch",
+        "modifiedDate": "2026-07-22T08:13:34.516Z",
+        "modifiedComment": "doi changed"
       },
       "payload": {
         "identifier": {
-          "identifier": "10.25039/CIE.DS.xvudnb9b",
+          "identifier": "10.25039/CIE.DS.xCzZq3nW",
           "identifierType": "DOI"
         },
         "creators": [
@@ -7304,6 +7304,20 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            }
+          ]
+        },
+        {
+          "rev": 2,
+          "by": "peter.blattner@metas.ch",
+          "date": "2026-07-22T08:13:34.516Z",
+          "comment": "doi changed",
+          "baseHash": "568a1f9de392f43d6c1332b6cbb7ab17c7728d9dea5032e35d3c18d1b703f199",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/identifier/identifier",
+              "value": "10.25039/CIE.DS.xCzZq3nW"
             }
           ]
         }
