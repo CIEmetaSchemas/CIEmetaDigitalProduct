@@ -5,8 +5,8 @@
   "title": "CIE data-table metadatabase",
   "description": "Curated CIEmetaDigitalProduct metadata for the CIE published data tables (https://cie.co.at/data-tables).",
   "baseHash": "452d1f81ebf0fd365b6fc04e3b166804f5f7fe5c6f761327c2a25a2b74a61290",
-  "generatedAt": "2026-07-21T18:52:46.641Z",
-  "lastModifiedDate": "2026-07-21T18:52:46.641Z",
+  "generatedAt": "2026-07-22T07:58:05.538Z",
+  "lastModifiedDate": "2026-07-22T07:58:05.538Z",
   "lastModifiedBy": "peter.blattner@metas.ch",
   "domains": [
     {
@@ -47,7 +47,16 @@
     "rightsIdentifier": "CC BY-SA 4.0",
     "interpolationMethod": "linear",
     "extrapolationMethod": "zero",
-    "dataQuality": "nominal"
+    "dataQuality": "nominal",
+    "crDepositorName": "CIE",
+    "crDepositorEmail": "ciecb@cie.co.at",
+    "crRegistrant": "International Commission on Illumination (CIE)",
+    "crDatabaseTitle": "CIEdataTableDatabase",
+    "crPublisherName": "International Commission on Illumination (CIE)",
+    "crInstitutionName": "International Commission on Illumination",
+    "crInstitutionAcronym": "CIE",
+    "crInstitutionPlace": "Vienna,AT",
+    "crInstitutionDepartment": "CIE Central Bureau"
   },
   "entries": [
     {
@@ -10610,6 +10619,41 @@
               "check": "wavelength_last",
               "status": "fail",
               "detail": "col1 wavelength_last: MISMATCH (meta :unap, file 1)"
+            }
+          ]
+        },
+        {
+          "date": "2026-07-22T07:57:02.191Z",
+          "by": "peter.blattner@metas.ch",
+          "fileName": "CIE_max_sle_mesopic.csv",
+          "md5": "9eec2066078327b2f714551799727699",
+          "sha256": "c1baf8381cd16332749afdf2171d2db61197e5246a4184a79556a746da717c25",
+          "passed": true,
+          "results": [
+            {
+              "check": "md5",
+              "status": "pass",
+              "detail": "md5: match"
+            },
+            {
+              "check": "sha256",
+              "status": "pass",
+              "detail": "sha256: match"
+            },
+            {
+              "check": "fileName",
+              "status": "pass",
+              "detail": "fileName: match"
+            },
+            {
+              "check": "sumOfColumns",
+              "status": "pass",
+              "detail": "sumOfColumns: match"
+            },
+            {
+              "check": "sampleRow",
+              "status": "pass",
+              "detail": "sampleRow[4]: match"
             }
           ]
         }
