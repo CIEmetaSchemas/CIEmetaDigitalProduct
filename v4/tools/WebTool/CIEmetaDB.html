@@ -994,12 +994,8 @@ function renderForm(page,e){
   gi.appendChild(field("Identifier (DOI)", inp(p.identifier,"identifier",{placeholder:APP.DOI_PREFIX+"xxxxxxxx"})));
   gi.appendChild(field("Identifier type", inp(p.identifier,"identifierType")));
   const idHint=document.createElement("div"); idHint.className="hint";
-  idHint.textContent="Format 10.25039/CIE.DS.①②③④⑤⑥⑦⑧ (8 chars, excludes o O l L 1 I 0). DOIs are normally assigned by CIE CB — use \"Update DOI\" for a draft proposal.";
-  const idProp=document.createElement("label"); idProp.style.padding="0";
-  const cbp=document.createElement("input"); cbp.type="checkbox"; cbp.style.width="auto"; cbp.checked=!!editMeta.idProposed;
-  cbp.onchange=()=>{ editMeta.idProposed=cbp.checked; markDirty(); };
-  idProp.appendChild(cbp); idProp.appendChild(document.createTextNode(" DOI is a local proposal (not yet assigned by CIE CB)"));
-  fsId.appendChild(gi); fsId.appendChild(idHint); fsId.appendChild(idProp);
+  idHint.textContent="Format 10.25039/CIE.DS.①②③④⑤⑥⑦⑧ (8 chars, excludes o O l L 1 I 0).";
+  fsId.appendChild(gi); fsId.appendChild(idHint);
   const curDoi=p.identifier&&p.identifier.identifier;
   if(curDoi && DB.entries.some(x=>x.entryId!==e.entryId && entryDoi(x)===curDoi)){
     const dw=document.createElement("div"); dw.className="hint"; dw.style.color="var(--err)"; dw.style.fontWeight="600"; dw.style.marginTop="4px";
