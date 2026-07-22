@@ -124,6 +124,7 @@
   .toast.show{opacity:1}
   .toast.err{background:var(--err)}
   .toast.ok{background:var(--ok)}
+  .toast.warn{background:var(--warn)}
   .kv{font-size:12px;color:var(--muted)}
   .divmgr .arr-item{display:flex;gap:8px;align-items:center}
   .divmgr .arr-item input{width:auto}
@@ -859,8 +860,10 @@ function renderList(){
     tb.appendChild(tr);
   }
   updateDbWarning(dups);
+  el("listEmpty").textContent = DB ? "No entries. Create one or import a DB / DataCite files." : "No database open — use New DB or Open DB….";
   el("listEmpty").style.display = rows.length?"none":"block";
-  el("dbStat").textContent = DB?`${total} entr${total===1?"y":"ies"}${dbFileHandle?" · "+dbFileHandle.name:""}`:"";
+  updateToolbarState();
+  el("dbStat").textContent = DB?`${total} entr${total===1?"y":"ies"}${dbFileHandle?" · "+dbFileHandle.name:""}${dbUnsaved()?" · ● unsaved":""}`:"";
   el("listCount").textContent = DB?(`Showing ${rows.length} of ${total} ${total===1?"entry":"entries"}`+((rows.length!==total)?" (filtered)":"")):"";
   const sb=el("sortBy"); if(sb && sb.value!==sort.key) sb.value=sort.key;
   const sd=el("sortDir"); if(sd) sd.textContent = sort.dir===1?"▲ Asc":"▼ Desc";
@@ -890,6 +893,7 @@ function markDirty(){ editDirty=true; syncJsonView(); const s=el("saveState"); i
 
 function renderDetail(){
   const pane=el("detailPane");
+  if(!DB){ pane.innerHTML='<div class="empty">No database open.<br>Use <b>New DB</b> or <b>Open DB…</b> to begin.</div>'; return; }
   const e=findEntry(selectedId);
   if(!e){ pane.innerHTML='<div class="empty">Select an entry on the left, or create a new one.</div>'; return; }
   pane.innerHTML="";
@@ -1571,24 +1575,30 @@ async function openDbFile(){
     try{
       const [h]=await window.showOpenFilePicker({types:[{description:"CIE metadatabase JSON",accept:{"application/json":[".json"]}}]});
       const f=await h.getFile(); const text=await f.text();
-      loadDbFromText(text); dbFileHandle=h;
+      // Only adopt the handle as the DB file when a full database was loaded —
+      // a single DataCite file imported here must not become the save target.
+      dbFileHandle = (loadDbFromText(text)==="db") ? h : null;
     }catch(e){ if(e.name!=="AbortError") toast("Open failed: "+e.message,"err"); }
   }else{
     pickFile(".json",async(f)=>{ loadDbFromText(await f.text()); dbFileHandle=null; });
   }
 }
+/* returns "db" | "datacite" | null (unrecognised/invalid) */
 function loadDbFromText(text){
-  let obj; try{ obj=JSON.parse(text); }catch(e){ toast("Not valid JSON: "+e.message,"err"); return; }
+  let obj; try{ obj=JSON.parse(text); }catch(e){ toast("Not valid JSON: "+e.message,"err"); return null; }
   // is this an aggregate DB or a single DataCite metadata file?
   if(obj && obj.dbSchemaName===APP.DB_SCHEMA_NAME){
-    DB=migrateDb(obj); lastLoadedBaseHash=DB.baseHash; selectedId=null; editModel=null; editDirty=false;
+    DB=migrateDb(obj); lastLoadedBaseHash=computeDbBaseHash(DB); selectedId=null; editModel=null; editDirty=false;
     suppressDbTouch=true; persist(); suppressDbTouch=false; // preserve the file's own lastModified* on open
     refreshDomainFilter(); renderList(); renderDetail(); toast("Database loaded — "+DB.entries.length+" entries","ok");
+    return "db";
   }else if(obj && obj.schemaName===APP.CIE_SCHEMA_NAME){
     if(!DB) DB=newDB();
     importDataCiteObjects([obj]);
+    return "datacite";
   }else{
     toast("Unrecognised file (neither CIEmetaDB nor CIEmetaDigitalProduct)","err");
+    return null;
   }
 }
 function migrateDb(obj){
@@ -1698,8 +1708,8 @@ function openImportDialog(){
 /* ============================================================================
    concurrency: optimistic per-entry merge
    ==========================================================================*/
-function mergeDb(incoming){
-  if(!DB){ DB=incoming; persist(); refreshDomainFilter(); renderList(); return; }
+function mergeDb(incoming, onComplete){
+  if(!DB){ DB=incoming; persist(); refreshDomainFilter(); renderList(); if(onComplete) onComplete(); return; }
   const mine=new Map(DB.entries.map(e=>[e.entryId,e]));
   const byDoi=new Map(); DB.entries.forEach(e=>{ const d=entryDoi(e); if(d) byDoi.set(d,e); });
   const conflicts=[]; let autoMerged=0, addedNew=0;
@@ -1720,8 +1730,8 @@ function mergeDb(incoming){
     conflicts.push({cur, inc});
   }
   persist(); refreshDomainFilter(); renderList();
-  if(conflicts.length){ openConflictDialog(conflicts, autoMerged, addedNew); }
-  else toast(`Merged: ${addedNew} new, ${autoMerged} updated, 0 conflicts`,"ok");
+  if(conflicts.length){ openConflictDialog(conflicts, autoMerged, addedNew, onComplete); }
+  else { toast(`Merged: ${addedNew} new, ${autoMerged} updated, 0 conflicts`,"ok"); if(onComplete) onComplete(); }
 }
 function historyContainsHash(entry, hash){
   // reconstruct each revision and compare contentHash
@@ -1733,7 +1743,7 @@ function historyContainsHash(entry, hash){
 }
 function replaceEntry(cur, inc){ Object.assign(cur, inc); }
 
-function openConflictDialog(conflicts, autoMerged, addedNew){
+function openConflictDialog(conflicts, autoMerged, addedNew, onComplete){
   let i=0; const resolutions=[];
   const body=document.createElement("div");
   const nav=document.createElement("p"); nav.className="hint";
@@ -1770,6 +1780,7 @@ function openConflictDialog(conflicts, autoMerged, addedNew){
     });
     persist(); refreshDomainFilter(); renderList(); renderDetail(); closeModal();
     toast(`Merge complete: ${addedNew} new, ${autoMerged} auto-updated, ${conflicts.length} resolved`,"ok");
+    if(onComplete) onComplete();
   }
   paint();
   modal("Resolve merge conflicts",body,[mkBtn("Cancel merge","ghost",()=>{ closeModal(); toast("Merge cancelled for remaining conflicts"); })]);
@@ -1784,21 +1795,53 @@ function download(filename, text, mime){
   const a=document.createElement("a"); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
+/* write the whole DB to a File System Access handle */
+async function writeText(handle, db){
+  const w=await handle.createWritable(); await w.write(JSON.stringify(db,null,2)); await w.close();
+}
+/* pick a new file, write to it, and adopt it as the current handle (Save As) */
+async function saveDbAs(){
+  const handle=await window.showSaveFilePicker({
+    suggestedName:(dbFileHandle&&dbFileHandle.name)||"CIEmetaDB.json",
+    types:[{description:"CIE metadatabase JSON",accept:{"application/json":[".json"]}}]});
+  await writeText(handle, DB);
+  dbFileHandle=handle; lastLoadedBaseHash=DB.baseHash;
+  renderList(); toast("Saved to "+handle.name,"ok");
+}
+/* Save to the loaded file, detecting parallel changes first (checkConflicts).
+   If the on-disk file changed since we loaded it, merge the on-disk version in
+   (reusing the conflict-resolution UI) and write the merged result. */
+async function saveToHandle(handle, checkConflicts){
+  if(checkConflicts && lastLoadedBaseHash){
+    let onDisk=null;
+    try{ const f=await handle.getFile(); onDisk=migrateDb(JSON.parse(await f.text())); }
+    catch(e){ onDisk=null; } // unreadable/deleted → treat as no parallel change, overwrite
+    if(onDisk && onDisk.dbSchemaName===APP.DB_SCHEMA_NAME && computeDbBaseHash(onDisk)!==lastLoadedBaseHash){
+      toast("File changed on disk by someone else — merging…","warn");
+      // Merge on-disk (theirs) into our in-memory DB (mine); write once resolved.
+      mergeDb(onDisk, async ()=>{
+        try{ await writeText(handle, DB); lastLoadedBaseHash=DB.baseHash; renderList(); toast("Merged and saved to "+handle.name,"ok"); }
+        catch(e){ toast("Save after merge failed: "+e.message,"err"); }
+      });
+      return;
+    }
+  }
+  await writeText(handle, DB);
+  lastLoadedBaseHash=DB.baseHash; renderList(); toast("Saved to "+handle.name,"ok");
+}
 async function saveDb(saveAs){
   if(!DB) return;
   persist();
-  const text=JSON.stringify(DB,null,2);
-  if(hasFSA && (saveAs || dbFileHandle)){
+  if(hasFSA){
     try{
-      if(saveAs || !dbFileHandle){
-        dbFileHandle=await window.showSaveFilePicker({suggestedName:(dbFileHandle&&dbFileHandle.name)||"CIEmetaDB.json",types:[{description:"CIE metadatabase JSON",accept:{"application/json":[".json"]}}]});
-      }
-      const w=await dbFileHandle.createWritable(); await w.write(text); await w.close();
-      lastLoadedBaseHash=DB.baseHash; renderList(); toast("Saved to "+dbFileHandle.name,"ok"); return;
+      if(saveAs || !dbFileHandle) await saveDbAs();   // Save As, or first save of a handle-less DB
+      else await saveToHandle(dbFileHandle, true);     // Save → overwrite loaded file (conflict-checked)
     }catch(e){ if(e.name==="AbortError") return; toast("Save failed: "+e.message,"err"); }
+    return;
   }
-  download("CIEmetaDB.json", text);
-  toast("Database downloaded","ok");
+  // No File System Access API (Firefox/Safari): cannot overwrite or detect parallel changes.
+  download("CIEmetaDB.json", JSON.stringify(DB,null,2));
+  toast("Copy downloaded — this browser can't overwrite files or detect parallel edits. Use a Chromium browser for in-place save.","warn");
 }
 /* export entries as individual DataCite files (strip envelope) */
 function exportDataCiteFiles(entries){
@@ -2003,13 +2046,22 @@ function pickFile(accept, cb){
 /* ============================================================================
    wiring
    ==========================================================================*/
+/* enable/disable toolbar actions that require an open database */
+function updateToolbarState(){
+  const hasDb = !!DB;
+  ["btnSave","btnSaveAs","btnDbInfo","btnNewEntry","btnDomains","btnDefaults","btnExportDataCite","btnImport"]
+    .forEach(id=>{ const b=el(id); if(b) b.disabled=!hasDb; });
+}
+/* true when the open DB has changes not yet written to its file (baseHash drifted
+   from the last synced state — or a New DB that was never saved to a file). */
+function dbUnsaved(){ return !!DB && DB.baseHash!==lastLoadedBaseHash; }
 function applyDbTitle(){
   const t=(DB&&DB.title)?DB.title:"";
   document.title = t ? ("CIE Metadatabase — "+t) : "CIE Metadatabase";
   const h=el("dbTitleHdr"); if(h) h.textContent = t ? ("· "+t) : "";
 }
 function openDbInfoDialog(){
-  if(!DB) DB=newDB();
+  if(!DB) return;
   const body=document.createElement("div");
   const draft={title:DB.title||"", description:DB.description||""};
   const g=document.createElement("div"); g.className="grid";
@@ -2048,11 +2100,32 @@ function openHelpDialog(){
     <h4>Toolbar</h4>
     <ul>
       <li><b>New DB</b> / <b>Open DB…</b> / <b>Save DB</b> / <b>Save DB As…</b> — manage the whole
-        metadatabase JSON. The working copy auto-saves to browser storage and survives a reload.</li>
+        metadatabase JSON (see <i>Saving &amp; concurrent edits</i> below).</li>
       <li><b>Import / Merge…</b> — reconcile another database or import individual
         <code>*.csv_metadata.json</code> files, with per-entry conflict resolution and DOI checks.</li>
       <li><b>+ New entry</b>, <b>Domains…</b>, <b>Edit defaults…</b>, <b>Export Metadata…</b>.</li>
       <li><b>? Help</b> — this dialog.</li>
+    </ul>
+
+    <h4>Saving &amp; concurrent edits</h4>
+    <ul>
+      <li><b>No database is open at startup.</b> Use <b>Open DB…</b> to load a file or <b>New DB</b> to
+        start one. A background working copy is kept in browser storage; if the tab was closed with
+        unsaved work, you are offered to restore it on the next launch.</li>
+      <li><b>Save DB</b> writes back to the <i>same file you opened</i> — no prompt. <b>Save DB As…</b>
+        always asks for a new location and then makes that the current file. A brand-new database (or a
+        restored working copy, which has no linked file) asks for a location on its first save.</li>
+      <li><b>Parallel-edit protection:</b> before overwriting, the tool re-reads the file on disk. If
+        someone else saved changes since you opened it, it merges their version with yours entry by
+        entry — non-conflicting changes are combined automatically and genuine both-sides edits open a
+        <b>conflict-resolution dialog</b> (Keep mine / Take theirs / Keep both) before the merged
+        result is written.</li>
+      <li>The status bar (top-right of the toolbar) shows the current file name and a
+        <b>● unsaved</b> marker when there are changes not yet written to it. Closing or reloading the
+        page while unsaved changes exist triggers a browser warning.</li>
+      <li><b>Browser support:</b> in-place saving and parallel-edit detection require a Chromium browser
+        (Chrome/Edge) via the File System Access API. In Firefox/Safari, <b>Save DB</b> downloads a
+        copy instead and cannot detect parallel changes.</li>
     </ul>
 
     <h4>Editing an entry</h4>
@@ -2106,15 +2179,15 @@ function wire(){
   el("appVersion").textContent="v"+APP.VERSION;
   ensureUser(false);
   el("btnUser").onclick=()=>ensureUser(true);
-  el("btnNewDb").onclick=()=>{ if(DB && !confirm("Start a new empty database? Unsaved changes to the working copy will be replaced.")) return; DB=newDB(); selectedId=null; editModel=null; editDirty=false; persist(); refreshDomainFilter(); renderList(); renderDetail(); toast("New database created","ok"); };
+  el("btnNewDb").onclick=()=>{ if(DB && !confirm("Start a new empty database? Unsaved changes to the working copy will be replaced.")) return; DB=newDB(); dbFileHandle=null; lastLoadedBaseHash=null; selectedId=null; editModel=null; editDirty=false; persist(); refreshDomainFilter(); renderList(); renderDetail(); toast("New database created — use Save to choose a file","ok"); };
   el("btnOpen").onclick=openDbFile;
   el("btnImport").onclick=openImportDialog;
   el("btnDbInfo").onclick=openDbInfoDialog;
   el("btnSave").onclick=()=>saveDb(false);
   el("btnSaveAs").onclick=()=>saveDb(true);
-  el("btnNewEntry").onclick=()=>{ if(!DB) DB=newDB(); openNewEntryDialog(); };
+  el("btnNewEntry").onclick=()=>{ if(!DB) return; openNewEntryDialog(); };
   el("btnDomains").onclick=openDomainsDialog;
-  el("btnDefaults").onclick=()=>{ if(!DB) DB=newDB(); openDefaultsDialog(); };
+  el("btnDefaults").onclick=()=>{ if(!DB) return; openDefaultsDialog(); };
   el("btnExportDataCite").onclick=()=>{ if(DB&&DB.entries.length) exportDataCiteFiles(DB.entries); else toast("No entries to export"); };
   el("btnHelp").onclick=openHelpDialog;
   el("search").oninput=renderList;
@@ -2128,9 +2201,17 @@ function wire(){
   document.querySelectorAll("table.entries th").forEach(th=>{
     th.onclick=()=>{ const k=th.dataset.sort; if(sort.key===k) sort.dir*=-1; else{ sort.key=k; sort.dir=1; } renderList(); };
   });
-  window.addEventListener("beforeunload",(e)=>{ if(editDirty){ e.preventDefault(); e.returnValue=""; } });
+  window.addEventListener("beforeunload",(e)=>{ if(editDirty || dbUnsaved()){ e.preventDefault(); e.returnValue=""; } });
 
-  if(!loadWorkingCopy()) DB=newDB();
+  // Start with no database open. Offer to restore an unsaved working copy if one
+  // remains from a previous session (recovery safety net, not auto-open).
+  DB=null;
+  try{
+    if(localStorage.getItem(APP.LS_DB) &&
+       confirm("Unsaved work from a previous session was found. Restore it?\n\n(It has no linked file — the first Save will ask where to save.)")){
+      loadWorkingCopy();
+    }
+  }catch(e){}
   refreshDomainFilter(); renderList(); renderDetail();
   if(!hasFSA){ el("btnSaveAs").title="File System Access API not available — downloads a file"; }
 }

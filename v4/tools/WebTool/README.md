@@ -30,13 +30,25 @@ Double-click `CIEmetaDB.html`, or open it via *File → Open* in Chrome, Edge or
 Firefox. On first use you are asked for an **editor identity** (name or initials);
 this is stamped onto every change and stored locally in your browser.
 
-To load data, click **Open DB…** and choose `CIEmetaDB_starter.json` (or your own
-database file). The working copy is auto-saved to browser `localStorage`, so your
-session survives a reload; use **Save DB** to write the file back to disk.
+**No database is open at startup.** Click **Open DB…** and choose
+`CIEmetaDB_starter.json` (or your own database file), or **New DB** to start an
+empty one. A background working copy is kept in browser `localStorage`; if the page
+was closed with unsaved work, the tool offers to **restore** it on the next launch
+(it has no linked file, so its first save behaves like *Save DB As…*).
 
-> **Browsers:** Chrome/Edge additionally offer the File System Access API, so
-> **Save DB** writes straight back to the opened file. Firefox falls back to a
-> normal download.
+### Saving
+
+- **Save DB** writes back to the *same file you opened* — no prompt.
+- **Save DB As…** always asks for a new location and adopts it as the current file.
+- A brand-new database, or a restored working copy (neither has a linked file), asks
+  for a location on its first save.
+- The status bar (top-right of the toolbar) shows the current file name and a
+  **● unsaved** marker when there are changes not yet written to it. Closing or
+  reloading the page with unsaved changes triggers a browser warning.
+
+> **Browsers:** in-place saving and parallel-edit detection require a **Chromium**
+> browser (Chrome/Edge) via the File System Access API. In **Firefox/Safari**,
+> **Save DB** downloads a copy instead and cannot detect parallel changes.
 
 ## Browsing the list
 
@@ -196,8 +208,24 @@ You can then:
 ## Concurrency — optimistic per-entry merge
 
 Because the database is a shared JSON file, two curators may edit copies in
-parallel. **Import / Merge…** reconciles an incoming database against the current
-one, per entry (matched by `entryId`):
+parallel. The tool guards against lost updates in two ways: automatically **at save
+time**, and on demand via **Import / Merge…**. Both use the same per-entry merge
+engine.
+
+### Automatic parallel-change check on Save (Chromium)
+
+**Save DB** re-reads the file on disk before overwriting it. It compares the file's
+content hash to the state you loaded (the *base hash*): if another curator saved
+changes in the meantime, the on-disk version is merged with yours entry by entry —
+non-conflicting changes are combined automatically, and genuine both-sides edits
+open the conflict-resolution dialog (below) — and the **merged** result is written.
+This needs the File System Access API (Chromium); in Firefox/Safari, where Save only
+downloads a copy, no re-read is possible and the check is skipped.
+
+### Import / Merge…
+
+**Import / Merge…** reconciles an incoming database against the current one, per
+entry (matched by `entryId`):
 
 - **Identical** (`contentHash` equal) → kept as-is.
 - **Fast-forward** — one side's current state appears in the other's history →
