@@ -1,6 +1,6 @@
 # CIEmetaDigitalProduct - Description
 
-Version 4
+Version 4.1
 
 The CIEmetaDigitalProduct meta schema is based on the most recent version of the DataCite schema (https://schema.datacite.org/meta/kernel-4.4/ ) . Additional, CIE relevant fields are defined as outlined below. The JSON schema description can be found here: https://doi.org/10.25039/CIE.SC.4taqevcd .
 To validate your JSON metadatafile with the schema definition you may want to use: https://www.jsonschemavalidator.net/ 
@@ -347,13 +347,30 @@ Additional validation information can be provided (the field can be repeated):
 |":unap"|not applicable, makes no sense|
 |"other"|The method of interpolation shall be stated in the description|
 
+**Computing `sumOfColumns`:** care shall be taken to state the **exact** column sum. When a column mixes numbers of very different magnitudes — small and large values added together, as in high-resolution spectral distributions with high dynamic range — ordinary IEEE-754 floating-point accumulation introduces rounding errors, and the stated sum can drift from the true value. Each column sum shall therefore be computed with exact arithmetic (for example arbitrary-precision integer / fixed-point summation of the decimal values as written) and stored as the exact decimal result, so that validation is an exact comparison rather than a tolerance-based one.
+
 ![image](https://user-images.githubusercontent.com/102721116/193694039-b73087e7-5861-4ec6-8cb7-b5891a82d28c.png)
 
+
+|ID|Property|Obligation|
+|---|---|---|
+|CIE 3|metadataRevision|O|
+
+The revision number of the JSON metadata file itself, given as an integer starting at 1. It is incremented **only when the content of the metadata file changes** (for example a corrected checksum, an added column header, or a fixed title). Purely administrative attributes that are held outside the published metadata file — such as the CIE division/domain assignment or the DOI landing-page URL kept in the curation database — do **not** change it.
+
+Note the distinction from the DataCite `Version` field (property 15 above): `Version` refers to the version of the *resource / dataset*, whereas `metadataRevision` refers to the version of *this metadata file*. The field is optional and backward compatible; a metadata file without it is treated as revision 1.
 
 
 
 
 ## Version history
+
+Version 4.1:
+- Optional field `metadataRevision` added (see CIE 3 above). It is the revision of the JSON metadata file itself:
+  - integer, starting at 1, incremented by 1 on every change of the metadata content (e.g. a corrected checksum, an added/edited column header, a fixed title or description);
+  - it is **not** changed by administrative attributes kept outside the published metadata file, such as the CIE division/domain assignment or the DOI landing-page URL;
+  - it is distinct from the DataCite `Version` field (property 15), which versions the *resource / dataset* rather than the metadata file;
+  - the change is backward compatible: the `schemaName`/`schemaVersion` values stay `CIEmetaDigitalProduct`/`4`, the schema DOI is unchanged, and a metadata file without the field is treated as revision 1.
 
 Version 4: 
 - wavelength range added to the column name

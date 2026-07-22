@@ -20,7 +20,8 @@
 //  datatableInfo (validation,dataQuality,extrapolationMethod, interpolationMethod)
 //  schemaName (required)
 //	schemaVersion (required)
-//	schemaURL:(required)//
+//	schemaURL:(required)
+//	metadataRevision (optional): revision of the JSON metadata file itself (not the resource; see DataCite "version"). Increments only on metadata-content changes.//
 //   
 //  to validate your JSON file use any online tool, i.e.: https://www.jsonschemavalidator.net/
 //
@@ -28,6 +29,7 @@
 //  version history
 //
 //  4.0 : new fields added in the column headers: wavelength_from, wavelength_to, wavelength_step
+//  4.1 : optional field metadataRevision added (revision of the JSON metadata file; backward-compatible, schemaVersion stays 4)
 //
 //
 "$schema": "http://json-schema.org/draft-07/schema#",
@@ -838,7 +840,12 @@
 		"schemaURL": {
 			"type": "string",
 			"const": "https://doi.org/10.25039/CIE.SC.4taqevcd"
-		},		
+		},
+		"metadataRevision": {
+			"type": "integer",
+			"minimum": 1,
+			"$comment": "CIE: revision number of THIS JSON metadata file. Starts at 1 and increments only when the metadata content changes; it is NOT bumped by envelope-level changes such as the DOI landing-page URL or the CIE division. Distinct from the DataCite 'version' field, which versions the described resource. Optional for backward compatibility."
+		},
 		"datatableInfo": {
 			"type": "object",
 			"properties": {

@@ -145,5 +145,6 @@
 	},
 	"schemaName": "CIEmetaDigitalProduct",
 	"schemaVersion": 4,
-	"schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+	"schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd",
+	"metadataRevision": 1
 }
