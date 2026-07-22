@@ -45,9 +45,9 @@
     "rights": "Creative Commons Attribution-ShareAlike 4.0 International",
     "rightsURI": "https://creativecommons.org/licenses/by-sa/4.0/",
     "rightsIdentifier": "CC BY-SA 4.0",
-    "interpolationMethod": "linear",
-    "extrapolationMethod": "zero",
-    "dataQuality": "nominal"
+    "interpolationMethod": ":unap",
+    "extrapolationMethod": ":unap",
+    "dataQuality": ":unap"
   },
   "entries": [
     {
