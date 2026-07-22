@@ -64,7 +64,6 @@
       "rev": 1,
       "contentHash": "d72f9f6338d60338ade0b9d22d3db2020737cb6707901c48cd0c70c491eb8e6b",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -424,7 +423,6 @@
       "rev": 2,
       "contentHash": "d14d3edecca6ddea84ac54cc3986d96112abe208f132c2f0cd65b0f30a4e847a",
       "status": "published",
-      "idProposed": true,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -810,7 +808,6 @@
       "rev": 1,
       "contentHash": "7139d1e64fb4675806c6b44230c5fe40e8e129d8e24eef99e63b0477d1acf623",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -1144,7 +1141,6 @@
       "rev": 1,
       "contentHash": "a7a8421af1f08fae229fcdc18af0daec0aca87c2cf860db527b8671018e64a68",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -1624,7 +1620,6 @@
       "rev": 1,
       "contentHash": "661a7eba05411eaa3bb2b69161afdd1337f9a91672e4f1ebbd8279fd25dda8b3",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -2104,7 +2099,6 @@
       "rev": 1,
       "contentHash": "329ff25c4a96de0520894e1b1383fb4b97da29bbb4a6b29a5223cc34aea655f9",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -4230,7 +4224,6 @@
       "rev": 1,
       "contentHash": "ec411e48dc63b63b0165f9190ec5fa798a1cf5d0e18b8f5b866d7f3b9ace8878",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -6356,7 +6349,6 @@
       "rev": 1,
       "contentHash": "8ce3b5e6dff7f7ee95bf6e2cbfa6e00028cd5d1048bbc5b2ff90737918991abc",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -6928,7 +6920,6 @@
       "rev": 2,
       "contentHash": "73194a8012b11031dafa761d622eb5b3cd1fd708d65bc043b04dce8abd34e1a2",
       "status": "published",
-      "idProposed": true,
       "domains": [],
       "audit": {
         "createdBy": "import",

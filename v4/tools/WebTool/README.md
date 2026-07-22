@@ -102,7 +102,6 @@ entry
 ├─ rev            revision counter, ++ on every committed change
 ├─ contentHash    sha256 of the canonical payload (concurrency/merge anchor)
 ├─ status         draft | review | published
-├─ idProposed     true when the DOI was generated locally, not yet assigned by CIE CB
 ├─ landingPage    URL the DOI resolves to (Crossref <resource>); envelope-level, per entry
 ├─ domains        [ CIE-division codes ]
 ├─ audit          createdBy/Date, modifiedBy/Date, modifiedComment
@@ -139,7 +138,7 @@ CIE dataset DOIs follow `10.25039/CIE.DS.$$$$$$$$` where the 8-character suffix 
 drawn from alphanumerics **excluding the confusable characters `o O l L 1 I 0`**.
 
 The **Update DOI** action (and the **New entry** dialog) generates a compliant
-suffix, checks uniqueness within the database, and marks the entry `proposed`.
+suffix and checks uniqueness within the database.
 For translations, which reuse the number with an appended ISO-639-1 language suffix
 (e.g. `10.25039/CIE.DS.mifmy4x4.ES`), enter the DOI manually in the identifier field.
 
@@ -153,18 +152,6 @@ get a **duplicate DOI** badge, the editor shows an inline warning, and saving a
 colliding DOI asks for confirmation. Clicking a DOI in the banner filters the list
 to the offending entries. Note that translated datasets use a distinct
 language-suffixed identifier (e.g. `…mifmy4x4.ES`) and therefore do not collide.
-
-### The `proposed` flag
-
-Real CIE DOIs are assigned by **CIE CB**, not by this tool. When you *generate* a
-DOI locally the entry is flagged `idProposed: true` (envelope field, per entry) and
-a **proposed** badge appears in the list — a reminder that the identifier is a local
-placeholder, not yet an official registered DOI. Once CIE CB assigns the real DOI,
-enter it and clear the *"DOI is a local proposal"* checkbox in the editor; the badge
-disappears. Entries imported from published DataCite files are **not** proposed. In
-the shipped `CIEmetaDB_starter.json` every entry has `idProposed: false`, so a fresh
-load shows no proposed badges — if you see one, it is from a locally created/edited
-working copy (the tool auto-saves to browser storage).
 
 ### DOI landing page
 

@@ -78,10 +78,6 @@
 					"enum": ["draft", "review", "published"],
 					"description": "Editorial workflow state."
 				},
-				"idProposed": {
-					"type": "boolean",
-					"description": "true when the DOI was generated locally and not yet assigned by CIE CB."
-				},
 				"domains": {
 					"type": "array",
 					"items": { "type": "string" },

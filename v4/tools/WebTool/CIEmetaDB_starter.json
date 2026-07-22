@@ -55,7 +55,6 @@
       "rev": 1,
       "contentHash": "d72f9f6338d60338ade0b9d22d3db2020737cb6707901c48cd0c70c491eb8e6b",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -414,7 +413,6 @@
       "rev": 1,
       "contentHash": "93afeac26b6c667a12bdd2a25f48c3fb200fa866d961227b8c6430b8f3960c6f",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -721,7 +719,6 @@
       "rev": 1,
       "contentHash": "79983b20cc448dc06839f1fe5161efc4d4066e4650f8b37b364bb1c05c4c320b",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -1122,7 +1119,6 @@
       "rev": 1,
       "contentHash": "70446fc3720250b01a666bbc5e62ed19035d850df3a1957fcaf426d1312ab2bf",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -1493,7 +1489,6 @@
       "rev": 1,
       "contentHash": "2ab27fe846e62e8417f717cfd98d3e74959d3c7418a224f719c60621b77bfc2f",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -1852,7 +1847,6 @@
       "rev": 1,
       "contentHash": "257e6ac6ff1521a78350c5a209df1fc19a29b1a404c34a6748317f46820a4f4a",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -2179,7 +2173,6 @@
       "rev": 1,
       "contentHash": "6a7c0bf4b09ce32f7c2e820829b67d7dc28416a75041a97667139aa6c54a86ed",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -2506,7 +2499,6 @@
       "rev": 1,
       "contentHash": "bc4e9d56099fa215a65489370d55e0321e1f9b6fcf9c58e32b5add71cc3959af",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -2865,7 +2857,6 @@
       "rev": 1,
       "contentHash": "636ae61477fbe7068c9e00829a2426538eeaff58c56a90f5dc84a0707cbc703a",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -3224,7 +3215,6 @@
       "rev": 1,
       "contentHash": "b8fb69af097128895b569365c61dfbcf99e33d8d77d3cdb420abb8458f042299",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -3557,7 +3547,6 @@
       "rev": 1,
       "contentHash": "7139d1e64fb4675806c6b44230c5fe40e8e129d8e24eef99e63b0477d1acf623",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -3890,7 +3879,6 @@
       "rev": 1,
       "contentHash": "bcbc3d48d222b934c8dcddb2c00989055a9699499774ad18f4fbabf8dfc9d993",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -4223,7 +4211,6 @@
       "rev": 1,
       "contentHash": "aedcd38879a527a1480f89a3adcfef8d59640db5065f419b435edbfba88838b7",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -4564,7 +4551,6 @@
       "rev": 1,
       "contentHash": "9786a32c6433a8d7bae42abe19cf89ee65492b018b989a89664b08289201396c",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -5375,7 +5361,6 @@
       "rev": 1,
       "contentHash": "39e2c4ace547fc458ff090d836742d0dda8e924fc47a7be794d15f81a980f9db",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -6186,7 +6171,6 @@
       "rev": 1,
       "contentHash": "36eeb5291c2e31ceea58d284df5ecbf2b7da23a37d5eb4a8e7ef640d518f9411",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -6593,7 +6577,6 @@
       "rev": 1,
       "contentHash": "3e839cd423da1e6d1cdb7ad70f6b55f5eb324b7665136d8c509d6afa0eb0eca0",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -6914,7 +6897,6 @@
       "rev": 1,
       "contentHash": "d127bf8c065fac792f6abf526b7f6ba639e251ae9712b5a881d1235959f4312a",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -7235,7 +7217,6 @@
       "rev": 1,
       "contentHash": "a7a8421af1f08fae229fcdc18af0daec0aca87c2cf860db527b8671018e64a68",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -7714,7 +7695,6 @@
       "rev": 1,
       "contentHash": "661a7eba05411eaa3bb2b69161afdd1337f9a91672e4f1ebbd8279fd25dda8b3",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -8193,7 +8173,6 @@
       "rev": 1,
       "contentHash": "55535a7e7f87bc0ebdff08d4b7577d6dfabff531a3b8209578a054e16a83aea5",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -8546,7 +8525,6 @@
       "rev": 1,
       "contentHash": "0dbc80d180f10fef3f5866823fcf13296cbacfc1e7a300cb877730b69cdba423",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -8899,7 +8877,6 @@
       "rev": 1,
       "contentHash": "d18656a838cf4fdf6b6686a5c07f97c4b26bbeef54c4d0782d7d0d33744e0d0f",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -9230,7 +9207,6 @@
       "rev": 1,
       "contentHash": "c71088c901772d50b11a30e79af441133febca96b051caef9db650c56bc5ed2d",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -9557,7 +9533,6 @@
       "rev": 1,
       "contentHash": "14674732405008ceefe5af384b8cbc40e031123707d64e8d6ea82824f484b7dc",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -9884,7 +9859,6 @@
       "rev": 1,
       "contentHash": "cf6792a47fb8fbb9ab5e18d3062e8650eb189ceb85484c2582fd5fb66bccfe51",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -10249,7 +10223,6 @@
       "rev": 1,
       "contentHash": "4ff5d79a96f591679e7ca5d01e8eb03b1b35354d8ed242d90dcefc8744964506",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -10580,7 +10553,6 @@
       "rev": 1,
       "contentHash": "4100e303a2061d135d2d340a1945d2380afa04732dd760cc1f4b5c73cb5ffc34",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -10945,7 +10917,6 @@
       "rev": 1,
       "contentHash": "329ff25c4a96de0520894e1b1383fb4b97da29bbb4a6b29a5223cc34aea655f9",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -13070,7 +13041,6 @@
       "rev": 1,
       "contentHash": "ec411e48dc63b63b0165f9190ec5fa798a1cf5d0e18b8f5b866d7f3b9ace8878",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -15195,7 +15165,6 @@
       "rev": 1,
       "contentHash": "8ce3b5e6dff7f7ee95bf6e2cbfa6e00028cd5d1048bbc5b2ff90737918991abc",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -15766,7 +15735,6 @@
       "rev": 1,
       "contentHash": "2ceca6b1f714475801e0552b7b150a159f043ea09a828e0cfa42802b90ce3a2b",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -16093,7 +16061,6 @@
       "rev": 1,
       "contentHash": "0b490f354b5979442df67278f48cb22a27d5c1164b4fbb540d361de29e5388db",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -16414,7 +16381,6 @@
       "rev": 1,
       "contentHash": "9a2ddd7a0d5f8542839c60f3f0aa6c5faff2c6810f381f259dde351946c76084",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -16741,7 +16707,6 @@
       "rev": 1,
       "contentHash": "568a1f9de392f43d6c1332b6cbb7ab17c7728d9dea5032e35d3c18d1b703f199",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",
@@ -17136,7 +17101,6 @@
       "rev": 1,
       "contentHash": "5f00020448c37bd64285c005f0742f6ba9bb4c2e57a79987cb8279c041b91c12",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "import",

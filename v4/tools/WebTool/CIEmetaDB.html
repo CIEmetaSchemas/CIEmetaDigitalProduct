@@ -64,7 +64,7 @@
   .badge.draft{background:#fdf0d8;color:#8a5b00}
   .badge.review{background:#e0ecfb;color:#0a4aa0}
   .badge.published{background:#dcf1e5;color:#12683f}
-  .badge.proposed{background:#fbe6e6;color:#9a2a24}
+  .badge.fail{background:#fbe6e6;color:#9a2a24}
   .badge.dup{background:#f7d7d4;color:#8f2721;border:1px solid #e39a94}
   .db-warning{background:#fbe6e6;color:#8f2721;border-bottom:1px solid #e6b3b0;padding:9px 16px;font-size:13px}
   .db-warning b{font-weight:700}
@@ -618,7 +618,7 @@ function buildCieSchema(){
 let DB = null;          // current metadatabase
 let selectedId = null;  // selected entryId
 let editModel = null;   // working payload copy of selected entry
-let editMeta = null;    // working copy of entry envelope (status/domains/idProposed)
+let editMeta = null;    // working copy of entry envelope (status/domains/landingPage)
 let editDirty = false;
 let sort = {key:"title", dir:1};
 let dbFileHandle = null; // File System Access API handle (if used)
@@ -668,7 +668,7 @@ function createEntry(payload, opts){
   const patch=diffPatch({}, payload, "");
   const e={
     entryId:uuid(), rev:1, contentHash:contentHash(payload),
-    status:opts.status||"draft", idProposed:!!opts.idProposed,
+    status:opts.status||"draft",
     landingPage:opts.landingPage||"",
     domains:opts.domains||[],
     audit:{createdBy:user, createdDate:now, modifiedBy:user, modifiedDate:now, modifiedComment:opts.comment||"Created"},
@@ -896,7 +896,7 @@ function renderList(){
     const doms=(e.domains||[]).map(d=>`<span class="chip dom">${esc(d)}</span>`).join("");
     tr.innerHTML=`<td><div class="title-cell">${esc(entryTitle(e))}</div>
         <div class="kv">${esc(entryFilename(e))}</div>${doms}</td>
-      <td><div class="doi-cell">${esc(entryDoi(e))}</div>${e.idProposed?'<span class="badge proposed">proposed</span>':''}${dupIds.has(e.entryId)?'<span class="badge dup" title="Duplicate DOI — must be fixed">duplicate DOI</span>':''}</td>
+      <td><div class="doi-cell">${esc(entryDoi(e))}</div>${dupIds.has(e.entryId)?'<span class="badge dup" title="Duplicate DOI — must be fixed">duplicate DOI</span>':''}</td>
       <td><span class="badge ${esc(e.status)}">${esc(e.status)}</span></td>
       <td class="kv">${esc((e.audit.modifiedDate||"").replace("T"," ").slice(0,19))}<br>${esc(e.audit.modifiedBy)}<br>rev ${e.rev}</td>`;
     tr.onclick=()=>selectEntry(e.entryId);
@@ -927,11 +927,11 @@ function selectEntry(id, keepTab){
   selectedId=id; editDirty=false;
   const e=findEntry(id);
   editModel = e?clone(e.payload):null;
-  editMeta = e?{status:e.status, domains:clone(e.domains||[]), idProposed:!!e.idProposed, landingPage:e.landingPage||""}:null;
+  editMeta = e?{status:e.status, domains:clone(e.domains||[]), landingPage:e.landingPage||""}:null;
   if(!keepTab) activeTab="form";
   renderList(); renderDetail();
 }
-function resetEditMeta(e){ editMeta = {status:e.status, domains:clone(e.domains||[]), idProposed:!!e.idProposed, landingPage:e.landingPage||""}; }
+function resetEditMeta(e){ editMeta = {status:e.status, domains:clone(e.domains||[]), landingPage:e.landingPage||""}; }
 function markDirty(){ editDirty=true; syncJsonView(); const s=el("saveState"); if(s) s.textContent="● unsaved"; }
 
 function renderDetail(){
@@ -1038,7 +1038,7 @@ function renderForm(page,e){
   const fsMeta=document.createElement("fieldset");
   fsMeta.innerHTML='<legend>Database entry</legend>';
   const gm=document.createElement("div"); gm.className="grid";
-  // status/domains/idProposed edit the envelope buffer (editMeta); committed via Save entry
+  // status/domains/landingPage edit the envelope buffer (editMeta); committed via Save entry
   gm.appendChild(field("Status", sel(editMeta,"status",["draft","review","published"])));
   const domWrap=document.createElement("div");
   DB.domains.forEach(d=>{
@@ -1266,7 +1266,7 @@ function renderValidationLog(page,e){
       const d=document.createElement("details"); d.style.margin="6px 0";
       const s=document.createElement("summary"); s.style.cursor="pointer";
       const fails=(rec.results||[]).filter(r=>r.status==="fail").length;
-      s.innerHTML=`<span class="badge ${rec.passed?"published":"proposed"}">${rec.passed?"PASS":"FAIL"}</span> `+
+      s.innerHTML=`<span class="badge ${rec.passed?"published":"fail"}">${rec.passed?"PASS":"FAIL"}</span> `+
         `${esc((rec.date||"").replace("T"," ").slice(0,19))} · ${esc(rec.by||"")} · <span class="mono">${esc(rec.fileName||"")}</span>${fails?` · ${fails} fail(s)`:""}`;
       d.appendChild(s);
       const meta=document.createElement("div"); meta.className="kv"; meta.style.margin="4px 0";
@@ -1425,7 +1425,6 @@ function revertToDefaults(){
 function metaChanged(e){
   if(!editMeta) return false;
   return editMeta.status!==e.status
-    || !!editMeta.idProposed!==!!e.idProposed
     || (editMeta.landingPage||"")!==(e.landingPage||"")
     || canonical((editMeta.domains||[]).slice().sort())!==canonical((e.domains||[]).slice().sort());
 }
@@ -1447,7 +1446,7 @@ function saveEntry(){
     commitEdit(e,editModel,comment);
   }
   if(meta){
-    e.status=editMeta.status; e.domains=clone(editMeta.domains); e.idProposed=editMeta.idProposed; e.landingPage=editMeta.landingPage||"";
+    e.status=editMeta.status; e.domains=clone(editMeta.domains); e.landingPage=editMeta.landingPage||"";
     if(!patch.length){ e.audit.modifiedBy=currentUser(); e.audit.modifiedDate=nowISO(); }
   }
   resetEditMeta(e); editDirty=false; persist(); renderList(); renderDetail();
@@ -1464,8 +1463,8 @@ function duplicateEntry(e){
   const p=clone(e.payload);
   if(p.identifier) p.identifier.identifier=doi;
   if(p.titles&&p.titles[0]) p.titles[0].title=(p.titles[0].title||"")+" (copy)";
-  const ne=createEntry(p,{status:"draft",idProposed:true,domains:clone(e.domains||[]),landingPage:e.landingPage||"",comment:"Duplicated from "+entryDoi(e)});
-  DB.entries.push(ne); persist(); selectEntry(ne.entryId); toast("Duplicated as new draft with proposed DOI","ok");
+  const ne=createEntry(p,{status:"draft",domains:clone(e.domains||[]),landingPage:e.landingPage||"",comment:"Duplicated from "+entryDoi(e)});
+  DB.entries.push(ne); persist(); selectEntry(ne.entryId); toast("Duplicated as new draft","ok");
 }
 
 /* ============================================================================
@@ -1529,7 +1528,7 @@ function openNewEntryDialog(){
   g.appendChild(field("DOI",doiWrap));
   g.appendChild(field("File name",fileInp));
   body.appendChild(g);
-  const hint=document.createElement("p"); hint.className="hint"; hint.textContent="A draft DOI is generated locally (marked \"proposed\"). Real DOIs are assigned by CIE CB.";
+  const hint=document.createElement("p"); hint.className="hint"; hint.textContent="A draft DOI is generated locally. Real DOIs are assigned by CIE CB.";
   body.appendChild(hint);
 
   picker.onchange=async()=>{
@@ -1562,7 +1561,7 @@ function openNewEntryDialog(){
       applyCsvToPayload(p, mode==="other"?null:staged.analysis,
         {md5:staged.md5, sha:staged.sha, filename, fileType:staged.fileType, mode});
     }
-    const e=createEntry(p,{status:"draft",idProposed:true,comment:"Created"});
+    const e=createEntry(p,{status:"draft",comment:"Created"});
     DB.entries.push(e); persist(); closeModal(); selectEntry(e.entryId); toast("New draft entry created","ok");
   });
   modal("New entry",body,[mkBtn("Cancel","ghost",closeModal),create]);
@@ -1574,12 +1573,12 @@ function openDoiDialog(e){
   const doiInp=document.createElement("input"); doiInp.value=generateDoi();
   const regen=mkBtn("Regenerate","ghost small",()=>{ doiInp.value=generateDoi(); });
   const w=document.createElement("div"); w.style.display="flex"; w.style.gap="6px"; w.appendChild(doiInp); w.appendChild(regen);
-  g.appendChild(field("Proposed DOI",w));
+  g.appendChild(field("DOI",w));
   body.appendChild(g);
   const apply=mkBtn("Apply to entry","sec",()=>{
     editModel.identifier=editModel.identifier||{identifierType:"DOI"};
     editModel.identifier.identifier=doiInp.value.trim();
-    editMeta.idProposed=true; markDirty(); closeModal(); renderDetail(); toast("DOI applied (proposed) — Save to commit");
+    markDirty(); closeModal(); renderDetail(); toast("DOI applied — Save to commit");
   });
   modal("Update DOI",body,[mkBtn("Cancel","ghost",closeModal),apply]);
 }
@@ -1715,7 +1714,7 @@ function importDataCiteObjects(objs){
     const doi=o&&o.identifier&&o.identifier.identifier;
     if(!doi){ noId++; }
     if(doi && byDoi.has(doi)){ conflicts.push({inc:o, existing:byDoi.get(doi), doi}); continue; } // DOI already present (DB or earlier in this batch)
-    const e=createEntry(o,{status:"published",idProposed:false,comment:"Imported from DataCite file"});
+    const e=createEntry(o,{status:"published",comment:"Imported from DataCite file"});
     DB.entries.push(e); added++;
     if(doi) byDoi.set(doi,e);
   }
@@ -1760,7 +1759,7 @@ function openImportConflictDialog(conflicts, added){
     conflicts.forEach((c,idx)=>{
       const r=resolutions[idx]||"skip";
       if(r==="update"){ if(commitEdit(c.existing, c.inc, "Updated from imported DataCite file")) updated++; else skipped++; }
-      else if(r==="dup"){ const e=createEntry(c.inc,{status:"published",idProposed:false,comment:"Imported (duplicate DOI kept)"}); DB.entries.push(e); dup++; }
+      else if(r==="dup"){ const e=createEntry(c.inc,{status:"published",comment:"Imported (duplicate DOI kept)"}); DB.entries.push(e); dup++; }
       else skipped++;
     });
     persist(); refreshDomainFilter(); renderList(); if(selectedId) selectEntry(selectedId,true); closeModal();
@@ -2235,7 +2234,7 @@ function openHelpDialog(){
         column sums, sample row and the wavelength range against the stored metadata, then fill or
         log the results.</li>
       <li><b>Update DOI</b> generates a compliant <code>10.25039/CIE.DS.$$$$$$$$</code> suffix
-        (marked <i>proposed</i> until CIE CB assigns the real DOI).</li>
+        (a local placeholder until CIE CB assigns the real DOI).</li>
     </ul>
 
     <h4>DOI landing page <span class="kv">(new)</span></h4>

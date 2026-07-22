@@ -64,7 +64,6 @@
       "rev": 1,
       "contentHash": "64f60c28a898c7f96e03ed3329de496dfb0171a0f3b6856e7a77ff80aaf96648",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -471,7 +470,6 @@
       "rev": 1,
       "contentHash": "4b23944ef15ed70d5edd03bbc9d3ab825474b7728fd5b41fe88d4a706c4166ea",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -826,7 +824,6 @@
       "rev": 1,
       "contentHash": "2618c071bd28098faccdd404d347aa8d9f68d9fe86d21fbf63fb6b9b581bd614",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -1275,7 +1272,6 @@
       "rev": 1,
       "contentHash": "a70469b2387c32d5acff7b9b723f139603af7db5e20e21581aec793af743696e",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -1710,7 +1706,6 @@
       "rev": 2,
       "contentHash": "58caaa271b89e268881e48455b5983eab6711ae9878710c64f4191102c314493",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -2185,7 +2180,6 @@
       "rev": 1,
       "contentHash": "257e6ac6ff1521a78350c5a209df1fc19a29b1a404c34a6748317f46820a4f4a",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -2560,7 +2554,6 @@
       "rev": 2,
       "contentHash": "c22ababe9427d818515c2409cba012b898a36cc9695a67cdf8e84bb0d53b1649",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -3003,7 +2996,6 @@
       "rev": 1,
       "contentHash": "bc4e9d56099fa215a65489370d55e0321e1f9b6fcf9c58e32b5add71cc3959af",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -3410,7 +3402,6 @@
       "rev": 1,
       "contentHash": "636ae61477fbe7068c9e00829a2426538eeaff58c56a90f5dc84a0707cbc703a",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -3817,7 +3808,6 @@
       "rev": 1,
       "contentHash": "4ceeba8498cefcbe1a369b09ba139c2e4e226238281e24f37bb3b705a59b1809",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -4198,7 +4188,6 @@
       "rev": 1,
       "contentHash": "7139d1e64fb4675806c6b44230c5fe40e8e129d8e24eef99e63b0477d1acf623",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -4579,7 +4568,6 @@
       "rev": 1,
       "contentHash": "82054e066dba97502491eb130275ef2b8e6fc2f684fa6736e785328aa3450a86",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -4960,7 +4948,6 @@
       "rev": 2,
       "contentHash": "73913237162df12dae612fc238a2cad96378b0f3739b9bfb537a73b4ffc65999",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -5429,7 +5416,6 @@
       "rev": 1,
       "contentHash": "e4317f4c637626e2f9509f8cecf6f900e4330f97075e8a3bf24dbdb6c112c8e1",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -6293,7 +6279,6 @@
       "rev": 1,
       "contentHash": "547318a9b1c89aa60b169d7127872f94a39f1c10a38818ac906c5d81dba94a6f",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -7157,7 +7142,6 @@
       "rev": 1,
       "contentHash": "1d42824a52a03a79651ead80c47ec270b7de160a12d477898d5b23d59b70c2b5",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -7612,7 +7596,6 @@
       "rev": 1,
       "contentHash": "3e839cd423da1e6d1cdb7ad70f6b55f5eb324b7665136d8c509d6afa0eb0eca0",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -7981,7 +7964,6 @@
       "rev": 1,
       "contentHash": "0e89da8d2be4abfc42e91b2705dffcda7a6eda36f29b09878f1b1d84542e634b",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -8350,7 +8332,6 @@
       "rev": 1,
       "contentHash": "0f4bdf1905b537b340790b909563044621f83eedf1150f9f2183912f8814a058",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -8877,7 +8858,6 @@
       "rev": 1,
       "contentHash": "94cc36a8b9297e007dc3ae0924919fbe9bb616e56a04219d7b5140704ec600bf",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -9404,7 +9384,6 @@
       "rev": 2,
       "contentHash": "e48f67f52158ee072b7d953cf8fc47d412ebf5e14cb8242d35300aab1a4be2c9",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -9873,7 +9852,6 @@
       "rev": 1,
       "contentHash": "0dbc80d180f10fef3f5866823fcf13296cbacfc1e7a300cb877730b69cdba423",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -10274,7 +10252,6 @@
       "rev": 1,
       "contentHash": "232231e62f26afb934931abb244b63779d7c976e2ccdde53f559bc13fa31b1f7",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -10688,7 +10665,6 @@
       "rev": 2,
       "contentHash": "14a239d887619d34068f7d79288f2c13ed5c1e2fde475841320495d15f601e91",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -11131,7 +11107,6 @@
       "rev": 2,
       "contentHash": "8ab9efe671b9721487c3b68f45e15ce3bb7c00269917a3e8a2b0e4e35046bb11",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -11574,7 +11549,6 @@
       "rev": 1,
       "contentHash": "cf6792a47fb8fbb9ab5e18d3062e8650eb189ceb85484c2582fd5fb66bccfe51",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -11987,7 +11961,6 @@
       "rev": 1,
       "contentHash": "4ff5d79a96f591679e7ca5d01e8eb03b1b35354d8ed242d90dcefc8744964506",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -12366,7 +12339,6 @@
       "rev": 2,
       "contentHash": "fc8af48106bbb8c62ca7247a20a445aa690cf04046c7abd3c7d767710f9025da",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -12847,7 +12819,6 @@
       "rev": 2,
       "contentHash": "bc21125470e3df266344f4c867a1ad2c8682b3c1a6c235202fefef6d97056437",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -13525,7 +13496,6 @@
       "rev": 2,
       "contentHash": "a76c5dc2b1d9f19ab9922d0f705257b3bebb57484d98351ab03755cbbf7d65d1",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -13997,7 +13967,6 @@
       "rev": 2,
       "contentHash": "a1abf3c1a9b627dd337396b229f73a0d491220248f144c311f9be4d272fe2657",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -14421,7 +14390,6 @@
       "rev": 1,
       "contentHash": "2c6c2f89fdafa53e8c89fdba452c67f256baba36369204b689683b958116acfa",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -16599,7 +16567,6 @@
       "rev": 1,
       "contentHash": "ecbe48fcea173fa74770dd697c5fc9d627ed756698c4e40299643fd91c9958c8",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -18777,7 +18744,6 @@
       "rev": 1,
       "contentHash": "f6c1b6787b84808d0406dd68a5bc7f7d970c797da2a54bc2bac89e9e7566ac28",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -19401,7 +19367,6 @@
       "rev": 1,
       "contentHash": "2ceca6b1f714475801e0552b7b150a159f043ea09a828e0cfa42802b90ce3a2b",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -19776,7 +19741,6 @@
       "rev": 1,
       "contentHash": "0b490f354b5979442df67278f48cb22a27d5c1164b4fbb540d361de29e5388db",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -20145,7 +20109,6 @@
       "rev": 2,
       "contentHash": "e9c0d312c651bf16d764ecf55f900337ab7740a109f375316ffddb2328775af8",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -20610,7 +20573,6 @@
       "rev": 1,
       "contentHash": "568a1f9de392f43d6c1332b6cbb7ab17c7728d9dea5032e35d3c18d1b703f199",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
@@ -21053,7 +21015,6 @@
       "rev": 1,
       "contentHash": "52d86f01c729b5924bb231c7341236d5227bf9f8ec59baad1d36fbe05373816c",
       "status": "published",
-      "idProposed": false,
       "domains": [],
       "audit": {
         "createdBy": "Peter Blattner",
