@@ -1371,15 +1371,19 @@ function renderCsvResult(out,e,filename,md5,sha,a){
   const vCols=vs.find(v=>v.validationType==="numberOfColumns");
   if(vCols){ const m=String(a.nCols)===String(vCols.validationValue).trim(); push("numberOfColumns",m?"pass":"fail",`numberOfColumns: ${m?"match":"MISMATCH (stored "+vCols.validationValue+")"}`); }
   const vSum=vs.find(v=>v.validationType==="sumOfColumns");
-  if(vSum){ let stored=null; try{ stored=JSON.parse(vSum.validationValue); }catch(err){}
-    if(Array.isArray(stored)){
+  if(vSum){
+    // Parse the stored array as raw decimal token STRINGS -- never via JSON.parse, whose
+    // numbers would be coerced to IEEE-754 doubles and lose the exact decimal digits.
+    const sv=String(vSum.validationValue).trim();
+    const raw=(sv.startsWith("[")&&sv.endsWith("]")) ? sv.slice(1,-1).split(",").map(t=>t.trim()).filter(t=>t!=="") : null;
+    if(raw){
       const exact=a.sumsExact||[];
-      // strict exact: stored must equal the exact BigInt sum rounded to its own decimal places
-      // (fall back to numClose only for a column that is not exactly summable, e.g. sentinel cells)
-      const cmp=(x,i)=> (exact[i]!=null)
-        ? normDec(roundDecimalStr(exact[i], decimalsOf(String(x))))===normDec(String(x))
-        : numClose(Number(x), a.sums[i]);
-      const m=stored.length===a.sums.length && stored.every(cmp);
+      // strict exact: the stored decimal must equal the exact BigInt sum rounded to its own
+      // decimal places (fall back to numClose only for a column that is not exactly summable)
+      const cmp=(tok,i)=> (exact[i]!=null)
+        ? normDec(roundDecimalStr(exact[i], decimalsOf(tok)))===normDec(tok)
+        : numClose(Number(tok), a.sums[i]);
+      const m=raw.length===a.sums.length && raw.every(cmp);
       const computed="["+a.sums.map((x,i)=>(exact[i]!=null)?exact[i]:fmtNum(x)).join(",")+"]";
       push("sumOfColumns",m?"pass":"fail",`sumOfColumns: ${m?"match":"MISMATCH (stored "+vSum.validationValue+", computed "+computed+")"}`); } }
   const vSample=vs.find(v=>v.validationType==="sampleRow");
