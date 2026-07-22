@@ -734,6 +734,59 @@ function parseCsv(text){
   const rows=lines.map(l=>l.split(","));
   return {lines, rows};
 }
+/* ---- exact decimal column sums (BigInt fixed-point, zero rounding error) ----
+   The CSV values are finite decimal strings, i.e. exact rationals m*10^-k. Scaling a
+   whole column to a common power of ten turns every value into an integer, and BigInt
+   addition of integers is exact by construction -- no IEEE-754 rounding ever occurs. */
+/* parse a plain/scientific decimal to {sign,digits,scale} with value = sign*digits*10^-scale; null if not numeric */
+function parseDecimal(s){
+  s=String(s).trim();
+  const m=s.match(/^([+-]?)(\d*)(?:\.(\d*))?(?:[eE]([+-]?\d+))?$/);
+  if(!m) return null;
+  const intp=m[2]||"", frac=m[3]||"";
+  if(intp===""&&frac==="") return null;                  // "", ".", or sign only
+  let digits=(intp+frac).replace(/^0+(?=\d)/,"");        // drop leading zeros, keep at least one
+  if(digits==="") digits="0";
+  const scale=frac.length-(m[4]?parseInt(m[4],10):0);    // value = digits*10^-scale
+  return {sign:(m[1]==="-")?-1n:1n, digits:BigInt(digits), scale};
+}
+/* render sign*|total|*10^-D (D>=0) as an exact decimal string */
+function scaledToDecimal(total, D){
+  const neg=total<0n; let t=(neg?-total:total).toString();
+  if(D>0){ t=t.padStart(D+1,"0"); t=t.slice(0,-D)+"."+t.slice(-D); }
+  return (neg?"-":"")+t;
+}
+/* exact per-column sums; each entry is a decimal string, or null if the column is not all-numeric */
+function exactColumnSums(rows, nCols){
+  const out=new Array(nCols).fill(null);
+  for(let c=0;c<nCols;c++){
+    let D=0, valid=true; const cells=[];
+    for(const r of rows){
+      const cell=(r[c]==null?"":String(r[c]).trim());
+      if(cell==="") continue;                            // skip blanks (same as the double path)
+      const d=parseDecimal(cell);
+      if(!d){ valid=false; break; }                      // non-numeric cell -> no exact sum for this column
+      cells.push(d); if(d.scale>D) D=d.scale;
+    }
+    if(!valid) continue;
+    let total=0n;
+    for(const d of cells) total += d.sign * d.digits * (10n ** BigInt(D-d.scale));
+    out[c]=scaledToDecimal(total, D);
+  }
+  return out;
+}
+/* decimals in a written number; strip trailing zeros; round an exact decimal string (half-up) to n places */
+function decimalsOf(s){ s=String(s).trim(); const i=s.indexOf("."); return i<0?0:(s.length-i-1); }
+function normDec(s){ s=String(s).trim(); if(s.indexOf(".")>=0) s=s.replace(/0+$/,"").replace(/\.$/,""); return (s===""||s==="-0"||s==="-")?"0":s; }
+function roundDecimalStr(s, n){
+  const d=parseDecimal(s); if(!d) return s;
+  let {sign,digits,scale}=d;
+  if(scale<=n){ digits=digits*(10n**BigInt(n-scale)); }
+  else { const p=10n**BigInt(scale-n), r=digits%p; digits=digits/p+((2n*r>=p)?1n:0n); }
+  let t=digits.toString(), out;
+  if(n>0){ t=t.padStart(n+1,"0"); out=t.slice(0,-n)+"."+t.slice(-n); } else out=t;
+  return ((sign<0n && digits!==0n)?"-":"")+out;
+}
 function analyzeCsv(text){
   const {lines, rows}=parseCsv(text);
   const nRows=rows.length;
@@ -749,6 +802,7 @@ function analyzeCsv(text){
     }
   }
   const allNumeric=nCols>0 && sumsValid.every(Boolean);
+  const sumsExact=exactColumnSums(rows, nCols);   // exact decimal sums (BigInt), null per non-numeric column
   // wavelength info from column 0
   let wl=null;
   if(nCols>0 && nRows>=2){
@@ -760,7 +814,7 @@ function analyzeCsv(text){
       wl={first,last,step:uniform?step:null,uniform};
     }
   }
-  return {nRows,nCols,sums,sumsValid,allNumeric,lines,rows,wl};
+  return {nRows,nCols,sums,sumsExact,sumsValid,allNumeric,lines,rows,wl};
 }
 /* map a file name to a MIME type for the formats[] field */
 function mimeFromName(name, fallbackType){
@@ -797,7 +851,8 @@ function applyCsvToPayload(p, a, opts){
   // sums: always for wavelength/data tables; for a plain headerless CSV only when numeric
   const wantSums = mode==="csvWavelength" || a.allNumeric;
   const vals=[];
-  if(wantSums) vals.push({validationType:"sumOfColumns",validationValue:"["+a.sums.map(x=>fmtNum(x)).join(",")+"]"});
+  if(wantSums){ const parts=a.sums.map((x,i)=>(a.sumsExact&&a.sumsExact[i]!=null)?a.sumsExact[i]:fmtNum(x));
+    vals.push({validationType:"sumOfColumns",validationValue:"["+parts.join(",")+"]"}); }
   vals.push({validationType:"sampleRow",validationParameter:String(rowN),validationValue:a.lines[rowN-1]||""});
   vals.push({validationType:"numberOfRows",validationValue:String(a.nRows)});
   vals.push({validationType:"numberOfColumns",validationValue:String(a.nCols)});
@@ -1287,7 +1342,7 @@ function renderCsvResult(out,e,filename,md5,sha,a){
   sum.textContent=
     `file: ${filename}\nrows: ${a.nRows}\ncolumns: ${a.nCols}\n`+
     `md5:    ${md5}\nsha256: ${sha}\n`+
-    `column sums: [${a.sums.map(x=>fmtNum(x)).join(", ")}]\n`+
+    `column sums: [${a.sums.map((x,i)=>(a.sumsExact&&a.sumsExact[i]!=null)?a.sumsExact[i]:fmtNum(x)).join(", ")}]\n`+
     (a.wl?`wavelength (col 1): first=${a.wl.first} last=${a.wl.last} step=${a.wl.uniform?a.wl.step:"(non-uniform)"}\n`:"");
   out.appendChild(sum);
 
@@ -1317,8 +1372,15 @@ function renderCsvResult(out,e,filename,md5,sha,a){
   if(vCols){ const m=String(a.nCols)===String(vCols.validationValue).trim(); push("numberOfColumns",m?"pass":"fail",`numberOfColumns: ${m?"match":"MISMATCH (stored "+vCols.validationValue+")"}`); }
   const vSum=vs.find(v=>v.validationType==="sumOfColumns");
   if(vSum){ let stored=null; try{ stored=JSON.parse(vSum.validationValue); }catch(err){}
-    if(Array.isArray(stored)){ const m=stored.length===a.sums.length && stored.every((x,i)=>numClose(Number(x),a.sums[i]));
-      const computed="["+a.sums.map(x=>fmtNum(x)).join(",")+"]";
+    if(Array.isArray(stored)){
+      const exact=a.sumsExact||[];
+      // strict exact: stored must equal the exact BigInt sum rounded to its own decimal places
+      // (fall back to numClose only for a column that is not exactly summable, e.g. sentinel cells)
+      const cmp=(x,i)=> (exact[i]!=null)
+        ? normDec(roundDecimalStr(exact[i], decimalsOf(String(x))))===normDec(String(x))
+        : numClose(Number(x), a.sums[i]);
+      const m=stored.length===a.sums.length && stored.every(cmp);
+      const computed="["+a.sums.map((x,i)=>(exact[i]!=null)?exact[i]:fmtNum(x)).join(",")+"]";
       push("sumOfColumns",m?"pass":"fail",`sumOfColumns: ${m?"match":"MISMATCH (stored "+vSum.validationValue+", computed "+computed+")"}`); } }
   const vSample=vs.find(v=>v.validationType==="sampleRow");
   if(vSample && vSample.validationParameter){ const idx=parseInt(vSample.validationParameter,10)-1; const line=a.lines[idx];
