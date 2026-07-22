@@ -231,6 +231,7 @@ const APP = {
   CIE_SCHEMA_NAME: "CIEmetaDigitalProduct",
   CIE_SCHEMA_VERSION: 4,
   LS_DB: "ciemetadb.workingcopy",
+  LS_SAVED_HASH: "ciemetadb.savedhash",
   LS_USER: "ciemetadb.user"
 };
 
@@ -1576,7 +1577,7 @@ function loadDbFromText(text){
   let obj; try{ obj=JSON.parse(text); }catch(e){ toast("Not valid JSON: "+e.message,"err"); return null; }
   // is this an aggregate DB or a single DataCite metadata file?
   if(obj && obj.dbSchemaName===APP.DB_SCHEMA_NAME){
-    DB=migrateDb(obj); lastLoadedBaseHash=computeDbBaseHash(DB); selectedId=null; editModel=null; editDirty=false;
+    DB=migrateDb(obj); markSaved(computeDbBaseHash(DB)); selectedId=null; editModel=null; editDirty=false;
     suppressDbTouch=true; persist(); suppressDbTouch=false; // preserve the file's own lastModified* on open
     refreshDomainFilter(); renderList(); renderDetail(); toast("Database loaded — "+DB.entries.length+" entries","ok");
     return "db";
@@ -1793,7 +1794,7 @@ async function saveDbAs(){
     suggestedName:(dbFileHandle&&dbFileHandle.name)||"CIEmetaDB.json",
     types:[{description:"CIE metadatabase JSON",accept:{"application/json":[".json"]}}]});
   await writeText(handle, DB);
-  dbFileHandle=handle; lastLoadedBaseHash=DB.baseHash;
+  dbFileHandle=handle; markSaved(DB.baseHash);
   renderList(); toast("Saved to "+handle.name,"ok");
 }
 /* Save to the loaded file, detecting parallel changes first (checkConflicts).
@@ -1808,14 +1809,14 @@ async function saveToHandle(handle, checkConflicts){
       toast("File changed on disk by someone else — merging…","warn");
       // Merge on-disk (theirs) into our in-memory DB (mine); write once resolved.
       mergeDb(onDisk, async ()=>{
-        try{ await writeText(handle, DB); lastLoadedBaseHash=DB.baseHash; renderList(); toast("Merged and saved to "+handle.name,"ok"); }
+        try{ await writeText(handle, DB); markSaved(DB.baseHash); renderList(); toast("Merged and saved to "+handle.name,"ok"); }
         catch(e){ toast("Save after merge failed: "+e.message,"err"); }
       });
       return;
     }
   }
   await writeText(handle, DB);
-  lastLoadedBaseHash=DB.baseHash; renderList(); toast("Saved to "+handle.name,"ok");
+  markSaved(DB.baseHash); renderList(); toast("Saved to "+handle.name,"ok");
 }
 async function saveDb(saveAs){
   if(!DB) return;
@@ -1829,6 +1830,7 @@ async function saveDb(saveAs){
   }
   // No File System Access API (Firefox/Safari): cannot overwrite or detect parallel changes.
   download("CIEmetaDB.json", JSON.stringify(DB,null,2));
+  markSaved(DB.baseHash); renderList();
   toast("Copy downloaded — this browser can't overwrite files or detect parallel edits. Use a Chromium browser for in-place save.","warn");
 }
 /* export entries as individual DataCite files (strip envelope) */
@@ -2043,6 +2045,11 @@ function updateToolbarState(){
 /* true when the open DB has changes not yet written to its file (baseHash drifted
    from the last synced state — or a New DB that was never saved to a file). */
 function dbUnsaved(){ return !!DB && DB.baseHash!==lastLoadedBaseHash; }
+/* record that `hash` is now written to disk, so the next-launch "restore unsaved
+   work?" prompt (which otherwise fires on mere localStorage presence) can tell a
+   cleanly-saved working copy apart from a genuinely unsaved one. */
+function markSaved(hash){ lastLoadedBaseHash=hash; try{ localStorage.setItem(APP.LS_SAVED_HASH, hash||""); }catch(e){} }
+function clearSavedMarker(){ lastLoadedBaseHash=null; try{ localStorage.removeItem(APP.LS_SAVED_HASH); }catch(e){} }
 function applyDbTitle(){
   const t=(DB&&DB.title)?DB.title:"";
   document.title = t ? ("CIE Metadatabase — "+t) : "CIE Metadatabase";
@@ -2167,7 +2174,7 @@ function wire(){
   el("appVersion").textContent="v"+APP.VERSION;
   ensureUser(false);
   el("btnUser").onclick=()=>ensureUser(true);
-  el("btnNewDb").onclick=()=>{ if(DB && !confirm("Start a new empty database? Unsaved changes to the working copy will be replaced.")) return; DB=newDB(); dbFileHandle=null; lastLoadedBaseHash=null; selectedId=null; editModel=null; editDirty=false; persist(); refreshDomainFilter(); renderList(); renderDetail(); toast("New database created — use Save to choose a file","ok"); };
+  el("btnNewDb").onclick=()=>{ if(DB && !confirm("Start a new empty database? Unsaved changes to the working copy will be replaced.")) return; DB=newDB(); dbFileHandle=null; clearSavedMarker(); selectedId=null; editModel=null; editDirty=false; persist(); refreshDomainFilter(); renderList(); renderDetail(); toast("New database created — use Save to choose a file","ok"); };
   el("btnOpen").onclick=openDbFile;
   el("btnImport").onclick=openImportDialog;
   el("btnDbInfo").onclick=openDbInfoDialog;
@@ -2190,12 +2197,19 @@ function wire(){
   window.addEventListener("beforeunload",(e)=>{ if(editDirty || dbUnsaved()){ e.preventDefault(); e.returnValue=""; } });
 
   // Start with no database open. Offer to restore an unsaved working copy if one
-  // remains from a previous session (recovery safety net, not auto-open).
+  // remains from a previous session (recovery safety net, not auto-open). Compare
+  // against the last-saved marker so a working copy that was already written to
+  // its file (nothing left to recover) doesn't trigger a false prompt every reload.
   DB=null;
   try{
-    if(localStorage.getItem(APP.LS_DB) &&
-       confirm("Unsaved work from a previous session was found. Restore it?\n\n(It has no linked file — the first Save will ask where to save.)")){
-      loadWorkingCopy();
+    const wc=localStorage.getItem(APP.LS_DB);
+    if(wc){
+      const wcHash=computeDbBaseHash(migrateDb(JSON.parse(wc)));
+      const savedHash=localStorage.getItem(APP.LS_SAVED_HASH);
+      if(wcHash!==savedHash &&
+         confirm("Unsaved work from a previous session was found. Restore it?\n\n(It has no linked file — the first Save will ask where to save.)")){
+        loadWorkingCopy();
+      }
     }
   }catch(e){}
   refreshDomainFilter(); renderList(); renderDetail();
