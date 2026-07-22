@@ -101,7 +101,7 @@
 				},
 				"payload": {
 					"type": "object",
-					"description": "The CIEmetaDigitalProduct metadata record. Validates against CIEmetaDigitalProduct_schema_04.json."
+					"description": "The CIEmetaDigitalProduct metadata record. Validates against CIEmetaDigitalProduct_schema_04.json. Carries an optional integer 'metadataRevision' mirroring the entry 'rev' (revision of the metadata file; advances only on payload-content changes, never on envelope changes such as domains or landingPage)."
 				},
 				"history": {
 					"type": "array",

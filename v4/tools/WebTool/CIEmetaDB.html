@@ -221,7 +221,7 @@
 
 /* ---------- constants ---------- */
 const APP = {
-  VERSION: "1.2.0",
+  VERSION: "1.3.0",
   DB_SCHEMA_NAME: "CIEmetaDB",
   DB_SCHEMA_VERSION: 1,
   DOI_PREFIX: "10.25039/CIE.DS.",
@@ -598,6 +598,7 @@ function buildCieSchema(){
       schemaName:{type:"string",const:"CIEmetaDigitalProduct"},
       schemaVersion:{type:"number",const:4},
       schemaURL:{type:"string",const:APP.SCHEMA_URL},
+      metadataRevision:{type:"integer",minimum:1},
       datatableInfo:{type:"object",properties:{
         interpolationMethod:strEnum(D.interpolationMethod),
         extrapolationMethod:strEnum(D.extrapolationMethod),
@@ -662,6 +663,7 @@ function blankPayload(doi, filename){
 /* create a new entry committed at rev 1 */
 function createEntry(payload, opts){
   opts=opts||{};
+  if(payload && payload.metadataRevision==null) payload.metadataRevision=1; // metadata-file revision starts at 1
   const now=nowISO(), user=currentUser();
   const patch=diffPatch({}, payload, "");
   const e={
@@ -675,16 +677,21 @@ function createEntry(payload, opts){
   };
   return e;
 }
+/* payload diff for change detection: ignores the bookkeeping metadataRevision field so it never
+   triggers (or suppresses) a revision on its own */
+function contentDiff(a,b){ const x=clone(a||{}),y=clone(b||{}); delete x.metadataRevision; delete y.metadataRevision; return diffPatch(x,y,""); }
 /* commit an edit to an existing entry */
 function commitEdit(entry, newPayload, comment){
   const now=nowISO(), user=currentUser();
   const oldPayload=entry.payload;
-  const patch=diffPatch(oldPayload, newPayload, "");
-  if(patch.length===0) return false;
+  if(contentDiff(oldPayload, newPayload).length===0) return false; // no genuine content change
   entry.rev+=1;
+  const stored=clone(newPayload);
+  stored.metadataRevision=entry.rev;                 // metadata-file revision follows the payload rev
+  const patch=diffPatch(oldPayload, stored, "");      // history/reconstruct include the metadataRevision bump
   entry.history.push({rev:entry.rev, by:user, date:now, comment:comment||"", baseHash:entry.contentHash, patch:patch});
-  entry.payload=clone(newPayload);
-  entry.contentHash=contentHash(newPayload);
+  entry.payload=stored;
+  entry.contentHash=contentHash(stored);
   entry.audit.modifiedBy=user; entry.audit.modifiedDate=now; entry.audit.modifiedComment=comment||"";
   return true;
 }
@@ -991,6 +998,11 @@ function renderForm(page,e){
   });
   gm.appendChild(field("Domains", domWrap));
   gm.appendChild(field("DOI landing page (Crossref resource URL)", inp(editMeta,"landingPage",{placeholder:"https://cie.co.at/datatable/…"})));
+  // metadata-file revision: read-only; increments only on metadata-content changes (not on envelope edits)
+  const revView=document.createElement("div"); revView.style.padding="6px 0"; revView.className="mono";
+  revView.textContent=(p.metadataRevision==null?"1":String(p.metadataRevision));
+  revView.title="Revision of this JSON metadata file. Increments only when the metadata content changes — not when the CIE division or DOI landing page is edited.";
+  gm.appendChild(field("Metadata revision", revView));
   fsMeta.appendChild(gm); page.appendChild(fsMeta);
 
   // identifier
@@ -1394,7 +1406,7 @@ function saveEntry(){
   if(curDoi && DB.entries.some(x=>x.entryId!==e.entryId && entryDoi(x)===curDoi)){
     if(!confirm("Another entry already uses this DOI:\n"+curDoi+"\n\nDOIs must be unique. Save anyway (the database will flag it as a duplicate to fix)?")) return;
   }
-  const patch=diffPatch(e.payload,editModel,"");
+  const patch=contentDiff(e.payload,editModel);
   const meta=metaChanged(e);
   if(patch.length===0 && !meta){ toast("No changes to save"); editDirty=false; renderDetail(); return; }
   // payload changes are versioned in history (with a comment); envelope changes are not
@@ -1601,6 +1613,7 @@ function migrateDb(obj){
     e.domains=e.domains||[]; if(e.landingPage==null) e.landingPage=""; e.history=e.history||[{rev:e.rev||1,by:"import",date:e.audit?e.audit.modifiedDate:nowISO(),comment:"Imported",baseHash:null,patch:diffPatch({},e.payload,"")}];
     if(e.contentHash==null) e.contentHash=contentHash(e.payload);
     if(e.rev==null) e.rev=e.history.length;
+    if(e.payload && e.payload.metadataRevision==null) e.payload.metadataRevision=e.rev; // backfill metadata-file revision
     return e;
   });
   return obj;
@@ -2127,7 +2140,9 @@ function openHelpDialog(){
     <ul>
       <li><b>Form / JSON / Validation / History</b> tabs. Payload changes are versioned (RFC-6902
         patches) and require a change comment on save; envelope changes (status, domains, DOI
-        landing page) are saved without a version bump.</li>
+        landing page) are saved without a version bump. The payload's <span class="mono">metadataRevision</span>
+        field mirrors the revision and is stamped automatically — it advances only on metadata-content
+        changes, never on envelope edits.</li>
       <li><b>Validation</b> tab — pick the CSV data file to check checksums, row/column counts,
         column sums, sample row and the wavelength range against the stored metadata, then fill or
         log the results.</li>

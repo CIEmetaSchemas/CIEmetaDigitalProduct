@@ -7,7 +7,7 @@ metadata records, with full git-like change history and safe concurrent-edit mer
 Modelled on the termdat curation workflow. Runs entirely in the browser from a
 local file — **no server, no network access, no external/CDN dependencies.**
 
-**Interface version 1.2.0** (shown in the header).
+**Interface version 1.3.0** (shown in the header).
 
 A **? Help** button in the toolbar opens an in-app summary of the features below,
 including the link to the Crossref deposit validator.
@@ -106,7 +106,7 @@ entry
 ├─ landingPage    URL the DOI resolves to (Crossref <resource>); envelope-level, per entry
 ├─ domains        [ CIE-division codes ]
 ├─ audit          createdBy/Date, modifiedBy/Date, modifiedComment
-├─ payload        the CIEmetaDigitalProduct (DataCite) record
+├─ payload        the CIEmetaDigitalProduct (DataCite) record (carries metadataRevision, mirroring rev)
 └─ history[]      append-only revision log (see below)
 ```
 
@@ -125,6 +125,13 @@ revision number, author, date and change comment.
   patches `1..N` onto the empty document.
 - **Restore:** the History tab can load any prior revision back into the editor;
   saving it commits a **new** revision (history is never rewritten).
+- **`metadataRevision`:** the payload carries an optional integer `metadataRevision` that mirrors
+  the entry `rev` — the revision of the **metadata file itself**. It is stamped automatically and
+  advances **only when the metadata content changes**, never on envelope-only edits (status, domains,
+  DOI landing page). It is exported with the `*.csv_metadata.json` file (unlike the envelope `rev`),
+  is shown read-only in the *Database entry* section of the Form tab, and is distinct from the DataCite
+  `version` field (which versions the described resource). Legacy files without it are treated as
+  revision 1.
 
 ## Identifiers (DOI)
 
