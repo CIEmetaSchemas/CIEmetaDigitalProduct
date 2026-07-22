@@ -221,7 +221,7 @@
 
 /* ---------- constants ---------- */
 const APP = {
-  VERSION: "1.4.0",
+  VERSION: "1.5.0",
   DB_SCHEMA_NAME: "CIEmetaDB",
   DB_SCHEMA_VERSION: 1,
   DOI_PREFIX: "10.25039/CIE.DS.",
@@ -1087,6 +1087,37 @@ function arraySection(parent, title, arr, itemRender, factory){
 }
 function g2(g,label,node){ const l=document.createElement("label"); l.textContent=label; g.appendChild(l); g.appendChild(node); }
 
+const COLUMN_HEADER_FIELD_LABELS=["Title","Quantity","Unit","Description","Wavelength first","Wavelength last","Wavelength step"];
+const COLUMN_HEADER_FIELD_KEYS=["title","quantity","unit","description","wavelength_first","wavelength_last","wavelength_step"];
+function parseColumnHeaderPaste(text){
+  let lines=text.replace(/\r\n?/g,"\n").split("\n");
+  while(lines.length && lines[lines.length-1].trim()==="") lines.pop();
+  if(!lines.length) return null;
+  let rows=lines.map(l=>l.split("\t"));
+  if(rows.length && (rows[0][0]||"").trim().toLowerCase()==="title") rows=rows.map(r=>r.slice(1));
+  if(rows.length<7) return null;
+  rows=rows.slice(0,7);
+  const n=Math.max(...rows.map(r=>r.length));
+  const out=[];
+  for(let i=0;i<n;i++){
+    const obj={};
+    COLUMN_HEADER_FIELD_KEYS.forEach((key,rowIdx)=>{
+      const cell=(rows[rowIdx][i]||"").trim();
+      if(key==="title"||key==="quantity"||key==="unit"){ obj[key]=cell; }
+      else if(key==="description"){ if(cell!=="") obj[key]=cell; }
+      else{ if(cell!=="") obj[key]=cell.startsWith(":")?cell:parseFloat(cell); }
+    });
+    out.push(obj);
+  }
+  return out;
+}
+function columnHeadersToTsv(arr){
+  return COLUMN_HEADER_FIELD_KEYS.map((key,rowIdx)=>{
+    const cells=arr.map(it=>it[key]==null?"":String(it[key]));
+    return [COLUMN_HEADER_FIELD_LABELS[rowIdx],...cells].join("\t");
+  }).join("\n");
+}
+
 function renderForm(page,e){
   const p=editModel;
   // sidebar meta fieldset
@@ -1229,7 +1260,31 @@ function renderForm(page,e){
   },()=>({validationType:"sumOfColumns",validationValue:""}));
 
   di.columnHeaders=di.columnHeaders||[];
-  arraySection(page,"Column headers",di.columnHeaders,(g,it)=>{
+  const chTools=document.createElement("div"); chTools.style.margin="0 0 8px";
+  const chHint=document.createElement("p"); chHint.className="hint"; chHint.style.margin="0 0 6px";
+  chHint.textContent='Paste column headers from Excel: prepare 7 rows (Title, Quantity, Unit, Description, Wavelength first, Wavelength last, Wavelength step), one column per data column — column-for-column with the CSV. A leading label column is optional and auto-detected. Pasting replaces the whole list below.';
+  chTools.appendChild(chHint);
+  const chRow=document.createElement("div"); chRow.style.display="flex"; chRow.style.gap="8px"; chRow.style.alignItems="flex-start";
+  const chPaste=document.createElement("textarea"); chPaste.rows=2; chPaste.placeholder="Click here, then Ctrl+V to paste rows copied from Excel…"; chPaste.style.flex="1";
+  chPaste.addEventListener("paste",(ev)=>{
+    ev.preventDefault();
+    const text=(ev.clipboardData||window.clipboardData).getData("text");
+    const parsed=parseColumnHeaderPaste(text);
+    if(!parsed || !parsed.length){ toast("Clipboard did not contain 7 tab-separated rows (Title/Quantity/Unit/Description/Wavelength first/last/step)","warn"); return; }
+    if(di.columnHeaders.length && !confirm(`Replace all ${di.columnHeaders.length} existing column header(s) with ${parsed.length} pasted column(s)?`)) return;
+    di.columnHeaders=parsed; markDirty(); renderDetail();
+    toast(`Pasted ${parsed.length} column header(s)`,"ok");
+  });
+  chRow.appendChild(chPaste);
+  const chCopy=document.createElement("button"); chCopy.type="button"; chCopy.className="ghost small"; chCopy.textContent="Copy current as text";
+  chCopy.onclick=()=>{ navigator.clipboard&&navigator.clipboard.writeText(columnHeadersToTsv(di.columnHeaders)); toast("Column headers copied","ok"); };
+  chRow.appendChild(chCopy);
+  chTools.appendChild(chRow);
+  page.appendChild(chTools);
+  arraySection(page,"Column headers",di.columnHeaders,(g,it,idx)=>{
+    const numLbl=document.createElement("div"); numLbl.style.gridColumn="1/-1"; numLbl.style.fontWeight="600"; numLbl.style.color="var(--cie-main)"; numLbl.style.marginBottom="2px";
+    numLbl.textContent="Column "+(idx+1);
+    g.appendChild(numLbl);
     g2(g,"Title",inp(it,"title"));
     g2(g,"Quantity",inp(it,"quantity"));
     g2(g,"Unit",inp(it,"unit"));
@@ -2302,6 +2357,21 @@ function openHelpDialog(){
         log the results.</li>
       <li><b>Update DOI</b> generates a compliant <code>10.25039/CIE.DS.$$$$$$$$</code> suffix
         (a local placeholder until CIE CB assigns the real DOI).</li>
+    </ul>
+
+    <h4>Column headers — bulk paste from Excel <span class="kv">(new)</span></h4>
+    <p style="margin:4px 0">In the Form tab's <b>Column headers</b> section (under <b>Data table info</b>),
+      the paste box above the list lets you bulk-fill columns from Excel instead of typing each one:</p>
+    <ul>
+      <li>Prepare <b>7 rows</b> — Title, Quantity, Unit, Description, Wavelength first, Wavelength last,
+        Wavelength step — with <b>one column per data column</b>, column-for-column with the CSV. A
+        leading label column (e.g. "Title" in column A) is optional and auto-detected.</li>
+      <li>Copy the range in Excel, click the paste box and press <b>Ctrl+V</b>. This <b>replaces the whole
+        Column headers list</b> (with a confirmation if it wasn't already empty).</li>
+      <li><b>Copy current as text</b> does the reverse — copies the current column headers back out in the
+        same layout, for editing in Excel and pasting back.</li>
+      <li>Each box is labelled <b>Column N</b> so a long list (e.g. 100 columns) stays legible while
+        scrolling.</li>
     </ul>
 
     <h4>DOI landing page <span class="kv">(new)</span></h4>

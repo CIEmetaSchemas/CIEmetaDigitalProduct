@@ -7,7 +7,7 @@ metadata records, with full git-like change history and safe concurrent-edit mer
 Modelled on the termdat curation workflow. Runs entirely in the browser from a
 local file — **no server, no network access, no external/CDN dependencies.**
 
-**Interface version 1.4.0** (shown in the header).
+**Interface version 1.5.0** (shown in the header).
 
 A **? Help** button in the toolbar opens an in-app summary of the features below,
 including the link to the Crossref deposit validator.
@@ -166,6 +166,25 @@ the tool prompts for the URL and saves it on the entry. Existing landing pages c
 recovered from a registered DOI via the Crossref REST API
 (`https://api.crossref.org/works/<doi>` → `resource.primary.URL`) or by following
 `https://doi.org/<doi>`.
+
+## Column headers — bulk paste from Excel
+
+Each data-table entry's **Column headers** (Form tab → *Data table info*) can be
+filled in one at a time, or in bulk via the paste box shown above the list:
+
+- Prepare **7 rows** — Title, Quantity, Unit, Description, Wavelength first,
+  Wavelength last, Wavelength step — with **one column per data column**,
+  column-for-column with the CSV. A leading label column (e.g. "Title" in
+  column A) is optional and auto-detected and stripped.
+- Copy that range in Excel, click the paste box and press **Ctrl+V**. This
+  **replaces the whole Column headers list** (with a confirmation dialog if it
+  wasn't already empty).
+- **Copy current as text** does the reverse — copies the current column
+  headers back out in the same row/column layout, for editing in Excel and
+  pasting back.
+- Each column-header box is labelled **Column N** so a long list (e.g. 100
+  columns, as in some CIE colour-fidelity tables) stays legible while
+  scrolling.
 
 ## Validation against the CSV data file
 
