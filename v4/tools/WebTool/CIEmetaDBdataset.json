@@ -4,9 +4,9 @@
   "dbId": "4cd12818-04ed-4654-b9f7-dbf622b029d1",
   "title": "CIE data-table metadatabase",
   "description": "Curated CIEmetaDigitalProduct metadata for the CIE published data tables (https://cie.co.at/data-tables).",
-  "baseHash": "452d1f81ebf0fd365b6fc04e3b166804f5f7fe5c6f761327c2a25a2b74a61290",
-  "generatedAt": "2026-07-22T07:58:05.538Z",
-  "lastModifiedDate": "2026-07-22T07:58:05.538Z",
+  "baseHash": "6e76b4172f505c8585ba86de0bac44d8fe9987328800933e1a9f2f6b341fd267",
+  "generatedAt": "2026-07-22T14:03:46.058Z",
+  "lastModifiedDate": "2026-07-22T14:03:46.058Z",
   "lastModifiedBy": "peter.blattner@metas.ch",
   "domains": [
     {
@@ -19437,8 +19437,8 @@
     },
     {
       "entryId": "6eda1ee9-0ba7-4958-af18-c8b89e8418f3",
-      "rev": 1,
-      "contentHash": "2ceca6b1f714475801e0552b7b150a159f043ea09a828e0cfa42802b90ce3a2b",
+      "rev": 2,
+      "contentHash": "dd897e9372ee3119e46b0d56ba14dfaad199e585182f8b704672d0ca2a7f1372",
       "status": "published",
       "domains": [
         "D1"
@@ -19446,9 +19446,9 @@
       "audit": {
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
-        "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedBy": "peter.blattner@metas.ch",
+        "modifiedDate": "2026-07-22T13:56:36.834Z",
+        "modifiedComment": "sum of column updated"
       },
       "payload": {
         "identifier": {
@@ -19531,7 +19531,7 @@
           "validations": [
             {
               "validationType": "sumOfColumns",
-              "validationValue": "[300015,60210.114316]"
+              "validationValue": "[300015,60250.921916]"
             },
             {
               "validationType": "sampleRow",
@@ -19564,7 +19564,7 @@
         "schemaName": "CIEmetaDigitalProduct",
         "schemaVersion": 4,
         "schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd",
-        "metadataRevision": 1
+        "metadataRevision": 2
       },
       "history": [
         {
@@ -19760,6 +19760,35 @@
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
             }
           ]
+        },
+        {
+          "rev": 2,
+          "by": "peter.blattner@metas.ch",
+          "date": "2026-07-22T13:56:36.834Z",
+          "comment": "sum of column updated",
+          "baseHash": "2ceca6b1f714475801e0552b7b150a159f043ea09a828e0cfa42802b90ce3a2b",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/datatableInfo/validations",
+              "value": [
+                {
+                  "validationType": "sumOfColumns",
+                  "validationValue": "[300015,60250.921916]"
+                },
+                {
+                  "validationType": "sampleRow",
+                  "validationParameter": "120",
+                  "validationValue": "419,20.647"
+                }
+              ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
+            }
+          ]
         }
       ],
       "validationLog": [
@@ -19790,6 +19819,51 @@
               "check": "sumOfColumns",
               "status": "fail",
               "detail": "sumOfColumns: MISMATCH (stored [300015,60210.114316])"
+            },
+            {
+              "check": "sampleRow",
+              "status": "pass",
+              "detail": "sampleRow[120]: match"
+            },
+            {
+              "check": "wavelength_first",
+              "status": "pass",
+              "detail": "col1 wavelength_first: match"
+            },
+            {
+              "check": "wavelength_last",
+              "status": "pass",
+              "detail": "col1 wavelength_last: match"
+            }
+          ]
+        },
+        {
+          "date": "2026-07-22T14:03:21.265Z",
+          "by": "peter.blattner@metas.ch",
+          "fileName": "CIE_std_illum_A_1nm.csv",
+          "md5": "ed0e4effb55d82b950c0912b6278a9d1",
+          "sha256": "61ef23fe146b8b665c74706717ab28cec7db6c9022993490bdc71991f43cb59b",
+          "passed": true,
+          "results": [
+            {
+              "check": "md5",
+              "status": "pass",
+              "detail": "md5: match"
+            },
+            {
+              "check": "sha256",
+              "status": "pass",
+              "detail": "sha256: match"
+            },
+            {
+              "check": "fileName",
+              "status": "pass",
+              "detail": "fileName: match"
+            },
+            {
+              "check": "sumOfColumns",
+              "status": "pass",
+              "detail": "sumOfColumns: match"
             },
             {
               "check": "sampleRow",
