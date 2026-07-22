@@ -942,7 +942,12 @@ function inp(obj,key,opts){
   if(opts.textarea) i.rows=opts.rows||3;
   i.value = obj[key]==null?"":obj[key];
   if(opts.placeholder) i.placeholder=opts.placeholder;
-  i.oninput=()=>{ if(i.value==="" && opts.deleteIfEmpty) delete obj[key]; else obj[key]=opts.number?(i.value===""?undefined:parseFloat(i.value)):i.value; markDirty(); };
+  i.oninput=()=>{
+    if(i.value==="" && opts.deleteIfEmpty) delete obj[key];
+    else if(opts.number){ const v=i.value.trim(); obj[key]=v.startsWith(":")?v:(v===""?undefined:parseFloat(v)); }
+    else obj[key]=i.value;
+    markDirty();
+  };
   return i;
 }
 function sel(obj,key,options){
@@ -1113,6 +1118,9 @@ function renderForm(page,e){
     g2(g,"Wavelength first",inp(it,"wavelength_first",{number:true,deleteIfEmpty:true}));
     g2(g,"Wavelength last",inp(it,"wavelength_last",{number:true,deleteIfEmpty:true}));
     g2(g,"Wavelength step",inp(it,"wavelength_step",{number:true,deleteIfEmpty:true}));
+    const wlHint=document.createElement("p"); wlHint.className="hint"; wlHint.style.gridColumn="1/-1";
+    wlHint.textContent='Enter ":unap" in Wavelength first/last/step if not applicable (no wavelengths in this column); use ":null" for Wavelength step if spacing is non-uniform.';
+    g.appendChild(wlHint);
   },()=>({title:"",quantity:"",unit:""}));
 
   // validation summary
@@ -1251,11 +1259,11 @@ function renderCsvResult(out,e,filename,md5,sha,a){
   if(vSample && vSample.validationParameter){ const idx=parseInt(vSample.validationParameter,10)-1; const line=a.lines[idx];
     const m=line!==undefined && line.trim()===String(vSample.validationValue).trim();
     push("sampleRow",m?"pass":"fail",`sampleRow[${vSample.validationParameter}]: ${m?"match":"MISMATCH (stored "+vSample.validationValue+", file "+(line===undefined?"(no such row)":line)+")"}`); }
-  // wavelength vs columnHeaders
+  // wavelength vs columnHeaders (sentinel strings like ":unap" mean "no wavelengths in this table" — skip)
   if(a.wl && chs[0]){
     const c0=chs[0];
-    if(c0.wavelength_first!=null){ const m=numClose(c0.wavelength_first,a.wl.first); push("wavelength_first",m?"pass":"fail",`col1 wavelength_first: ${m?"match":"MISMATCH (meta "+c0.wavelength_first+", file "+a.wl.first+")"}`); }
-    if(c0.wavelength_last!=null){ const m=numClose(c0.wavelength_last,a.wl.last); push("wavelength_last",m?"pass":"fail",`col1 wavelength_last: ${m?"match":"MISMATCH (meta "+c0.wavelength_last+", file "+a.wl.last+")"}`); }
+    if(typeof c0.wavelength_first==="number"){ const m=numClose(c0.wavelength_first,a.wl.first); push("wavelength_first",m?"pass":"fail",`col1 wavelength_first: ${m?"match":"MISMATCH (meta "+c0.wavelength_first+", file "+a.wl.first+")"}`); }
+    if(typeof c0.wavelength_last==="number"){ const m=numClose(c0.wavelength_last,a.wl.last); push("wavelength_last",m?"pass":"fail",`col1 wavelength_last: ${m?"match":"MISMATCH (meta "+c0.wavelength_last+", file "+a.wl.last+")"}`); }
   }
   if(a.nCols && chs.length && a.nCols!==chs.length) push("columnHeaders","warn",`columnHeaders count (${chs.length}) differs from CSV columns (${a.nCols})`);
   if(!checks.length) push("","warn","No stored checksums/validations to check — use Generate below.");
