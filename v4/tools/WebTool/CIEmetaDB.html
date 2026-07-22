@@ -1318,7 +1318,8 @@ function renderCsvResult(out,e,filename,md5,sha,a){
   const vSum=vs.find(v=>v.validationType==="sumOfColumns");
   if(vSum){ let stored=null; try{ stored=JSON.parse(vSum.validationValue); }catch(err){}
     if(Array.isArray(stored)){ const m=stored.length===a.sums.length && stored.every((x,i)=>numClose(Number(x),a.sums[i]));
-      push("sumOfColumns",m?"pass":"fail",`sumOfColumns: ${m?"match":"MISMATCH (stored "+vSum.validationValue+")"}`); } }
+      const computed="["+a.sums.map(x=>fmtNum(x)).join(",")+"]";
+      push("sumOfColumns",m?"pass":"fail",`sumOfColumns: ${m?"match":"MISMATCH (stored "+vSum.validationValue+", computed "+computed+")"}`); } }
   const vSample=vs.find(v=>v.validationType==="sampleRow");
   if(vSample && vSample.validationParameter){ const idx=parseInt(vSample.validationParameter,10)-1; const line=a.lines[idx];
     const m=line!==undefined && line.trim()===String(vSample.validationValue).trim();
