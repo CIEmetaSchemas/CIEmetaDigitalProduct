@@ -1911,7 +1911,7 @@ function loadWorkingCopy(){
 const hasFSA = ("showOpenFilePicker" in window) && ("showSaveFilePicker" in window);
 
 async function openDbFile(){
-  if(editDirty && !confirm("Discard unsaved entry changes?")) return;
+  if((editDirty || dbUnsaved()) && !confirm("Discard unsaved changes to the current database and open another?")) return;
   if(hasFSA){
     try{
       const [h]=await window.showOpenFilePicker({types:[{description:"CIE metadatabase JSON",accept:{"application/json":[".json"]}}]});
