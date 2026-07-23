@@ -221,7 +221,7 @@
 
 /* ---------- constants ---------- */
 const APP = {
-  VERSION: "1.5.0",
+  VERSION: "1.6.0",
   DB_SCHEMA_NAME: "CIEmetaDB",
   DB_SCHEMA_VERSION: 1,
   DOI_PREFIX: "10.25039/CIE.DS.",
@@ -867,6 +867,102 @@ function applyCsvToPayload(p, a, opts){
 }
 function readFileBytes(file){
   return new Promise((res,rej)=>{ const fr=new FileReader(); fr.onload=()=>res(new Uint8Array(fr.result)); fr.onerror=rej; fr.readAsArrayBuffer(file); });
+}
+
+/* ============================================================================
+   XLSX reader — pure browser, no external libs (runs from file://)
+   .xlsx is a ZIP of XML parts. We unzip (built-in DecompressionStream for the
+   deflated parts), then read sharedStrings + the first worksheet with DOMParser.
+   ==========================================================================*/
+function csvField(v){ const s=(v==null?"":String(v)); return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }
+async function inflateRaw(bytes){
+  if(typeof DecompressionStream==="undefined")
+    throw new Error("this browser cannot read .xlsx (no DecompressionStream) — export the sheet to CSV manually");
+  const ds=new DecompressionStream("deflate-raw");
+  const ab=await new Response(new Blob([bytes]).stream().pipeThrough(ds)).arrayBuffer();
+  return new Uint8Array(ab);
+}
+async function unzip(bytes){
+  const u16=(o)=>bytes[o]|(bytes[o+1]<<8);
+  const u32=(o)=>(bytes[o]|(bytes[o+1]<<8)|(bytes[o+2]<<16)|(bytes[o+3]<<24))>>>0;
+  // End of Central Directory: scan backwards for its signature
+  let eo=-1;
+  for(let i=bytes.length-22;i>=0 && i>=bytes.length-22-65536;i--){ if(u32(i)===0x06054b50){ eo=i; break; } }
+  if(eo<0) throw new Error("not a valid .xlsx (no ZIP directory)");
+  const n=u16(eo+10); let p=u32(eo+16);
+  const dec=new TextDecoder("utf-8"), entries=[];
+  for(let i=0;i<n && p+46<=bytes.length;i++){
+    if(u32(p)!==0x02014b50) break;
+    const method=u16(p+10), compSize=u32(p+20);
+    const nameLen=u16(p+28), extraLen=u16(p+30), commLen=u16(p+32), lho=u32(p+42);
+    const name=dec.decode(bytes.subarray(p+46,p+46+nameLen));
+    entries.push({name,method,compSize,lho});
+    p+=46+nameLen+extraLen+commLen;
+  }
+  const map=new Map();
+  for(const e of entries){
+    if(u32(e.lho)!==0x04034b50) continue;
+    const nl=u16(e.lho+26), el=u16(e.lho+28), start=e.lho+30+nl+el;
+    const comp=bytes.subarray(start,start+e.compSize);
+    if(e.method===0) map.set(e.name,comp);
+    else if(e.method===8) map.set(e.name,await inflateRaw(comp));
+  }
+  return map;
+}
+function colRefToIdx(ref){
+  const m=String(ref).match(/^[A-Z]+/); if(!m) return 0;
+  let n=0; for(const ch of m[0]) n=n*26+(ch.charCodeAt(0)-64); return n-1;
+}
+/* parse .xlsx bytes → {headerRows: string[7][], dataRows: string[][]}.
+   Rows 1-7 (A1 down) are the column descriptors; row 8+ is the data table. */
+async function parseXlsx(bytes){
+  const map=await unzip(bytes);
+  const xmlOf=(name)=>{ const b=map.get(name); return b?new TextDecoder("utf-8").decode(b):null; };
+  const parse=(txt)=>new DOMParser().parseFromString(txt,"application/xml");
+  // shared strings
+  const ss=[]; const ssTxt=xmlOf("xl/sharedStrings.xml");
+  if(ssTxt){ const sis=parse(ssTxt).getElementsByTagName("si");
+    for(const si of sis){ const ts=si.getElementsByTagName("t"); let s=""; for(const t of ts) s+=t.textContent; ss.push(s); } }
+  // locate first worksheet (via workbook + rels, else first sheetN.xml)
+  let sheetPath=null;
+  const wb=xmlOf("xl/workbook.xml"), rels=xmlOf("xl/_rels/workbook.xml.rels");
+  if(wb && rels){
+    const sheet=parse(wb).getElementsByTagName("sheet")[0];
+    let rid=null; if(sheet) for(const a of sheet.attributes){ if(a.name==="r:id"||a.localName==="id"){ rid=a.value; break; } }
+    if(rid){ for(const r of parse(rels).getElementsByTagName("Relationship")){
+      if(r.getAttribute("Id")===rid){ let t=r.getAttribute("Target")||""; t=t.replace(/^\//,""); if(!/^xl\//.test(t)) t="xl/"+t; sheetPath=t; break; } } }
+  }
+  if(!sheetPath || !map.has(sheetPath)){ for(const k of map.keys()){ if(/^xl\/worksheets\/sheet\d+\.xml$/i.test(k)){ sheetPath=k; break; } } }
+  const sheetTxt=sheetPath && xmlOf(sheetPath);
+  if(!sheetTxt) throw new Error("no worksheet found in .xlsx");
+  // build a sparse grid
+  const grid=[]; let maxCol=0;
+  for(const row of parse(sheetTxt).getElementsByTagName("row")){
+    const ri=parseInt(row.getAttribute("r"),10)-1; if(!(ri>=0)) continue;
+    const arr=grid[ri]||(grid[ri]=[]);
+    let auto=0;
+    for(const c of row.getElementsByTagName("c")){
+      const ref=c.getAttribute("r"), ci=ref?colRefToIdx(ref):auto; auto=ci+1;
+      const t=c.getAttribute("t"); let val="";
+      if(t==="s"){ const v=c.getElementsByTagName("v")[0]; if(v) val=ss[parseInt(v.textContent,10)]||""; }
+      else if(t==="inlineStr"){ const is=c.getElementsByTagName("t")[0]; if(is) val=is.textContent; }
+      else { const v=c.getElementsByTagName("v")[0]; if(v) val=v.textContent; }
+      arr[ci]=val; if(ci+1>maxCol) maxCol=ci+1;
+    }
+  }
+  // column count comes from the 7 header rows
+  let ncol=0; for(let r=0;r<7;r++){ const a=grid[r]; if(a && a.length>ncol) ncol=a.length; }
+  if(!ncol) ncol=maxCol;
+  const pick=(r)=>{ const a=grid[r]||[]; const out=new Array(ncol); for(let c=0;c<ncol;c++) out[c]=(a[c]==null?"":String(a[c])); return out; };
+  const headerRows=[]; for(let r=0;r<7;r++) headerRows.push(pick(r));
+  const dataRows=[];
+  for(let r=7;r<grid.length;r++){
+    if(!grid[r]) continue;
+    const cells=pick(r);
+    if(cells.every(x=>x==="")) continue;   // skip fully-empty rows
+    dataRows.push(cells);
+  }
+  return {headerRows, dataRows};
 }
 
 /* ============================================================================
@@ -1624,6 +1720,7 @@ function openNewEntryDialog(){
   const TYPES=[
     {v:"csvWavelength", label:"headerless CSV, first column wavelength"},
     {v:"csv",           label:"headerless CSV"},
+    {v:"xlsx",          label:"Excel .xlsx (7 header rows + data table)"},
     {v:"other",         label:"other filetype"}
   ];
   TYPES.forEach((t,i)=>{
@@ -1634,7 +1731,7 @@ function openNewEntryDialog(){
   });
   fset.appendChild(typeWrap);
   const fhint=document.createElement("p"); fhint.className="hint";
-  fhint.textContent="Attach the data file to pre-fill metadata: CSV fills columns, sample row, sums (numeric only) and — for the wavelength option — the wavelength range; other filetypes set the file format. Checksums and file name are always filled. Leave empty for a blank draft.";
+  fhint.textContent="Attach the data file to pre-fill metadata: CSV fills columns, sample row, sums (numeric only) and — for the wavelength option — the wavelength range; the .xlsx option reads 7 header rows (Title/Quantity/Unit/Description/Wavelength first/last/step) plus the data table, fills the column headers and validations, and generates the header-less CSV for download; other filetypes set the file format. Checksums and file name are always filled. Leave empty for a blank draft.";
   fset.appendChild(fhint);
   body.appendChild(fset);
 
@@ -1653,19 +1750,35 @@ function openNewEntryDialog(){
   const hint=document.createElement("p"); hint.className="hint"; hint.textContent="A draft DOI is generated locally. Real DOIs are assigned by CIE CB.";
   body.appendChild(hint);
 
-  picker.onchange=async()=>{
+  const selType=()=>(typeWrap.querySelector("input[name='newEntryFileType']:checked")||{}).value||"csvWavelength";
+  async function stageFile(){
     const f=picker.files&&picker.files[0]; if(!f){ staged=null; pickInfo.textContent=""; clearBtn.style.display="none"; return; }
+    const mode=selType();
     pickInfo.textContent="reading…"; clearBtn.style.display="";
     try{
       const bytes=await readFileBytes(f);
-      const md5=md5Bytes(bytes), sha=sha256Bytes(bytes);
-      let analysis=null;
-      try{ analysis=analyzeCsv(new TextDecoder("utf-8").decode(bytes)); }catch(_){}
-      staged={md5, sha, filename:f.name, fileType:f.type||"", analysis};
-      if(!fileInp.value.trim()) fileInp.value=f.name;
-      pickInfo.textContent = analysis ? `${f.name} — ${analysis.nRows} rows × ${analysis.nCols} cols` : f.name;
-    }catch(err){ staged=null; pickInfo.textContent="could not read file"; }
-  };
+      if(mode==="xlsx"){
+        const {headerRows,dataRows}=await parseXlsx(bytes);
+        const columnHeaders=parseColumnHeaderPaste(headerRows.map(r=>r.join("\t")).join("\n"))||[];
+        const csvText=dataRows.map(r=>r.map(csvField).join(",")).join("\r\n");
+        const analysis=analyzeCsv(csvText);
+        const md5=md5Bytes(_enc.encode(csvText)), sha=sha256Bytes(_enc.encode(csvText));
+        const csvName=f.name.replace(/\.xlsx?$/i,".csv");
+        if(!fileInp.value.trim() || /\.xlsx?$/i.test(fileInp.value.trim())) fileInp.value=csvName;
+        staged={mode:"xlsx", md5, sha, filename:csvName, fileType:"", csvText, columnHeaders, analysis};
+        pickInfo.textContent=`${f.name} → CSV ${analysis.nRows} rows × ${analysis.nCols} cols, ${columnHeaders.length} header col(s)`;
+      }else{
+        const md5=md5Bytes(bytes), sha=sha256Bytes(bytes);
+        let analysis=null;
+        try{ analysis=analyzeCsv(new TextDecoder("utf-8").decode(bytes)); }catch(_){}
+        staged={mode, md5, sha, filename:f.name, fileType:f.type||"", analysis};
+        if(!fileInp.value.trim()) fileInp.value=f.name;
+        pickInfo.textContent = analysis ? `${f.name} — ${analysis.nRows} rows × ${analysis.nCols} cols` : f.name;
+      }
+    }catch(err){ staged=null; const msg=(err&&err.message)||String(err); pickInfo.textContent="could not read file: "+msg; toast("Could not read file: "+msg,"err"); }
+  }
+  picker.onchange=stageFile;
+  typeWrap.querySelectorAll("input[name='newEntryFileType']").forEach(r=>r.addEventListener("change",()=>{ if(picker.files&&picker.files[0]) stageFile(); }));
   clearBtn.onclick=()=>{ picker.value=""; staged=null; pickInfo.textContent=""; clearBtn.style.display="none"; };
 
   const create=mkBtn("Create entry","sec",()=>{
@@ -1678,10 +1791,17 @@ function openNewEntryDialog(){
     p.datatableInfo.extrapolationMethod=":unap";
     p.datatableInfo.dataQuality=":unap";
     if(staged){
-      const mode=(typeWrap.querySelector("input[name='newEntryFileType']:checked")||{}).value||"csvWavelength";
+      const mode=selType();
       const filename=fileInp.value.trim()||staged.filename;
-      applyCsvToPayload(p, mode==="other"?null:staged.analysis,
-        {md5:staged.md5, sha:staged.sha, filename, fileType:staged.fileType, mode});
+      if(mode==="xlsx"){
+        // auto: sums only if the whole table is numeric (text/vocabulary tables get none)
+        applyCsvToPayload(p, staged.analysis, {md5:staged.md5, sha:staged.sha, filename, mode:"csv"});
+        p.datatableInfo.columnHeaders=staged.columnHeaders;   // rich 7-row headers win
+        download(filename, staged.csvText, "text/csv");       // generated header-less CSV
+      }else{
+        applyCsvToPayload(p, mode==="other"?null:staged.analysis,
+          {md5:staged.md5, sha:staged.sha, filename, fileType:staged.fileType, mode});
+      }
     }
     const e=createEntry(p,{status:"draft",comment:"Created"});
     DB.entries.push(e); persist(); closeModal(); selectEntry(e.entryId); toast("New draft entry created","ok");
@@ -2373,6 +2493,27 @@ function openHelpDialog(){
       <li>Each box is labelled <b>Column N</b> so a long list (e.g. 100 columns) stays legible while
         scrolling.</li>
     </ul>
+
+    <h4>New entry from an Excel workbook (.xlsx) <span class="kv">(new)</span></h4>
+    <p style="margin:4px 0">In <b>+ New entry</b>, under <b>Related data file</b>, choose the file type
+      <b>Excel .xlsx (7 header rows + data table)</b> and pick a single-worksheet workbook laid out as:</p>
+    <ul>
+      <li><b>Rows 1–7</b>, starting at cell <b>A1</b> (no leading label column), describe the columns —
+        one worksheet column per data column, in the order <b>Title, Quantity, Unit, Description,
+        Wavelength first, Wavelength last, Wavelength step</b> (same 7 fields as the bulk paste above).</li>
+      <li><b>Row 8 onward</b> is the data table itself.</li>
+      <li>On <b>Create entry</b> the tool fills the <b>column headers</b> and <b>validations</b>, computes the
+        checksums, and <b>generates the header-less CSV</b> — named from the <b>File name</b> field (keep it
+        concise, e.g. <code>CIE_xxx.csv</code>, matching the published files) — which downloads automatically.</li>
+      <li>Both <b>numeric</b> data (spectral / wavelength tables and plain numerical tables) and <b>text</b>
+        data (e.g. multilingual vocabularies) are supported. For non-spectral columns put <code>:unap</code>
+        in the wavelength rows. Column sums are written only when every column is numeric.</li>
+      <li>Example workbooks are in the <code>examples/</code> folder next to the tool
+        (spectral, numerical and text).</li>
+    </ul>
+    <p class="hint" style="margin:4px 0">Reading <code>.xlsx</code> uses the browser's built-in
+      decompression (Chromium/Edge, Firefox, Safari). The generated CSV is what gets published and what
+      the stored checksums and sums describe — not the workbook.</p>
 
     <h4>DOI landing page <span class="kv">(new)</span></h4>
     <p style="margin:4px 0">Each entry has a <b>DOI landing page</b> (the URL a DOI resolves to). It
