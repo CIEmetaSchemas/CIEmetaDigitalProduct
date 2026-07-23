@@ -61,7 +61,7 @@
   "entries": [
     {
       "entryId": "dd141f8a-31b5-41cc-bf57-7eef4504829a",
-      "rev": 1,
+      "rev": 2,
       "contentHash": "64f60c28a898c7f96e03ed3329de496dfb0171a0f3b6856e7a77ff80aaf96648",
       "status": "published",
       "domains": [
@@ -69,10 +69,10 @@
       ],
       "audit": {
         "createdBy": "Peter Blattner",
-        "createdDate": "2026-07-21T15:36:06.376Z",
+        "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedDate": "2024-09-20T16:00:00.000Z",
+        "modifiedComment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)"
       },
       "payload": {
         "identifier": {
@@ -204,13 +204,13 @@
         "schemaName": "CIEmetaDigitalProduct",
         "schemaVersion": 4,
         "schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd",
-        "metadataRevision": 1
+        "metadataRevision": 2
       },
       "history": [
         {
           "rev": 1,
           "by": "Peter Blattner",
-          "date": "2026-07-21T15:36:06.376Z",
+          "date": "2024-09-20T08:00:00.000Z",
           "comment": "Imported from DataCite file",
           "baseHash": null,
           "patch": [
@@ -345,7 +345,7 @@
                 },
                 {
                   "hashMethod": "sha256",
-                  "checksum": "1f1413de6d58e533e8a3d26e4b7dc30f4cd6f67aebb7593fa3553394da939952"
+                  "checksum": "1f1413de6d58e533e8a3d26e4b7dc3f4cd6f67aebb7593fa3553394da939952"
                 }
               ]
             },
@@ -416,6 +416,29 @@
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
             }
           ]
+        },
+        {
+          "rev": 2,
+          "by": "Peter Blattner",
+          "date": "2024-09-20T16:00:00.000Z",
+          "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
+          "baseHash": "d72f9f6338d60338ade0b9d22d3db2020737cb6707901c48cd0c70c491eb8e6b",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "73de03dc084a116e3b79902d6d4e2c5a"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "1f1413de6d58e533e8a3d26e4b7dc30f4cd6f67aebb7593fa3553394da939952"
+                }
+              ]
+            }
+          ]
         }
       ],
       "validationLog": [
@@ -469,7 +492,7 @@
     },
     {
       "entryId": "ef380a5a-482c-4318-84c9-902095e2d306",
-      "rev": 1,
+      "rev": 2,
       "contentHash": "4b23944ef15ed70d5edd03bbc9d3ab825474b7728fd5b41fe88d4a706c4166ea",
       "status": "published",
       "domains": [
@@ -477,10 +500,10 @@
       ],
       "audit": {
         "createdBy": "Peter Blattner",
-        "createdDate": "2026-07-21T15:36:06.376Z",
+        "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedDate": "2024-09-20T16:00:00.000Z",
+        "modifiedComment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)"
       },
       "payload": {
         "identifier": {
@@ -586,13 +609,13 @@
         "schemaName": "CIEmetaDigitalProduct",
         "schemaVersion": 4,
         "schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd",
-        "metadataRevision": 1
+        "metadataRevision": 2
       },
       "history": [
         {
           "rev": 1,
           "by": "Peter Blattner",
-          "date": "2026-07-21T15:36:06.376Z",
+          "date": "2024-09-20T08:00:00.000Z",
           "comment": "Imported from DataCite file",
           "baseHash": null,
           "patch": [
@@ -714,7 +737,7 @@
                 },
                 {
                   "hashMethod": "sha256",
-                  "checksum": "23e07c6b8a2f5273f9e3abb3c64a374f3456eee0a70dd447fdb14c617f55224e"
+                  "checksum": "23e07c6b8a2f5273f9e3abb3c64a374f3456eee0a7dd447fdb14c617f55224e"
                 }
               ]
             },
@@ -770,6 +793,29 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            }
+          ]
+        },
+        {
+          "rev": 2,
+          "by": "Peter Blattner",
+          "date": "2024-09-20T16:00:00.000Z",
+          "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
+          "baseHash": "93afeac26b6c667a12bdd2a25f48c3fb200fa866d961227b8c6430b8f3960c6f",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "01dba8b4ebdbd2a3ebb9fa6cc8719939"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "23e07c6b8a2f5273f9e3abb3c64a374f3456eee0a70dd447fdb14c617f55224e"
+                }
+              ]
             }
           ]
         }
@@ -3827,7 +3873,7 @@
     },
     {
       "entryId": "9afa2e4c-4812-45e2-b546-2b7d6ca39496",
-      "rev": 1,
+      "rev": 2,
       "contentHash": "4ceeba8498cefcbe1a369b09ba139c2e4e226238281e24f37bb3b705a59b1809",
       "status": "published",
       "domains": [
@@ -3835,10 +3881,10 @@
       ],
       "audit": {
         "createdBy": "Peter Blattner",
-        "createdDate": "2026-07-21T15:36:06.376Z",
+        "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedDate": "2024-09-20T16:00:00.000Z",
+        "modifiedComment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)"
       },
       "payload": {
         "identifier": {
@@ -3957,13 +4003,13 @@
         "schemaName": "CIEmetaDigitalProduct",
         "schemaVersion": 4,
         "schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd",
-        "metadataRevision": 1
+        "metadataRevision": 2
       },
       "history": [
         {
           "rev": 1,
           "by": "Peter Blattner",
-          "date": "2026-07-21T15:36:06.376Z",
+          "date": "2024-09-20T08:00:00.000Z",
           "comment": "Imported from DataCite file",
           "baseHash": null,
           "patch": [
@@ -4098,7 +4144,7 @@
                 },
                 {
                   "hashMethod": "sha256",
-                  "checksum": "51c53bf065345fc1fb9d50aff40fb0a2ce370bcf35121a3dc4bafc0888602f0b"
+                  "checksum": "51c53bf065345fc1fb9d50aff4fb0a2ce37bcf35121a3dc4bafc0888602fb"
                 }
               ]
             },
@@ -4154,6 +4200,29 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            }
+          ]
+        },
+        {
+          "rev": 2,
+          "by": "Peter Blattner",
+          "date": "2024-09-20T16:00:00.000Z",
+          "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
+          "baseHash": "b8fb69af097128895b569365c61dfbcf99e33d8d77d3cdb420abb8458f042299",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "bb325f040bab332d91f8d9447aa47b78"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "51c53bf065345fc1fb9d50aff40fb0a2ce370bcf35121a3dc4bafc0888602f0b"
+                }
+              ]
             }
           ]
         }
@@ -4591,7 +4660,7 @@
     },
     {
       "entryId": "0f13447e-9229-4279-be5b-539910ef4bb7",
-      "rev": 1,
+      "rev": 2,
       "contentHash": "82054e066dba97502491eb130275ef2b8e6fc2f684fa6736e785328aa3450a86",
       "status": "published",
       "domains": [
@@ -4599,10 +4668,10 @@
       ],
       "audit": {
         "createdBy": "Peter Blattner",
-        "createdDate": "2026-07-21T15:36:06.376Z",
+        "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedDate": "2024-09-20T16:00:00.000Z",
+        "modifiedComment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)"
       },
       "payload": {
         "identifier": {
@@ -4721,13 +4790,13 @@
         "schemaName": "CIEmetaDigitalProduct",
         "schemaVersion": 4,
         "schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd",
-        "metadataRevision": 1
+        "metadataRevision": 2
       },
       "history": [
         {
           "rev": 1,
           "by": "Peter Blattner",
-          "date": "2026-07-21T15:36:06.376Z",
+          "date": "2024-09-20T08:00:00.000Z",
           "comment": "Imported from DataCite file",
           "baseHash": null,
           "patch": [
@@ -4862,7 +4931,7 @@
                 },
                 {
                   "hashMethod": "sha256",
-                  "checksum": "573a08831f2bcdf18a8e333490049e6d0fabaf1d1c0abbc2a49d6247a939b62d"
+                  "checksum": "573a08831f2bcdf18a8e333490049e6dfabaf1d1cabbc2a49d6247a939b62d"
                 }
               ]
             },
@@ -4918,6 +4987,29 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            }
+          ]
+        },
+        {
+          "rev": 2,
+          "by": "Peter Blattner",
+          "date": "2024-09-20T16:00:00.000Z",
+          "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
+          "baseHash": "bcbc3d48d222b934c8dcddb2c00989055a9699499774ad18f4fbabf8dfc9d993",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "fc2ae36ece39ad1729696ab2833bd013"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "573a08831f2bcdf18a8e333490049e6d0fabaf1d1c0abbc2a49d6247a939b62d"
+                }
+              ]
             }
           ]
         }
@@ -7173,7 +7265,7 @@
     },
     {
       "entryId": "7a4b58c2-3d2e-42f3-9203-c386f9be89cd",
-      "rev": 1,
+      "rev": 2,
       "contentHash": "1d42824a52a03a79651ead80c47ec270b7de160a12d477898d5b23d59b70c2b5",
       "status": "published",
       "domains": [
@@ -7181,10 +7273,10 @@
       ],
       "audit": {
         "createdBy": "Peter Blattner",
-        "createdDate": "2026-07-21T15:36:06.376Z",
+        "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedDate": "2024-09-20T16:00:00.000Z",
+        "modifiedComment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)"
       },
       "payload": {
         "identifier": {
@@ -7340,13 +7432,13 @@
         "schemaName": "CIEmetaDigitalProduct",
         "schemaVersion": 4,
         "schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd",
-        "metadataRevision": 1
+        "metadataRevision": 2
       },
       "history": [
         {
           "rev": 1,
           "by": "Peter Blattner",
-          "date": "2026-07-21T15:36:06.376Z",
+          "date": "2024-09-20T08:00:00.000Z",
           "comment": "Imported from DataCite file",
           "baseHash": null,
           "patch": [
@@ -7481,7 +7573,7 @@
                 },
                 {
                   "hashMethod": "sha256",
-                  "checksum": "035e09d62b27f4b1e362ff1ba99a50235f0d7886c2781c50d49851b6e4bb4552"
+                  "checksum": "035e09d62b27f4b1e362ff1ba99a50235fd7886c2781c50d49851b6e4bb4552"
                 }
               ]
             },
@@ -7574,6 +7666,29 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            }
+          ]
+        },
+        {
+          "rev": 2,
+          "by": "Peter Blattner",
+          "date": "2024-09-20T16:00:00.000Z",
+          "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
+          "baseHash": "32835d8c2ad0f2b7c241643e3fbe439d17de429222181b85b0ed9e4f8795e025",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "423e996fd3ee17eaf783633e4fd2f62c"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "035e09d62b27f4b1e362ff1ba99a50235f0d7886c2781c50d49851b6e4bb4552"
+                }
+              ]
             }
           ]
         }
@@ -7999,7 +8114,7 @@
     },
     {
       "entryId": "6c7d55ee-5743-4b92-9a21-4f7c034f6f85",
-      "rev": 1,
+      "rev": 2,
       "contentHash": "0e89da8d2be4abfc42e91b2705dffcda7a6eda36f29b09878f1b1d84542e634b",
       "status": "published",
       "domains": [
@@ -8007,10 +8122,10 @@
       ],
       "audit": {
         "createdBy": "Peter Blattner",
-        "createdDate": "2026-07-21T15:36:06.376Z",
+        "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedDate": "2024-09-20T16:00:00.000Z",
+        "modifiedComment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)"
       },
       "payload": {
         "identifier": {
@@ -8123,13 +8238,13 @@
         "schemaName": "CIEmetaDigitalProduct",
         "schemaVersion": 4,
         "schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd",
-        "metadataRevision": 1
+        "metadataRevision": 2
       },
       "history": [
         {
           "rev": 1,
           "by": "Peter Blattner",
-          "date": "2026-07-21T15:36:06.376Z",
+          "date": "2024-09-20T08:00:00.000Z",
           "comment": "Imported from DataCite file",
           "baseHash": null,
           "patch": [
@@ -8258,7 +8373,7 @@
                 },
                 {
                   "hashMethod": "sha256",
-                  "checksum": "be1dc615b4b03e0b4b3e294660101526a30ed17dc800e85786c29759b3dcb7a6"
+                  "checksum": "be1dc615b4b03eb4b3e294660101526a3ed17dc800e85786c29759b3dcb7a6"
                 }
               ]
             },
@@ -8316,6 +8431,29 @@
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
             }
           ]
+        },
+        {
+          "rev": 2,
+          "by": "Peter Blattner",
+          "date": "2024-09-20T16:00:00.000Z",
+          "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
+          "baseHash": "d127bf8c065fac792f6abf526b7f6ba639e251ae9712b5a881d1235959f4312a",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "c8843fdca93e747c8a3590cd74b01cfd"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "be1dc615b4b03e0b4b3e294660101526a30ed17dc800e85786c29759b3dcb7a6"
+                }
+              ]
+            }
+          ]
         }
       ],
       "validationLog": [
@@ -8369,7 +8507,7 @@
     },
     {
       "entryId": "f82d0656-040a-4318-b4e8-4101c9461ff7",
-      "rev": 1,
+      "rev": 2,
       "contentHash": "0f4bdf1905b537b340790b909563044621f83eedf1150f9f2183912f8814a058",
       "status": "published",
       "domains": [
@@ -8377,10 +8515,10 @@
       ],
       "audit": {
         "createdBy": "Peter Blattner",
-        "createdDate": "2026-07-21T15:36:06.376Z",
+        "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedDate": "2024-09-20T16:00:00.000Z",
+        "modifiedComment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)"
       },
       "payload": {
         "identifier": {
@@ -8572,13 +8710,13 @@
         "schemaName": "CIEmetaDigitalProduct",
         "schemaVersion": 4,
         "schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd",
-        "metadataRevision": 1
+        "metadataRevision": 2
       },
       "history": [
         {
           "rev": 1,
           "by": "Peter Blattner",
-          "date": "2026-07-21T15:36:06.376Z",
+          "date": "2024-09-20T08:00:00.000Z",
           "comment": "Imported from DataCite file",
           "baseHash": null,
           "patch": [
@@ -8713,7 +8851,7 @@
                 },
                 {
                   "hashMethod": "sha256",
-                  "checksum": "6147313bd1ec570ef308df222e1fe1e58115fde1ad0a7d4ba91fb9dcb776b267"
+                  "checksum": "6147313bd1ec57ef308df222e1fe1e58115fde1ada7d4ba91fb9dcb776b267"
                 }
               ]
             },
@@ -8842,6 +8980,29 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            }
+          ]
+        },
+        {
+          "rev": 2,
+          "by": "Peter Blattner",
+          "date": "2024-09-20T16:00:00.000Z",
+          "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
+          "baseHash": "dd328822cf099402051502b17d8185cdb3e11a4844e28fbe730198485233378b",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "91a73557fe319a085dd598ce96fa8ace"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "6147313bd1ec570ef308df222e1fe1e58115fde1ad0a7d4ba91fb9dcb776b267"
+                }
+              ]
             }
           ]
         }
@@ -14454,7 +14615,7 @@
     },
     {
       "entryId": "6043d076-fd73-4f53-b68a-5817feb6fdd9",
-      "rev": 1,
+      "rev": 2,
       "contentHash": "2c6c2f89fdafa53e8c89fdba452c67f256baba36369204b689683b958116acfa",
       "status": "published",
       "domains": [
@@ -14462,10 +14623,10 @@
       ],
       "audit": {
         "createdBy": "Peter Blattner",
-        "createdDate": "2026-07-21T15:36:06.376Z",
+        "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedDate": "2024-09-20T16:00:00.000Z",
+        "modifiedComment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)"
       },
       "payload": {
         "identifier": {
@@ -15480,13 +15641,13 @@
         "schemaName": "CIEmetaDigitalProduct",
         "schemaVersion": 4,
         "schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd",
-        "metadataRevision": 1
+        "metadataRevision": 2
       },
       "history": [
         {
           "rev": 1,
           "by": "Peter Blattner",
-          "date": "2026-07-21T15:36:06.376Z",
+          "date": "2024-09-20T08:00:00.000Z",
           "comment": "Imported from DataCite file",
           "baseHash": null,
           "patch": [
@@ -15630,7 +15791,7 @@
                 },
                 {
                   "hashMethod": "sha256",
-                  "checksum": "eb1d04a0d489918970f32354c2261581e9f9ba59456e0feae7227c7b5413aa3b"
+                  "checksum": "eb1d04a0d489918970f32354c2261581e9f9ba59456efeae7227c7b5413aa3b"
                 }
               ]
             },
@@ -16575,6 +16736,29 @@
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
             }
           ]
+        },
+        {
+          "rev": 2,
+          "by": "Peter Blattner",
+          "date": "2024-09-20T16:00:00.000Z",
+          "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
+          "baseHash": "d5332702f2b00ecc651dc54802a26b09562eb2d9324198f20890572ab735974f",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "11ef0bcbfaea43f1143ac40fbf52d7ff"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "eb1d04a0d489918970f32354c2261581e9f9ba59456e0feae7227c7b5413aa3b"
+                }
+              ]
+            }
+          ]
         }
       ],
       "validationLog": [
@@ -16633,7 +16817,7 @@
     },
     {
       "entryId": "a2446659-e673-4417-b297-36fbe32cf044",
-      "rev": 1,
+      "rev": 2,
       "contentHash": "ecbe48fcea173fa74770dd697c5fc9d627ed756698c4e40299643fd91c9958c8",
       "status": "published",
       "domains": [
@@ -16641,10 +16825,10 @@
       ],
       "audit": {
         "createdBy": "Peter Blattner",
-        "createdDate": "2026-07-21T15:36:06.376Z",
+        "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedDate": "2024-09-20T16:00:00.000Z",
+        "modifiedComment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)"
       },
       "payload": {
         "identifier": {
@@ -17659,13 +17843,13 @@
         "schemaName": "CIEmetaDigitalProduct",
         "schemaVersion": 4,
         "schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd",
-        "metadataRevision": 1
+        "metadataRevision": 2
       },
       "history": [
         {
           "rev": 1,
           "by": "Peter Blattner",
-          "date": "2026-07-21T15:36:06.376Z",
+          "date": "2024-09-20T08:00:00.000Z",
           "comment": "Imported from DataCite file",
           "baseHash": null,
           "patch": [
@@ -17809,7 +17993,7 @@
                 },
                 {
                   "hashMethod": "sha256",
-                  "checksum": "32327de84b4bb8715a2b2f1bce3f5d2eca6276a44bde19c93c6f0aad5742db63"
+                  "checksum": "32327de84b4bb8715a2b2f1bce3f5d2eca6276a44bde19c93c6faad5742db63"
                 }
               ]
             },
@@ -18754,6 +18938,29 @@
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
             }
           ]
+        },
+        {
+          "rev": 2,
+          "by": "Peter Blattner",
+          "date": "2024-09-20T16:00:00.000Z",
+          "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
+          "baseHash": "a29891b2cba0937f30defcc88eb24812d4e0e2bb6741cfd441558b6beef36504",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "5f8f0b2e6a30a8630bda424b85a1806d"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "32327de84b4bb8715a2b2f1bce3f5d2eca6276a44bde19c93c6f0aad5742db63"
+                }
+              ]
+            }
+          ]
         }
       ],
       "validationLog": [
@@ -18812,7 +19019,7 @@
     },
     {
       "entryId": "020236b1-90d5-4100-baaa-723f3e986df4",
-      "rev": 1,
+      "rev": 2,
       "contentHash": "f6c1b6787b84808d0406dd68a5bc7f7d970c797da2a54bc2bac89e9e7566ac28",
       "status": "published",
       "domains": [
@@ -18820,10 +19027,10 @@
       ],
       "audit": {
         "createdBy": "Peter Blattner",
-        "createdDate": "2026-07-21T15:36:06.376Z",
+        "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-07-21T15:36:06.376Z",
-        "modifiedComment": "Imported from DataCite file"
+        "modifiedDate": "2024-09-20T16:00:00.000Z",
+        "modifiedComment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)"
       },
       "payload": {
         "identifier": {
@@ -19061,13 +19268,13 @@
         "schemaName": "CIEmetaDigitalProduct",
         "schemaVersion": 4,
         "schemaURL": "https://doi.org/10.25039/CIE.SC.4taqevcd",
-        "metadataRevision": 1
+        "metadataRevision": 2
       },
       "history": [
         {
           "rev": 1,
           "by": "Peter Blattner",
-          "date": "2026-07-21T15:36:06.376Z",
+          "date": "2024-09-20T08:00:00.000Z",
           "comment": "Imported from DataCite file",
           "baseHash": null,
           "patch": [
@@ -19199,7 +19406,7 @@
                 },
                 {
                   "hashMethod": "sha256",
-                  "checksum": "f461decedb5c18800c61a6923240c71f6cf91fd23ac94865133cbfdb7e05c0ad"
+                  "checksum": "f461decedb5c1880c61a6923240c71f6cf91fd23ac94865133cbfdb7e05c0ad"
                 }
               ]
             },
@@ -19377,6 +19584,29 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            }
+          ]
+        },
+        {
+          "rev": 2,
+          "by": "Peter Blattner",
+          "date": "2024-09-20T16:00:00.000Z",
+          "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
+          "baseHash": "ad3abd39aff1a2ca3bf7d29dc2da21d87fc150494fc433da5670033233127325",
+          "patch": [
+            {
+              "op": "replace",
+              "path": "/checksums",
+              "value": [
+                {
+                  "hashMethod": "md5",
+                  "checksum": "6ad6522831a844edb8484e884d05c9e9"
+                },
+                {
+                  "hashMethod": "sha256",
+                  "checksum": "f461decedb5c18800c61a6923240c71f6cf91fd23ac94865133cbfdb7e05c0ad"
+                }
+              ]
             }
           ]
         }

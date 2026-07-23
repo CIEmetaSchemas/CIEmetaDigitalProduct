@@ -43,7 +43,7 @@
   input,select,textarea{font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px 8px;background:#fff;width:100%}
   input:focus,select:focus,textarea:focus{outline:2px solid var(--cie-sec2);border-color:var(--cie-sec1)}
   textarea{resize:vertical;font-family:"Cascadia Code",Consolas,monospace;font-size:12.5px;line-height:1.4}
-  .wrap{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:0;height:calc(100vh - 96px)}
+  .wrap{display:grid;grid-template-columns:minmax(380px,480px) 1fr;gap:0;height:calc(100vh - 96px)}
   .list-pane{border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;min-height:0}
   .list-filters{padding:10px 12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
   .list-filters .row{display:flex;gap:8px}
@@ -60,6 +60,7 @@
   a.doi-link:hover{color:var(--cie-main);border-bottom-style:solid}
   .chip{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:10px;background:var(--cie-sec3);color:#0a2a52;margin:1px 3px 1px 0}
   .chip.dom{background:#e3ecfb;border:1px solid var(--cie-sec2)}
+  .chip.rev{background:#eeece6;border:1px solid #d6d2c7;color:#6b665a}
   .badge{display:inline-block;font-size:10px;padding:1px 7px;border-radius:4px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
   .badge.draft{background:#fdf0d8;color:#8a5b00}
   .badge.review{background:#e0ecfb;color:#0a4aa0}
@@ -221,7 +222,7 @@
 
 /* ---------- constants ---------- */
 const APP = {
-  VERSION: "1.6.0",
+  VERSION: "1.7.0",
   DB_SCHEMA_NAME: "CIEmetaDB",
   DB_SCHEMA_VERSION: 1,
   DOI_PREFIX: "10.25039/CIE.DS.",
@@ -503,6 +504,33 @@ function diffPatch(a, b, base){
   return ops;
 }
 function esc6902(k){ return String(k).replace(/~/g,"~0").replace(/\//g,"~1"); }
+/* granular field diff: like diffPatch but recurses into arrays by index so a single
+   changed element yields a precise leaf path (e.g. /checksums/1/checksum) instead of a
+   whole-array replace. Used by the "Compare with file" view. */
+function deepDiff(a, b, base){
+  base = base||"";
+  const ops=[];
+  const isObj=x=>x&&typeof x==="object"&&!Array.isArray(x);
+  if(isObj(a)&&isObj(b)){
+    for(const k of Object.keys(a)){ if(!(k in b)) ops.push({op:"remove",path:base+"/"+esc6902(k)}); }
+    for(const k of Object.keys(b)){
+      const p=base+"/"+esc6902(k);
+      if(!(k in a)) ops.push({op:"add",path:p,value:clone(b[k])});
+      else ops.push(...deepDiff(a[k],b[k],p));
+    }
+  }else if(Array.isArray(a)&&Array.isArray(b)){
+    const n=Math.max(a.length,b.length);
+    for(let i=0;i<n;i++){
+      const p=base+"/"+i;
+      if(i>=a.length) ops.push({op:"add",path:p,value:clone(b[i])});
+      else if(i>=b.length) ops.push({op:"remove",path:p});
+      else ops.push(...deepDiff(a[i],b[i],p));
+    }
+  }else{
+    if(canonical(a)!==canonical(b)) ops.push({op:"replace",path:base,value:clone(b)});
+  }
+  return ops;
+}
 /* reconstruct payload at revision rev (1-based) from history forward patches */
 function reconstruct(history, rev){
   let doc={};
@@ -634,7 +662,13 @@ function newDB(){
     domains:clone(DEFAULT_DOMAINS), defaults:clone(DEFAULT_VALUES), entries:[]
   };
 }
-function computeDbBaseHash(db){ return sha256Str(db.entries.map(e=>e.contentHash).join("|")); }
+/* per-entry fingerprint for the DB hash: payload contentHash PLUS the envelope fields
+   (status/domains/landingPage) that are versioned outside the payload — so an envelope-only
+   edit still drifts the DB baseHash and marks the database unsaved. */
+function entryEnvFingerprint(e){
+  return e.contentHash+"~"+canonical({status:e.status||"", domains:(e.domains||[]).slice().sort(), landingPage:e.landingPage||""});
+}
+function computeDbBaseHash(db){ return sha256Str(db.entries.map(entryEnvFingerprint).join("|")); }
 function findEntry(id){ return DB.entries.find(e=>e.entryId===id); }
 
 function blankPayload(doi, filename){
@@ -1045,8 +1079,9 @@ function renderList(){
     const tr=document.createElement("tr");
     if(e.entryId===selectedId) tr.className="sel";
     const doms=(e.domains||[]).map(d=>`<span class="chip dom">${esc(d)}</span>`).join("");
+    const revChip=`<span class="chip rev" title="Metadata file revision">rev ${e.rev}</span>`;
     tr.innerHTML=`<td><div class="title-cell">${esc(entryTitle(e))}</div>
-        <div class="kv">${esc(entryFilename(e))}</div>${doms}</td>
+        <div class="kv">${esc(entryFilename(e))}</div>${doms}${revChip}</td>
       <td><div class="doi-cell">${esc(entryDoi(e))}</div>${dupIds.has(e.entryId)?'<span class="badge dup" title="Duplicate DOI — must be fixed">duplicate DOI</span>':''}</td>
       <td><span class="badge ${esc(e.status)}">${esc(e.status)}</span></td>
       <td class="kv">${esc((e.audit.modifiedDate||"").replace("T"," ").slice(0,19))}<br>${esc(e.audit.modifiedBy)}<br>rev ${e.rev}</td>`;
@@ -1107,6 +1142,7 @@ function renderDetail(){
       <button class="ghost" id="btnRevert">Revert</button>
       <button class="ghost" id="btnGenDoi">Update DOI</button>
       <button class="ghost" id="btnRevertDefaults">Revert to defaults</button>
+      <button class="ghost" id="btnCompareFile">Compare with file&hellip;</button>
       <button class="ghost" id="btnValidateCsv">Validate against CSV&hellip;</button>
       <button class="ghost" id="btnDupe">Duplicate</button>
       <button class="ghost" id="btnExportOne">Export Metadata file</button>
@@ -1132,6 +1168,7 @@ function renderDetail(){
   el("btnDupe").onclick=()=>duplicateEntry(e);
   el("btnExportOne").onclick=()=>exportDataCiteFiles([e]);
   el("btnExportCrossref").onclick=()=>exportCrossrefXml(e);
+  el("btnCompareFile").onclick=()=>openCompareDialog(e);
   el("btnDelete").onclick=()=>deleteEntry(e);
   if(editDirty) el("saveState").textContent="● unsaved";
 
@@ -2022,6 +2059,92 @@ function openImportConflictDialog(conflicts, added){
   modal("Resolve import DOI conflicts",body,[mkBtn("Skip remaining","ghost",finish)]);
 }
 
+/* Read-only comparison of a database entry against an external metadata JSON file.
+   Loads a file, diffs every field against the saved entry payload, shows the
+   differences. Never imports or modifies anything. */
+function openCompareDialog(e){
+  pickFile(".json,application/json", async (f)=>{
+    let obj;
+    try{ obj=JSON.parse(await f.text()); }
+    catch(err){ toast("Invalid JSON file","err"); return; }
+    // resolve which object holds the metadata payload
+    if(obj && (obj.dbSchemaName===APP.DB_SCHEMA_NAME || Array.isArray(obj.entries))){
+      toast("That is a database file — pick a single metadata file","err"); return;
+    }
+    let payload = (obj && obj.payload && obj.entryId) ? obj.payload : obj;
+    if(!payload || typeof payload!=="object"){ toast("File does not contain a metadata object","err"); return; }
+
+    const body=document.createElement("div");
+
+    // header line
+    const hd=document.createElement("p"); hd.className="hint";
+    hd.innerHTML=`Comparing database entry <b>${esc(entryTitle(e))}</b> `+
+      `(rev ${e.rev}${entryDoi(e)?`, <span class="mono">${esc(entryDoi(e))}</span>`:""}) `+
+      `with file <b>${esc(f.name)}</b>.`;
+    body.appendChild(hd);
+
+    // soft identity check — warn but still compare
+    const fileDoi = payload.identifier && payload.identifier.identifier;
+    const fileFn = (payload.alternateIdentifiers||[]).filter(x=>x&&x.alternateIdentifierType==="fileName").map(x=>x.alternateIdentifier)[0];
+    const mism=[];
+    if(entryDoi(e) && fileDoi && entryDoi(e)!==fileDoi) mism.push(`DOI (entry: ${entryDoi(e)} · file: ${fileDoi})`);
+    if(entryFilename(e) && fileFn && entryFilename(e)!==fileFn) mism.push(`fileName (entry: ${entryFilename(e)} · file: ${fileFn})`);
+    if(mism.length){
+      const w=document.createElement("div"); w.className="warnrow";
+      w.textContent="⚠ This file does not appear to describe the same dataset — mismatched "+mism.join("; ")+". Comparing anyway.";
+      body.appendChild(w);
+    }
+
+    // informational schema check on the file
+    try{
+      const errs=validate(payload, CIE_SCHEMA);
+      if(errs && errs.length){
+        const v=document.createElement("p"); v.className="hint";
+        v.style.color="var(--warn)";
+        v.textContent=`Note: the file has ${errs.length} schema issue(s) (comparison still shown).`;
+        body.appendChild(v);
+      }
+    }catch(_){}
+
+    // field-by-field diff (all metadata fields, granular into arrays).
+    // metadataRevision is internal revision bookkeeping (not part of the DataCite
+    // metadata and absent from exported files), so it is excluded from the field diff;
+    // it remains visible in the raw side-by-side below.
+    const A=clone(e.payload), B=clone(payload);
+    delete A.metadataRevision; delete B.metadataRevision;
+    const ops=deepDiff(A, B, "");
+    if(ops.length===0){
+      const ok=document.createElement("div"); ok.className="val-ok";
+      ok.textContent="✓ No differences — the file matches this entry's metadata.";
+      body.appendChild(ok);
+    }else{
+      const sum=document.createElement("p"); sum.className="hint";
+      sum.innerHTML=`<b>${ops.length}</b> field difference(s). Legend: `+
+        `<span class="op-replace">~ changed</span> (database → file), `+
+        `<span class="op-add">+ only in file</span>, `+
+        `<span class="op-remove">− only in database</span>.`;
+      body.appendChild(sum);
+      const box=document.createElement("div"); box.className="diff";
+      box.innerHTML=renderDiff(ops, 2, e.payload);
+      body.appendChild(box);
+    }
+
+    // raw side-by-side for full context
+    function payloadBox(title,p){
+      const d=document.createElement("div"); d.className="conflict";
+      d.innerHTML=`<h4>${esc(title)}</h4>`;
+      const s=document.createElement("div"); s.className="side"; const pre=document.createElement("pre");
+      pre.textContent=JSON.stringify(p,null,1); s.appendChild(pre); d.appendChild(s); return d;
+    }
+    const cols=document.createElement("div"); cols.className="cols2";
+    cols.appendChild(payloadBox(`Database entry (rev ${e.rev})`, e.payload));
+    cols.appendChild(payloadBox("File", payload));
+    body.appendChild(cols);
+
+    modal("Compare with metadata file", body, [mkBtn("Close","ghost",closeModal)]);
+  });
+}
+
 /* Import/Merge dialog: aggregate DB merge OR datacite files */
 function openImportDialog(){
   const body=document.createElement("div");
@@ -2186,12 +2309,20 @@ async function saveDb(saveAs){
   markSaved(DB.baseHash); renderList();
   toast("Copy downloaded — this browser can't overwrite files or detect parallel edits. Use a Chromium browser for in-place save.","warn");
 }
+/* metadata-file name for an entry: <base>.csv_metadata[.vN].json, with the
+   revision suffix (_v2, _v3, …) appended only when the metadata revision > 1
+   (e.g. CIE_cc_1964_10deg.csv_metadata_v2.json), matching the published files. */
+function metadataFileName(e){
+  const base=entryFilename(e)||sanitize(entryTitle(e));
+  const stem=base.endsWith(".csv")?base+"_metadata":base+".csv_metadata";
+  const rev=(e.payload&&e.payload.metadataRevision)||e.rev||1;
+  return stem+(rev>1?"_v"+rev:"")+".json";
+}
 /* export entries as individual DataCite files (strip envelope) */
 function exportDataCiteFiles(entries){
   entries=entries||DB.entries;
   if(entries.length===1){
-    const e=entries[0]; const base=entryFilename(e)||sanitize(entryTitle(e));
-    const fn=base.endsWith(".csv")?base+"_metadata.json":base+".csv_metadata.json";
+    const e=entries[0]; const fn=metadataFileName(e);
     download(fn, JSON.stringify(e.payload,null,"\t"));
     toast("Exported "+fn,"ok"); return;
   }
@@ -2199,8 +2330,7 @@ function exportDataCiteFiles(entries){
   if(!confirm(`Export ${entries.length} metadata (DataCite) files as separate downloads?`)) return;
   let n=0;
   const step=()=>{ if(n>=entries.length){ toast("Exported "+entries.length+" files","ok"); return; }
-    const e=entries[n++]; const base=entryFilename(e)||sanitize(entryTitle(e));
-    const fn=base.endsWith(".csv")?base+"_metadata.json":base+".csv_metadata.json";
+    const e=entries[n++]; const fn=metadataFileName(e);
     download(fn, JSON.stringify(e.payload,null,"\t")); setTimeout(step,250); };
   step();
 }
@@ -2549,6 +2679,24 @@ function openHelpDialog(){
     </ul>
     <p style="margin:4px 0"><b>Validate the generated XML</b> with the Crossref deposit parser:<br>
       <a href="https://data.crossref.org/reports/parser.html" target="_blank" rel="noopener noreferrer">https://data.crossref.org/reports/parser.html</a></p>
+
+    <h4>Compare with an external metadata file <span class="kv">(new)</span></h4>
+    <p style="margin:4px 0">The per-entry <b>Compare with file…</b> button (entry action bar, next to
+      <b>Revert to defaults</b>) checks the selected database entry against an external
+      <code>*.csv_metadata.json</code> file — useful to see whether a published or exported file still
+      matches what the database holds. It is <b>read-only</b>: nothing is imported or changed.</p>
+    <ul>
+      <li>Pick a single metadata file; <b>every field is compared</b> and the differences are listed
+        field by field (arrays are compared element by element, so a single changed value — e.g.
+        <span class="mono">/checksums/1/checksum</span> — is pinpointed rather than shown as a whole-array change).</li>
+      <li>Colours follow the History diff: <span class="op-replace">~ changed</span> (database → file),
+        <span class="op-add">+ only in file</span>, <span class="op-remove">− only in database</span>.
+        A green banner confirms when there are <b>no differences</b>.</li>
+      <li>If the file's DOI or file name does not match the entry, a warning is shown but the comparison
+        still runs. The two payloads are also shown raw, side by side, for context.</li>
+      <li>The bookkeeping <span class="mono">metadataRevision</span> field is excluded from the field
+        comparison (exported files do not carry it), but remains visible in the raw side-by-side view.</li>
+    </ul>
 
     <h4>Reference links</h4>
     <ul>
