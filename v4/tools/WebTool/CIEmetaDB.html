@@ -221,7 +221,7 @@
 
 /* ---------- constants ---------- */
 const APP = {
-  VERSION: "1.6.0",
+  VERSION: "1.7.0",
   DB_SCHEMA_NAME: "CIEmetaDB",
   DB_SCHEMA_VERSION: 1,
   DOI_PREFIX: "10.25039/CIE.DS.",
@@ -503,6 +503,33 @@ function diffPatch(a, b, base){
   return ops;
 }
 function esc6902(k){ return String(k).replace(/~/g,"~0").replace(/\//g,"~1"); }
+/* granular field diff: like diffPatch but recurses into arrays by index so a single
+   changed element yields a precise leaf path (e.g. /checksums/1/checksum) instead of a
+   whole-array replace. Used by the "Compare with file" view. */
+function deepDiff(a, b, base){
+  base = base||"";
+  const ops=[];
+  const isObj=x=>x&&typeof x==="object"&&!Array.isArray(x);
+  if(isObj(a)&&isObj(b)){
+    for(const k of Object.keys(a)){ if(!(k in b)) ops.push({op:"remove",path:base+"/"+esc6902(k)}); }
+    for(const k of Object.keys(b)){
+      const p=base+"/"+esc6902(k);
+      if(!(k in a)) ops.push({op:"add",path:p,value:clone(b[k])});
+      else ops.push(...deepDiff(a[k],b[k],p));
+    }
+  }else if(Array.isArray(a)&&Array.isArray(b)){
+    const n=Math.max(a.length,b.length);
+    for(let i=0;i<n;i++){
+      const p=base+"/"+i;
+      if(i>=a.length) ops.push({op:"add",path:p,value:clone(b[i])});
+      else if(i>=b.length) ops.push({op:"remove",path:p});
+      else ops.push(...deepDiff(a[i],b[i],p));
+    }
+  }else{
+    if(canonical(a)!==canonical(b)) ops.push({op:"replace",path:base,value:clone(b)});
+  }
+  return ops;
+}
 /* reconstruct payload at revision rev (1-based) from history forward patches */
 function reconstruct(history, rev){
   let doc={};
@@ -1107,6 +1134,7 @@ function renderDetail(){
       <button class="ghost" id="btnRevert">Revert</button>
       <button class="ghost" id="btnGenDoi">Update DOI</button>
       <button class="ghost" id="btnRevertDefaults">Revert to defaults</button>
+      <button class="ghost" id="btnCompareFile">Compare with file&hellip;</button>
       <button class="ghost" id="btnValidateCsv">Validate against CSV&hellip;</button>
       <button class="ghost" id="btnDupe">Duplicate</button>
       <button class="ghost" id="btnExportOne">Export Metadata file</button>
@@ -1132,6 +1160,7 @@ function renderDetail(){
   el("btnDupe").onclick=()=>duplicateEntry(e);
   el("btnExportOne").onclick=()=>exportDataCiteFiles([e]);
   el("btnExportCrossref").onclick=()=>exportCrossrefXml(e);
+  el("btnCompareFile").onclick=()=>openCompareDialog(e);
   el("btnDelete").onclick=()=>deleteEntry(e);
   if(editDirty) el("saveState").textContent="● unsaved";
 
@@ -2022,6 +2051,92 @@ function openImportConflictDialog(conflicts, added){
   modal("Resolve import DOI conflicts",body,[mkBtn("Skip remaining","ghost",finish)]);
 }
 
+/* Read-only comparison of a database entry against an external metadata JSON file.
+   Loads a file, diffs every field against the saved entry payload, shows the
+   differences. Never imports or modifies anything. */
+function openCompareDialog(e){
+  pickFile(".json,application/json", async (f)=>{
+    let obj;
+    try{ obj=JSON.parse(await f.text()); }
+    catch(err){ toast("Invalid JSON file","err"); return; }
+    // resolve which object holds the metadata payload
+    if(obj && (obj.dbSchemaName===APP.DB_SCHEMA_NAME || Array.isArray(obj.entries))){
+      toast("That is a database file — pick a single metadata file","err"); return;
+    }
+    let payload = (obj && obj.payload && obj.entryId) ? obj.payload : obj;
+    if(!payload || typeof payload!=="object"){ toast("File does not contain a metadata object","err"); return; }
+
+    const body=document.createElement("div");
+
+    // header line
+    const hd=document.createElement("p"); hd.className="hint";
+    hd.innerHTML=`Comparing database entry <b>${esc(entryTitle(e))}</b> `+
+      `(rev ${e.rev}${entryDoi(e)?`, <span class="mono">${esc(entryDoi(e))}</span>`:""}) `+
+      `with file <b>${esc(f.name)}</b>.`;
+    body.appendChild(hd);
+
+    // soft identity check — warn but still compare
+    const fileDoi = payload.identifier && payload.identifier.identifier;
+    const fileFn = (payload.alternateIdentifiers||[]).filter(x=>x&&x.alternateIdentifierType==="fileName").map(x=>x.alternateIdentifier)[0];
+    const mism=[];
+    if(entryDoi(e) && fileDoi && entryDoi(e)!==fileDoi) mism.push(`DOI (entry: ${entryDoi(e)} · file: ${fileDoi})`);
+    if(entryFilename(e) && fileFn && entryFilename(e)!==fileFn) mism.push(`fileName (entry: ${entryFilename(e)} · file: ${fileFn})`);
+    if(mism.length){
+      const w=document.createElement("div"); w.className="warnrow";
+      w.textContent="⚠ This file does not appear to describe the same dataset — mismatched "+mism.join("; ")+". Comparing anyway.";
+      body.appendChild(w);
+    }
+
+    // informational schema check on the file
+    try{
+      const errs=validate(payload, CIE_SCHEMA);
+      if(errs && errs.length){
+        const v=document.createElement("p"); v.className="hint";
+        v.style.color="var(--warn)";
+        v.textContent=`Note: the file has ${errs.length} schema issue(s) (comparison still shown).`;
+        body.appendChild(v);
+      }
+    }catch(_){}
+
+    // field-by-field diff (all metadata fields, granular into arrays).
+    // metadataRevision is internal revision bookkeeping (not part of the DataCite
+    // metadata and absent from exported files), so it is excluded from the field diff;
+    // it remains visible in the raw side-by-side below.
+    const A=clone(e.payload), B=clone(payload);
+    delete A.metadataRevision; delete B.metadataRevision;
+    const ops=deepDiff(A, B, "");
+    if(ops.length===0){
+      const ok=document.createElement("div"); ok.className="val-ok";
+      ok.textContent="✓ No differences — the file matches this entry's metadata.";
+      body.appendChild(ok);
+    }else{
+      const sum=document.createElement("p"); sum.className="hint";
+      sum.innerHTML=`<b>${ops.length}</b> field difference(s). Legend: `+
+        `<span class="op-replace">~ changed</span> (database → file), `+
+        `<span class="op-add">+ only in file</span>, `+
+        `<span class="op-remove">− only in database</span>.`;
+      body.appendChild(sum);
+      const box=document.createElement("div"); box.className="diff";
+      box.innerHTML=renderDiff(ops, 2, e.payload);
+      body.appendChild(box);
+    }
+
+    // raw side-by-side for full context
+    function payloadBox(title,p){
+      const d=document.createElement("div"); d.className="conflict";
+      d.innerHTML=`<h4>${esc(title)}</h4>`;
+      const s=document.createElement("div"); s.className="side"; const pre=document.createElement("pre");
+      pre.textContent=JSON.stringify(p,null,1); s.appendChild(pre); d.appendChild(s); return d;
+    }
+    const cols=document.createElement("div"); cols.className="cols2";
+    cols.appendChild(payloadBox(`Database entry (rev ${e.rev})`, e.payload));
+    cols.appendChild(payloadBox("File", payload));
+    body.appendChild(cols);
+
+    modal("Compare with metadata file", body, [mkBtn("Close","ghost",closeModal)]);
+  });
+}
+
 /* Import/Merge dialog: aggregate DB merge OR datacite files */
 function openImportDialog(){
   const body=document.createElement("div");
@@ -2556,6 +2671,24 @@ function openHelpDialog(){
     </ul>
     <p style="margin:4px 0"><b>Validate the generated XML</b> with the Crossref deposit parser:<br>
       <a href="https://data.crossref.org/reports/parser.html" target="_blank" rel="noopener noreferrer">https://data.crossref.org/reports/parser.html</a></p>
+
+    <h4>Compare with an external metadata file <span class="kv">(new)</span></h4>
+    <p style="margin:4px 0">The per-entry <b>Compare with file…</b> button (entry action bar, next to
+      <b>Revert to defaults</b>) checks the selected database entry against an external
+      <code>*.csv_metadata.json</code> file — useful to see whether a published or exported file still
+      matches what the database holds. It is <b>read-only</b>: nothing is imported or changed.</p>
+    <ul>
+      <li>Pick a single metadata file; <b>every field is compared</b> and the differences are listed
+        field by field (arrays are compared element by element, so a single changed value — e.g.
+        <span class="mono">/checksums/1/checksum</span> — is pinpointed rather than shown as a whole-array change).</li>
+      <li>Colours follow the History diff: <span class="op-replace">~ changed</span> (database → file),
+        <span class="op-add">+ only in file</span>, <span class="op-remove">− only in database</span>.
+        A green banner confirms when there are <b>no differences</b>.</li>
+      <li>If the file's DOI or file name does not match the entry, a warning is shown but the comparison
+        still runs. The two payloads are also shown raw, side by side, for context.</li>
+      <li>The bookkeeping <span class="mono">metadataRevision</span> field is excluded from the field
+        comparison (exported files do not carry it), but remains visible in the raw side-by-side view.</li>
+    </ul>
 
     <h4>Reference links</h4>
     <ul>

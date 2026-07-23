@@ -7,7 +7,7 @@ metadata records, with full git-like change history and safe concurrent-edit mer
 Modelled on the termdat curation workflow. Runs entirely in the browser from a
 local file — **no server, no network access, no external/CDN dependencies.**
 
-**Interface version 1.6.0** (shown in the header).
+**Interface version 1.7.0** (shown in the header).
 
 A **? Help** button in the toolbar opens an in-app summary of the features below,
 including the link to the Crossref deposit validator.
@@ -259,6 +259,29 @@ You can then:
   md5, sha256, overall pass/fail and every per-check result) into the entry's
   append-only `validationLog`, stored in the database. Past logged validations are
   listed under **Logged validations** in the same tab.
+
+## Compare an entry with an external metadata file
+
+Open an entry → **Compare with file…** (action bar, next to *Revert to defaults*) →
+pick a `*.csv_metadata.json` file. The tool compares that file against the entry's
+**stored** payload and lists the differences. It is **read-only** — nothing is
+imported, applied or changed.
+
+- **All fields are compared**, and arrays are compared **element by element**, so a
+  single changed value is pinpointed to its exact path (e.g.
+  `/checksums/1/checksum`) instead of showing a whole array as changed.
+- Differences use the same colours as the History diff: **~ changed**
+  (database → file), **+ only in file**, **− only in database**. A green banner
+  confirms when the file matches the entry exactly.
+- If the file's **DOI** or **file name** differs from the entry, a warning banner is
+  shown but the comparison still runs (so you can compare deliberately). The file is
+  also validated against the schema and any issues are noted. Both payloads are shown
+  raw, side by side, for context.
+- The bookkeeping `metadataRevision` field is **excluded** from the field comparison
+  (exported files do not carry it) but stays visible in the raw side-by-side view.
+
+Use it, for example, to confirm an exported file matches the database, or to see
+exactly what changed between a stored entry and an older published file.
 
 ## Concurrency — optimistic per-entry merge
 
