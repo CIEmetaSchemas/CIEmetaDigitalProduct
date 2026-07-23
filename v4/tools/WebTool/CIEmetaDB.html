@@ -1709,15 +1709,9 @@ function openNewEntryDialog(){
   // ---- related data file (optional) ----
   let staged=null;   // {md5, sha, filename, fileType, analysis}
   const fset=document.createElement("fieldset"); fset.innerHTML="<legend>Related data file (optional)</legend>";
-  const picker=document.createElement("input"); picker.type="file"; picker.style.maxWidth="360px";
-  const pickInfo=document.createElement("span"); pickInfo.className="hint"; pickInfo.style.marginLeft="8px";
-  const clearBtn=document.createElement("button"); clearBtn.type="button"; clearBtn.className="ghost small";
-  clearBtn.textContent="✕"; clearBtn.title="Remove selected file"; clearBtn.style.marginLeft="8px"; clearBtn.style.display="none";
-  const pickRow=document.createElement("div"); pickRow.style.display="flex"; pickRow.style.alignItems="center";
-  pickRow.appendChild(picker); pickRow.appendChild(pickInfo); pickRow.appendChild(clearBtn);
-  fset.appendChild(pickRow);
-  const typeWrap=document.createElement("div"); typeWrap.style.marginTop="8px";
+  const typeWrap=document.createElement("div");
   const TYPES=[
+    {v:"none",          label:"No data file (blank draft)"},
     {v:"csvWavelength", label:"headerless CSV, first column wavelength"},
     {v:"csv",           label:"headerless CSV"},
     {v:"xlsx",          label:"Excel .xlsx (7 header rows + data table)"},
@@ -1730,8 +1724,16 @@ function openNewEntryDialog(){
     lab.appendChild(r); lab.appendChild(document.createTextNode(t.label)); typeWrap.appendChild(lab);
   });
   fset.appendChild(typeWrap);
+  // file control — hidden until a data-file type is chosen (then the OS dialog auto-opens)
+  const picker=document.createElement("input"); picker.type="file"; picker.style.maxWidth="360px";
+  const pickInfo=document.createElement("span"); pickInfo.className="hint"; pickInfo.style.marginLeft="8px";
+  const clearBtn=document.createElement("button"); clearBtn.type="button"; clearBtn.className="ghost small";
+  clearBtn.textContent="✕"; clearBtn.title="Remove selected file"; clearBtn.style.marginLeft="8px"; clearBtn.style.display="none";
+  const pickRow=document.createElement("div"); pickRow.style.display="none"; pickRow.style.alignItems="center"; pickRow.style.marginTop="8px";
+  pickRow.appendChild(picker); pickRow.appendChild(pickInfo); pickRow.appendChild(clearBtn);
+  fset.appendChild(pickRow);
   const fhint=document.createElement("p"); fhint.className="hint";
-  fhint.textContent="Attach the data file to pre-fill metadata: CSV fills columns, sample row, sums (numeric only) and — for the wavelength option — the wavelength range; the .xlsx option reads 7 header rows (Title/Quantity/Unit/Description/Wavelength first/last/step) plus the data table, fills the column headers and validations, and generates the header-less CSV for download; other filetypes set the file format. Checksums and file name are always filled. Leave empty for a blank draft.";
+  fhint.textContent="Choose a data-file type to attach a file — the file dialog opens automatically. CSV fills columns, sample row, sums (numeric only) and — for the wavelength option — the wavelength range; the .xlsx option reads 7 header rows (Title/Quantity/Unit/Description/Wavelength first/last/step) plus the data table, fills the column headers and validations, and generates the header-less CSV for download; other filetypes set the file format. Checksums and file name are always filled. Leave on “No data file” for a blank draft.";
   fset.appendChild(fhint);
   body.appendChild(fset);
 
@@ -1750,7 +1752,9 @@ function openNewEntryDialog(){
   const hint=document.createElement("p"); hint.className="hint"; hint.textContent="A draft DOI is generated locally. Real DOIs are assigned by CIE CB.";
   body.appendChild(hint);
 
-  const selType=()=>(typeWrap.querySelector("input[name='newEntryFileType']:checked")||{}).value||"csvWavelength";
+  const selType=()=>(typeWrap.querySelector("input[name='newEntryFileType']:checked")||{}).value||"none";
+  const acceptFor=(m)=> m==="xlsx" ? ".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                       : (m==="csvWavelength"||m==="csv") ? ".csv,text/csv" : "";
   async function stageFile(){
     const f=picker.files&&picker.files[0]; if(!f){ staged=null; pickInfo.textContent=""; clearBtn.style.display="none"; return; }
     const mode=selType();
@@ -1778,7 +1782,14 @@ function openNewEntryDialog(){
     }catch(err){ staged=null; const msg=(err&&err.message)||String(err); pickInfo.textContent="could not read file: "+msg; toast("Could not read file: "+msg,"err"); }
   }
   picker.onchange=stageFile;
-  typeWrap.querySelectorAll("input[name='newEntryFileType']").forEach(r=>r.addEventListener("change",()=>{ if(picker.files&&picker.files[0]) stageFile(); }));
+  // selecting a data-file type reveals the file control and auto-opens the OS dialog;
+  // "No data file" hides it. The change event is a user gesture, so picker.click() is allowed.
+  typeWrap.querySelectorAll("input[name='newEntryFileType']").forEach(r=>r.addEventListener("change",()=>{
+    const mode=selType();
+    picker.value=""; staged=null; pickInfo.textContent=""; clearBtn.style.display="none";
+    if(mode==="none"){ pickRow.style.display="none"; return; }
+    picker.accept=acceptFor(mode); pickRow.style.display="flex"; picker.click();
+  }));
   clearBtn.onclick=()=>{ picker.value=""; staged=null; pickInfo.textContent=""; clearBtn.style.display="none"; };
 
   const create=mkBtn("Create entry","sec",()=>{
@@ -2496,7 +2507,8 @@ function openHelpDialog(){
 
     <h4>New entry from an Excel workbook (.xlsx) <span class="kv">(new)</span></h4>
     <p style="margin:4px 0">In <b>+ New entry</b>, under <b>Related data file</b>, choose the file type
-      <b>Excel .xlsx (7 header rows + data table)</b> and pick a single-worksheet workbook laid out as:</p>
+      <b>Excel .xlsx (7 header rows + data table)</b> — the file dialog opens automatically (filtered to
+      <code>.xlsx</code>) — and pick a single-worksheet workbook laid out as:</p>
     <ul>
       <li><b>Rows 1–7</b>, starting at cell <b>A1</b> (no leading label column), describe the columns —
         one worksheet column per data column, in the order <b>Title, Quantity, Unit, Description,

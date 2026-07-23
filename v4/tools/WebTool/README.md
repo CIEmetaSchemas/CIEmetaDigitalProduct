@@ -190,8 +190,10 @@ filled in one at a time, or in bulk via the paste box shown above the list:
 ## New entry from an Excel workbook (.xlsx)
 
 The **+ New entry** dialog can build an entry directly from an Excel workbook.
-Under **Related data file**, choose the file type **Excel .xlsx (7 header rows +
-data table)** and pick a **single-worksheet** workbook laid out as:
+Under **Related data file** you first pick a **file type** — the default is **No
+data file** (blank draft); choosing any data-file type opens the file dialog
+automatically, filtered to that type. Choose **Excel .xlsx (7 header rows + data
+table)** and pick a **single-worksheet** workbook laid out as:
 
 - **Rows 1–7**, starting at cell **A1** (no leading label column), describe the
   columns — **one worksheet column per data column**, in the order **Title,
