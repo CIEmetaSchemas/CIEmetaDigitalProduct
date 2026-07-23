@@ -174,7 +174,6 @@
         <select id="filterStatus">
           <option value="">All statuses</option>
           <option value="draft">Draft</option>
-          <option value="review">Review</option>
           <option value="published">Published</option>
         </select>
       </div>
@@ -222,7 +221,7 @@
 
 /* ---------- constants ---------- */
 const APP = {
-  VERSION: "1.7.0",
+  VERSION: "1.8.0",
   DB_SCHEMA_NAME: "CIEmetaDB",
   DB_SCHEMA_VERSION: 1,
   DOI_PREFIX: "10.25039/CIE.DS.",
@@ -317,21 +316,6 @@ const DEFAULT_FIELDS = [
 function defaults(){ return (DB && DB.defaults) || DEFAULT_VALUES; }
 function defCreator(){ const d=defaults(); return {name:d.creatorName||"", nameType:d.creatorNameType||"Organizational"}; }
 function defRights(){ const d=defaults(); const r={rights:d.rights||""}; if(d.rightsURI)r.rightsURI=d.rightsURI; if(d.rightsIdentifier)r.rightsIdentifier=d.rightsIdentifier; return r; }
-/* apply the default-managed fields onto a payload (used by "Revert to defaults") */
-function applyDefaultsToPayload(p){
-  const d=defaults();
-  p.creators=[defCreator()];
-  p.publisher=d.publisher||"";
-  p.language=d.language||"";
-  p.formats=[d.format||"text/csv"];
-  p.types={resourceType:d.resourceType||"", resourceTypeGeneral:d.resourceTypeGeneral||"Dataset"};
-  p.rightsList=[defRights()];
-  p.datatableInfo=p.datatableInfo||{};
-  p.datatableInfo.interpolationMethod=d.interpolationMethod||"";
-  p.datatableInfo.extrapolationMethod=d.extrapolationMethod||"";
-  p.datatableInfo.dataQuality=d.dataQuality||"";
-  return p;
-}
 
 /* ============================================================================
    Hashers (pure JS, work on raw bytes — reliable from file://)
@@ -646,7 +630,7 @@ function buildCieSchema(){
 let DB = null;          // current metadatabase
 let selectedId = null;  // selected entryId
 let editModel = null;   // working payload copy of selected entry
-let editMeta = null;    // working copy of entry envelope (status/domains/landingPage)
+let editMeta = null;    // working copy of editable envelope fields (domains/landingPage); status is read-only
 let editDirty = false;
 let sort = {key:"title", dir:1};
 let dbFileHandle = null; // File System Access API handle (if used)
@@ -694,36 +678,63 @@ function blankPayload(doi, filename){
   return p;
 }
 
-/* create a new entry committed at rev 1 */
+/* create a new entry. New/duplicated entries start as an unpublished draft (rev 0, no revision
+   history yet); entries created as already-published (e.g. DataCite import) are seeded with a
+   published baseline revision so their history/filename are consistent. */
 function createEntry(payload, opts){
   opts=opts||{};
-  if(payload && payload.metadataRevision==null) payload.metadataRevision=1; // metadata-file revision starts at 1
+  const published = opts.status==="published";
   const now=nowISO(), user=currentUser();
-  const patch=diffPatch({}, payload, "");
+  if(payload && payload.metadataRevision==null) payload.metadataRevision=1; // metadata-file revision starts at 1
+  const rev = published ? ((payload && payload.metadataRevision) || 1) : 0;
   const e={
-    entryId:uuid(), rev:1, contentHash:contentHash(payload),
-    status:opts.status||"draft",
+    entryId:uuid(), rev:rev, contentHash:contentHash(payload),
+    status: published ? "published" : "draft",
     landingPage:opts.landingPage||"",
     domains:opts.domains||[],
     audit:{createdBy:user, createdDate:now, modifiedBy:user, modifiedDate:now, modifiedComment:opts.comment||"Created"},
     payload:clone(payload),
-    history:[{rev:1, by:user, date:now, comment:opts.comment||"Created", baseHash:null, patch:patch}]
+    history: published ? [{rev:rev, by:user, date:now, comment:opts.comment||"Created", baseHash:null, patch:diffPatch({}, payload, "")}] : []
   };
   return e;
 }
 /* payload diff for change detection: ignores the bookkeeping metadataRevision field so it never
    triggers (or suppresses) a revision on its own */
 function contentDiff(a,b){ const x=clone(a||{}),y=clone(b||{}); delete x.metadataRevision; delete y.metadataRevision; return diffPatch(x,y,""); }
-/* commit an edit to an existing entry */
-function commitEdit(entry, newPayload, comment){
-  const now=nowISO(), user=currentUser();
-  const oldPayload=entry.payload;
-  if(contentDiff(oldPayload, newPayload).length===0) return false; // no genuine content change
-  entry.rev+=1;
+/* the version a draft will become when published — used for filename/display only. Published
+   entries simply show their own rev. */
+function pendingRev(e){ return e.status==="published" ? e.rev : (e.rev||0)+1; }
+/* store a draft edit WITHOUT creating a revision: updates the saved payload and flips the entry to
+   draft (unless the payload matches the last published revision again, in which case it snaps back
+   to published). Never touches rev or history. Returns true if the stored payload changed. */
+function storeDraft(entry, newPayload){
   const stored=clone(newPayload);
-  stored.metadataRevision=entry.rev;                 // metadata-file revision follows the payload rev
-  const patch=diffPatch(oldPayload, stored, "");      // history/reconstruct include the metadataRevision bump
-  entry.history.push({rev:entry.rev, by:user, date:now, comment:comment||"", baseHash:entry.contentHash, patch:patch});
+  if(contentDiff(entry.payload, stored).length===0) return false; // nothing changed
+  const lastPublished = entry.history.length ? reconstruct(entry.history, entry.rev) : {};
+  const backToPublished = entry.rev>0 && contentDiff(lastPublished, stored).length===0;
+  // a draft represents the pending next revision (last published + 1); rev itself is untouched
+  stored.metadataRevision = backToPublished ? entry.rev : (entry.rev||0)+1;
+  entry.status = backToPublished ? "published" : "draft";
+  entry.payload=stored;
+  entry.contentHash=contentHash(stored);
+  const now=nowISO(), user=currentUser();
+  entry.audit.modifiedBy=user; entry.audit.modifiedDate=now; entry.audit.modifiedComment="";
+  return true;
+}
+/* publish the current payload as a new revision. This is the ONLY action that creates a revision:
+   it records one history entry holding the diff from the previously published revision, bumps rev,
+   and marks the entry published. Returns false when there is nothing new to publish. */
+function publishEntry(entry, newPayload, comment){
+  const now=nowISO(), user=currentUser();
+  const lastPublished = entry.history.length ? reconstruct(entry.history, entry.rev) : {};
+  const stored=clone(newPayload);
+  if(contentDiff(lastPublished, stored).length===0) return false; // no changes since last publish
+  const newRev=(entry.rev||0)+1;
+  stored.metadataRevision=newRev;                    // metadata-file revision follows the published rev
+  const patch=diffPatch(lastPublished, stored, "");
+  entry.history.push({rev:newRev, by:user, date:now, comment:comment||"", baseHash:entry.contentHash, patch:patch});
+  entry.rev=newRev;
+  entry.status="published";
   entry.payload=stored;
   entry.contentHash=contentHash(stored);
   entry.audit.modifiedBy=user; entry.audit.modifiedDate=now; entry.audit.modifiedComment=comment||"";
@@ -1079,12 +1090,12 @@ function renderList(){
     const tr=document.createElement("tr");
     if(e.entryId===selectedId) tr.className="sel";
     const doms=(e.domains||[]).map(d=>`<span class="chip dom">${esc(d)}</span>`).join("");
-    const revChip=`<span class="chip rev" title="Metadata file revision">rev ${e.rev}</span>`;
+    const revChip=`<span class="chip rev" title="${e.status==="draft"?"Pending revision (draft — not yet published)":"Published revision"}">rev ${pendingRev(e)}${e.status==="draft"?" draft":""}</span>`;
     tr.innerHTML=`<td><div class="title-cell">${esc(entryTitle(e))}</div>
         <div class="kv">${esc(entryFilename(e))}</div>${doms}${revChip}</td>
       <td><div class="doi-cell">${esc(entryDoi(e))}</div>${dupIds.has(e.entryId)?'<span class="badge dup" title="Duplicate DOI — must be fixed">duplicate DOI</span>':''}</td>
       <td><span class="badge ${esc(e.status)}">${esc(e.status)}</span></td>
-      <td class="kv">${esc((e.audit.modifiedDate||"").replace("T"," ").slice(0,19))}<br>${esc(e.audit.modifiedBy)}<br>rev ${e.rev}</td>`;
+      <td class="kv">${esc((e.audit.modifiedDate||"").replace("T"," ").slice(0,19))}<br>${esc(e.audit.modifiedBy)}<br>rev ${pendingRev(e)}</td>`;
     tr.onclick=()=>selectEntry(e.entryId);
     tb.appendChild(tr);
   }
@@ -1113,11 +1124,11 @@ function selectEntry(id, keepTab){
   selectedId=id; editDirty=false;
   const e=findEntry(id);
   editModel = e?clone(e.payload):null;
-  editMeta = e?{status:e.status, domains:clone(e.domains||[]), landingPage:e.landingPage||""}:null;
+  editMeta = e?{domains:clone(e.domains||[]), landingPage:e.landingPage||""}:null; // status is read-only, not buffered
   if(!keepTab) activeTab="form";
   renderList(); renderDetail();
 }
-function resetEditMeta(e){ editMeta = {status:e.status, domains:clone(e.domains||[]), landingPage:e.landingPage||""}; }
+function resetEditMeta(e){ editMeta = {domains:clone(e.domains||[]), landingPage:e.landingPage||""}; }
 function markDirty(){ editDirty=true; syncJsonView(); const s=el("saveState"); if(s) s.textContent="● unsaved"; }
 
 function renderDetail(){
@@ -1132,16 +1143,17 @@ function renderDetail(){
     <div class="meta">
       ${doi?`<a class="mono doi-link" href="https://doi.org/${esc(doi)}" target="_blank" rel="noopener noreferrer">https://doi.org/${esc(doi)}</a>`:'<span class="mono">(no DOI)</span>'}
       ${e.landingPage?`<a class="mono doi-link" href="${esc(e.landingPage)}" target="_blank" rel="noopener noreferrer" title="DOI landing page (Crossref resource)">↪ landing page</a>`:'<span class="mono" style="color:var(--muted)">(no landing page)</span>'}
-      <span>rev ${e.rev}</span>
+      <span class="badge ${esc(e.status)}" title="Status is set automatically: draft while edited, published when you press Publish">${esc(e.status)}</span>
+      <span title="${e.status==="draft"?"Pending revision — becomes this number when published":"Published revision"}">rev ${pendingRev(e)}</span>
       <span>created ${esc((e.audit.createdDate||"").slice(0,10))} by ${esc(e.audit.createdBy)}</span>
       <span>modified ${esc((e.audit.modifiedDate||"").slice(0,10))} by ${esc(e.audit.modifiedBy)}</span>
       <span id="saveState"></span>
     </div>
     <div class="detail-actions">
-      <button id="btnSaveEntry">Save entry</button>
-      <button class="ghost" id="btnRevert">Revert</button>
-      <button class="ghost" id="btnGenDoi">Update DOI</button>
-      <button class="ghost" id="btnRevertDefaults">Revert to defaults</button>
+      <button id="btnSaveEntry">Save draft</button>
+      <button id="btnPublish" title="Create a new revision and mark the entry published">Publish entry</button>
+      <button class="ghost" id="btnRevert" title="Discard unsaved editor changes and return to the last saved version">Undo changes</button>
+      <button class="ghost" id="btnRevertPublished" title="Discard unpublished draft edits and restore the last published revision">Revert to last published</button>
       <button class="ghost" id="btnCompareFile">Compare with file&hellip;</button>
       <button class="ghost" id="btnValidateCsv">Validate against CSV&hellip;</button>
       <button class="ghost" id="btnDupe">Duplicate</button>
@@ -1161,10 +1173,10 @@ function renderDetail(){
   const page=document.createElement("div"); page.className="tabpage"; page.id="tabpage"; pane.appendChild(page);
 
   el("btnSaveEntry").onclick=saveEntry;
-  el("btnRevert").onclick=()=>{ editModel=clone(e.payload); resetEditMeta(e); editDirty=false; renderDetail(); toast("Reverted to saved version"); };
+  el("btnPublish").onclick=publishEntryAction;
+  el("btnRevert").onclick=()=>{ editModel=clone(e.payload); resetEditMeta(e); editDirty=false; renderDetail(); toast("Changes undone — back to the last saved version"); };
+  el("btnRevertPublished").onclick=()=>revertToPublished(e);
   el("btnValidateCsv").onclick=()=>{ activeTab="validate"; renderDetail(); };
-  el("btnGenDoi").onclick=()=>openDoiDialog(e);
-  el("btnRevertDefaults").onclick=revertToDefaults;
   el("btnDupe").onclick=()=>duplicateEntry(e);
   el("btnExportOne").onclick=()=>exportDataCiteFiles([e]);
   el("btnExportCrossref").onclick=()=>exportCrossrefXml(e);
@@ -1257,8 +1269,12 @@ function renderForm(page,e){
   const fsMeta=document.createElement("fieldset");
   fsMeta.innerHTML='<legend>Database entry</legend>';
   const gm=document.createElement("div"); gm.className="grid";
-  // status/domains/landingPage edit the envelope buffer (editMeta); committed via Save entry
-  gm.appendChild(field("Status", sel(editMeta,"status",["draft","review","published"])));
+  // status is read-only: set automatically (draft while edited, published via Publish entry).
+  // domains/landingPage edit the envelope buffer (editMeta); committed via Save draft.
+  const statusView=document.createElement("div"); statusView.style.padding="4px 0";
+  statusView.innerHTML=`<span class="badge ${esc(e.status)}">${esc(e.status)}</span>`;
+  statusView.title="Set automatically — 'draft' while an entry has unpublished edits, 'published' after you press Publish entry.";
+  gm.appendChild(field("Status", statusView));
   const domWrap=document.createElement("div");
   DB.domains.forEach(d=>{
     const lab=document.createElement("label"); lab.style.display="inline-flex"; lab.style.alignItems="center"; lab.style.gap="4px"; lab.style.marginRight="12px"; lab.style.padding="0";
@@ -1268,10 +1284,10 @@ function renderForm(page,e){
   });
   gm.appendChild(field("Domains", domWrap));
   gm.appendChild(field("DOI landing page (Crossref resource URL)", inp(editMeta,"landingPage",{placeholder:"https://cie.co.at/datatable/…"})));
-  // metadata-file revision: read-only; increments only on metadata-content changes (not on envelope edits)
+  // metadata-file revision: read-only; only Publish entry mints a new revision.
   const revView=document.createElement("div"); revView.style.padding="6px 0"; revView.className="mono";
-  revView.textContent=(p.metadataRevision==null?"1":String(p.metadataRevision));
-  revView.title="Revision of this JSON metadata file. Increments only when the metadata content changes — not when the CIE division or DOI landing page is edited.";
+  revView.textContent = e.status==="draft" ? (pendingRev(e)+" (draft — not yet published)") : String(e.rev);
+  revView.title="Revision of this JSON metadata file. A new revision is created only when you press Publish entry — not when saving a draft or editing the CIE division / DOI landing page.";
   gm.appendChild(field("Metadata revision", revView));
   fsMeta.appendChild(gm); page.appendChild(fsMeta);
 
@@ -1279,7 +1295,12 @@ function renderForm(page,e){
   const fsId=document.createElement("fieldset"); fsId.innerHTML='<legend>Identifier</legend>';
   const gi=document.createElement("div"); gi.className="grid";
   p.identifier=p.identifier||{identifier:"",identifierType:"DOI"};
-  gi.appendChild(field("Identifier (DOI)", inp(p.identifier,"identifier",{placeholder:APP.DOI_PREFIX+"xxxxxxxx"})));
+  const doiInput=inp(p.identifier,"identifier",{placeholder:APP.DOI_PREFIX+"xxxxxxxx"});
+  doiInput.style.flex="1"; doiInput.style.minWidth="0";
+  const doiRow=document.createElement("div"); doiRow.style.display="flex"; doiRow.style.gap="6px"; doiRow.style.alignItems="center";
+  doiRow.appendChild(doiInput);
+  doiRow.appendChild(mkBtn("Update DOI…","ghost small",()=>openDoiDialog(e)));
+  gi.appendChild(field("Identifier (DOI)", doiRow));
   gi.appendChild(field("Identifier type", inp(p.identifier,"identifierType")));
   const idHint=document.createElement("div"); idHint.className="hint";
   idHint.textContent="Format 10.25039/CIE.DS.①②③④⑤⑥⑦⑧ (8 chars, excludes o O l L 1 I 0).";
@@ -1620,7 +1641,7 @@ function renderCsvResult(out,e,filename,md5,sha,a){
   const btn=document.createElement("button"); btn.className="sec"; btn.textContent="Fill checksums, validations & wavelength range";
   btn.onclick=()=>{
     applyCsvToPayload(p, a, {md5, sha, filename, mode:"csvWavelength", sampleRow:rowInp.value});
-    markDirty(); toast("Metadata fields filled from CSV — review and Save entry","ok");
+    markDirty(); toast("Metadata fields filled from CSV — review and Save draft","ok");
     activeTab="form"; renderDetail();
   };
   gen.appendChild(p1); gen.appendChild(rowInp); gen.appendChild(document.createElement("br")); gen.appendChild(document.createElement("br")); gen.appendChild(btn);
@@ -1632,7 +1653,7 @@ function fmtNum(x){ if(!Number.isFinite(x)) return "0"; if(Number.isInteger(x)) 
 /* ---- history ---- */
 function renderHistory(page,e){
   const info=document.createElement("p"); info.className="hint";
-  info.textContent="Newest first. Each revision stores the field-level change (RFC-6902 JSON-Patch) from the previous one; earlier revisions are reconstructed by replaying patches.";
+  info.textContent="Newest first. A revision is created only when you Publish an entry; each one stores the field-level change (RFC-6902 JSON-Patch) from the previous published revision. Draft edits between publishes are not listed here.";
   page.appendChild(info);
   const hist=e.history.slice().reverse();
   for(const h of hist){
@@ -1645,7 +1666,7 @@ function renderHistory(page,e){
     const diff=document.createElement("div"); diff.className="diff"; diff.innerHTML=renderDiff(h.patch,h.rev,prev); box.appendChild(diff);
     if(h.rev<e.rev){
       const rb=document.createElement("button"); rb.className="ghost small"; rb.style.marginTop="6px"; rb.textContent="Restore this revision";
-      rb.onclick=()=>{ const old=reconstruct(e.history,h.rev); editModel=old; markDirty(); toast(`Loaded rev ${h.rev} into editor — Save to commit as new revision`,"ok"); activeTab="form"; renderDetail(); };
+      rb.onclick=()=>{ const old=reconstruct(e.history,h.rev); editModel=old; markDirty(); toast(`Loaded rev ${h.rev} into editor — Publish to commit as a new revision`,"ok"); activeTab="form"; renderDetail(); };
       box.appendChild(rb);
     }
     page.appendChild(box);
@@ -1670,42 +1691,70 @@ function renderDiff(patch,rev,prev){
 function shortVal(v){ if(v===undefined) return "∅"; const s=typeof v==="string"?v:JSON.stringify(v); return s.length>120?s.slice(0,117)+"…":s; }
 
 /* ---- entry actions ---- */
-function revertToDefaults(){
-  if(!editModel) return;
-  const labels=DEFAULT_FIELDS.map(f=>f.label).join(", ");
-  if(!confirm("Reset all default-managed fields to the database defaults?\n\nAffected: creators, "+labels+".\n\nKept: title, identifier, publication year, subjects, descriptions, related items, checksums and validations.")) return;
-  applyDefaultsToPayload(editModel); markDirty(); renderDetail();
-  toast("Fields reset to defaults — Save entry to commit","ok");
+/* discard unpublished draft edits and restore the entry to its last published revision.
+   Applied immediately (confirmed) — draft edits are unversioned and are lost. */
+function revertToPublished(e){
+  if(!e) return;
+  if(e.rev===0 || !e.history.length){ toast("This entry has never been published","warn"); return; }
+  const lastPublished=reconstruct(e.history, e.rev);
+  const clean = e.status==="published" && !editDirty && contentDiff(e.payload, lastPublished).length===0;
+  if(clean){ toast("Already at published rev "+e.rev); return; }
+  if(!confirm("Discard unpublished draft edits and restore published rev "+e.rev+"?")) return;
+  e.payload=clone(lastPublished);                 // its metadataRevision already equals e.rev
+  e.status="published";
+  e.contentHash=contentHash(e.payload);
+  e.audit.modifiedBy=currentUser(); e.audit.modifiedDate=nowISO(); e.audit.modifiedComment="Reverted to published rev "+e.rev;
+  editModel=clone(e.payload); resetEditMeta(e); editDirty=false;
+  persist(); renderList(); renderDetail();
+  toast("Restored published rev "+e.rev,"ok");
 }
+/* envelope (non-payload) changes: domains + landing page only. Status is no longer user-editable,
+   so it is not part of this comparison. */
 function metaChanged(e){
   if(!editMeta) return false;
-  return editMeta.status!==e.status
-    || (editMeta.landingPage||"")!==(e.landingPage||"")
+  return (editMeta.landingPage||"")!==(e.landingPage||"")
     || canonical((editMeta.domains||[]).slice().sort())!==canonical((e.domains||[]).slice().sort());
 }
-function saveEntry(){
-  const e=findEntry(selectedId); if(!e) return;
+/* pre-flight checks shared by Save and Publish; returns false to abort. */
+function preSaveChecks(e){
   const errs=validate(editModel,CIE_SCHEMA);
-  if(errs.length){ if(!confirm("The entry has "+errs.length+" schema issue(s):\n\n"+errs.slice(0,10).join("\n")+(errs.length>10?"\n…":"")+"\n\nSave anyway?")) return; }
+  if(errs.length){ if(!confirm("The entry has "+errs.length+" schema issue(s):\n\n"+errs.slice(0,10).join("\n")+(errs.length>10?"\n…":"")+"\n\nContinue anyway?")) return false; }
   const curDoi=editModel.identifier&&editModel.identifier.identifier;
   if(curDoi && DB.entries.some(x=>x.entryId!==e.entryId && entryDoi(x)===curDoi)){
-    if(!confirm("Another entry already uses this DOI:\n"+curDoi+"\n\nDOIs must be unique. Save anyway (the database will flag it as a duplicate to fix)?")) return;
+    if(!confirm("Another entry already uses this DOI:\n"+curDoi+"\n\nDOIs must be unique. Continue anyway (the database will flag it as a duplicate to fix)?")) return false;
   }
-  const patch=contentDiff(e.payload,editModel);
+  return true;
+}
+/* Save draft edits. Payload changes are stored WITHOUT creating a revision (the entry flips to
+   draft); envelope changes (domains / landing page) are stored as before. Publishing is the only
+   action that mints a revision — see publishEntry. */
+function saveEntry(){
+  const e=findEntry(selectedId); if(!e) return;
+  if(!preSaveChecks(e)) return;
+  const payloadChanged=contentDiff(e.payload,editModel).length>0;
   const meta=metaChanged(e);
-  if(patch.length===0 && !meta){ toast("No changes to save"); editDirty=false; renderDetail(); return; }
-  // payload changes are versioned in history (with a comment); envelope changes are not
-  if(patch.length){
-    const comment=prompt("Change comment (what changed and why):","");
-    if(comment===null) return; // cancelled
-    commitEdit(e,editModel,comment);
-  }
+  if(!payloadChanged && !meta){ toast("No changes to save"); editDirty=false; renderDetail(); return; }
+  if(payloadChanged) storeDraft(e,editModel);            // updates payload + status, no revision
   if(meta){
-    e.status=editMeta.status; e.domains=clone(editMeta.domains); e.landingPage=editMeta.landingPage||"";
-    if(!patch.length){ e.audit.modifiedBy=currentUser(); e.audit.modifiedDate=nowISO(); }
+    e.domains=clone(editMeta.domains); e.landingPage=editMeta.landingPage||"";
+    if(!payloadChanged){ e.audit.modifiedBy=currentUser(); e.audit.modifiedDate=nowISO(); }
   }
   resetEditMeta(e); editDirty=false; persist(); renderList(); renderDetail();
-  toast(patch.length?("Saved rev "+e.rev):"Saved entry changes","ok");
+  toast(e.status==="draft"?"Saved draft (not yet published)":"Saved entry changes","ok");
+}
+/* Publish the current editor content as a new revision (the only path that creates one). */
+function publishEntryAction(){
+  const e=findEntry(selectedId); if(!e) return;
+  if(!preSaveChecks(e)) return;
+  const lastPublished = e.history.length ? reconstruct(e.history, e.rev) : {};
+  if(contentDiff(lastPublished, editModel).length===0){ toast("No changes to publish since rev "+e.rev,"warn"); return; }
+  const comment=prompt("Revision text for rev "+((e.rev||0)+1)+" (what changed and why):","");
+  if(comment===null) return; // cancelled
+  // persist any envelope edits alongside the publish
+  if(metaChanged(e)){ e.domains=clone(editMeta.domains); e.landingPage=editMeta.landingPage||""; }
+  publishEntry(e,editModel,comment);
+  resetEditMeta(e); editDirty=false; persist(); renderList(); renderDetail();
+  toast("Published rev "+e.rev,"ok");
 }
 function deleteEntry(e){
   if(!confirm(`Delete entry "${entryTitle(e)}" (${entryDoi(e)})?\nThis removes it from the database.`)) return;
@@ -1991,6 +2040,8 @@ function migrateDb(obj){
     if(e.contentHash==null) e.contentHash=contentHash(e.payload);
     if(e.rev==null) e.rev=e.history.length;
     if(e.payload && e.payload.metadataRevision==null) e.payload.metadataRevision=e.rev; // backfill metadata-file revision
+    if(e.status==="review") e.status="draft"; // legacy three-state status collapses to draft/published
+    if(e.status!=="draft" && e.status!=="published") e.status="published";
     return e;
   });
   return obj;
@@ -2048,7 +2099,7 @@ function openImportConflictDialog(conflicts, added){
     let updated=0, dup=0, skipped=0;
     conflicts.forEach((c,idx)=>{
       const r=resolutions[idx]||"skip";
-      if(r==="update"){ if(commitEdit(c.existing, c.inc, "Updated from imported DataCite file")) updated++; else skipped++; }
+      if(r==="update"){ if(publishEntry(c.existing, c.inc, "Updated from imported DataCite file")) updated++; else skipped++; }
       else if(r==="dup"){ const e=createEntry(c.inc,{status:"published",comment:"Imported (duplicate DOI kept)"}); DB.entries.push(e); dup++; }
       else skipped++;
     });
@@ -2309,14 +2360,16 @@ async function saveDb(saveAs){
   markSaved(DB.baseHash); renderList();
   toast("Copy downloaded — this browser can't overwrite files or detect parallel edits. Use a Chromium browser for in-place save.","warn");
 }
-/* metadata-file name for an entry: <base>.csv_metadata[.vN].json, with the
-   revision suffix (_v2, _v3, …) appended only when the metadata revision > 1
-   (e.g. CIE_cc_1964_10deg.csv_metadata_v2.json), matching the published files. */
+/* metadata-file name for an entry: <base>.csv_metadata[_vN][_draft].json. The revision suffix
+   (_v2, _v3, …) is appended only when the (pending) revision > 1 (e.g.
+   CIE_cc_1964_10deg.csv_metadata_v2.json), matching the published files. A draft entry uses its
+   PENDING revision — the version it will become when published — and gets a trailing _draft
+   (e.g. …_v2_draft.json, or …_metadata_draft.json for a first, never-published draft). */
 function metadataFileName(e){
   const base=entryFilename(e)||sanitize(entryTitle(e));
   const stem=base.endsWith(".csv")?base+"_metadata":base+".csv_metadata";
-  const rev=(e.payload&&e.payload.metadataRevision)||e.rev||1;
-  return stem+(rev>1?"_v"+rev:"")+".json";
+  const rev=pendingRev(e)||1;
+  return stem+(rev>1?"_v"+rev:"")+(e.status==="draft"?"_draft":"")+".json";
 }
 /* export entries as individual DataCite files (strip envelope) */
 function exportDataCiteFiles(entries){
@@ -2606,18 +2659,29 @@ function openHelpDialog(){
         copy instead and cannot detect parallel changes.</li>
     </ul>
 
-    <h4>Editing an entry</h4>
+    <h4>Editing an entry — draft &amp; publish</h4>
     <ul>
-      <li><b>Form / JSON / Validation / History</b> tabs. Payload changes are versioned (RFC-6902
-        patches) and require a change comment on save; envelope changes (status, domains, DOI
-        landing page) are saved without a version bump. The payload's <span class="mono">metadataRevision</span>
-        field mirrors the revision and is stamped automatically — it advances only on metadata-content
-        changes, never on envelope edits.</li>
+      <li><b>Status is automatic</b> and read-only, with two values: <b>draft</b> and <b>published</b>.
+        Creating or duplicating an entry, or editing any payload field, sets it to <b>draft</b>.</li>
+      <li><b>Save draft</b> stores your edits <i>without</i> creating a revision — the revision number
+        does not change and no history entry is added. Domains and the DOI landing page are envelope
+        fields: editing them saves without touching status or revision.</li>
+      <li><b>Publish entry</b> is the only action that mints a revision: it asks for a short revision
+        text, records one <b>History</b> entry holding the change since the previous published
+        revision (RFC-6902 patch), bumps the revision number and sets status to <b>published</b>.
+        History therefore shows revision-to-revision changes, never intermediate draft saves.</li>
+      <li>The payload's <span class="mono">metadataRevision</span> mirrors the published revision and is
+        stamped automatically. Exporting a <b>draft</b> appends <span class="mono">_draft</span> after
+        the (pending) revision number in the file name (e.g. <span class="mono">…_metadata_v2_draft.json</span>).</li>
+      <li><b>Undo changes</b> discards unsaved editor edits and returns to the last <i>saved</i> version.
+        <b>Revert to last published</b> discards unpublished draft edits and restores the entry to its
+        last published revision (immediate, with a confirmation — draft edits are not versioned and are lost).</li>
       <li><b>Validation</b> tab — pick the CSV data file to check checksums, row/column counts,
         column sums, sample row and the wavelength range against the stored metadata, then fill or
         log the results.</li>
-      <li><b>Update DOI</b> generates a compliant <code>10.25039/CIE.DS.$$$$$$$$</code> suffix
-        (a local placeholder until CIE CB assigns the real DOI).</li>
+      <li><b>Update DOI</b> — the small button beside the <b>Identifier (DOI)</b> field generates a
+        compliant <code>10.25039/CIE.DS.$$$$$$$$</code> suffix (a local placeholder until CIE CB
+        assigns the real DOI).</li>
     </ul>
 
     <h4>Column headers — bulk paste from Excel <span class="kv">(new)</span></h4>

@@ -63,7 +63,7 @@
       "entryId": "364e757a-5e95-6077-1093-c4136c7c5220",
       "rev": 1,
       "contentHash": "d72f9f6338d60338ade0b9d22d3db2020737cb6707901c48cd0c70c491eb8e6b",
-      "status": "published",
+      "status": "draft",
       "domains": [],
       "audit": {
         "createdBy": "import",

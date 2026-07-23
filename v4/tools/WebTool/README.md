@@ -7,7 +7,7 @@ metadata records, with full git-like change history and safe concurrent-edit mer
 Modelled on the termdat curation workflow. Runs entirely in the browser from a
 local file — **no server, no network access, no external/CDN dependencies.**
 
-**Interface version 1.7.0** (shown in the header).
+**Interface version 1.8.0** (shown in the header).
 
 A **? Help** button in the toolbar opens an in-app summary of the features below,
 including the link to the Crossref deposit validator.
@@ -78,12 +78,30 @@ and email, registrant, database title, publisher name and the institution fields
 (name, acronym, place, department). These are organisation-wide values used by
 **Export Crossref XML** (see below); set them once and they apply to every deposit.
 
-In the entry editor, **Revert to defaults** (in the action bar at the top, next to
-*Update DOI*) resets **all** default-managed fields of the current entry — creators,
-publisher, language, resource type, format, rights and the data-table methods — to
-the database defaults. Title, identifier, publication year, subjects, descriptions,
-related items, checksums and validations are left untouched. Like other edits it
-becomes *unsaved* until you Save the entry.
+## Draft & publish workflow
+
+Each entry is either a **draft** or **published**, and the status is **automatic and
+read-only** — you never set it by hand:
+
+- Creating or duplicating an entry, or editing any **payload** field, sets the entry to
+  **draft**.
+- **Save draft** stores your edits **without creating a revision** — the revision number is
+  unchanged, no history entry is added, and you are not asked for a comment. Envelope fields
+  (domains, DOI landing page) also save this way and never change status or revision.
+- **Publish entry** is the *only* action that mints a revision. It asks for a short **revision
+  text**, records **one** history entry holding the change since the previous published
+  revision, bumps the revision number and sets status to **published**. History therefore shows
+  revision-to-revision changes only, never intermediate draft saves.
+- Exporting a **draft** appends `_draft` after the (pending) revision number in the file name —
+  e.g. a new draft → `…_metadata_draft.json`, a draft on top of published v1 →
+  `…_metadata_v2_draft.json`.
+
+The action bar also offers two revert actions:
+
+- **Undo changes** — discards unsaved editor edits and returns to the last *saved* version.
+- **Revert to last published** — discards unpublished draft edits and restores the entry to its
+  last published revision (applied immediately, after a confirmation, since draft edits are not
+  versioned and are lost).
 
 ## Data model (metadatabase envelope)
 
@@ -100,9 +118,9 @@ Each entry wraps the DataCite payload with curation metadata:
 ```
 entry
 ├─ entryId        internal stable id (independent of the DOI; used for merge matching)
-├─ rev            revision counter, ++ on every committed change
+├─ rev            last published revision number (0 = never published); only Publish changes it
 ├─ contentHash    sha256 of the canonical payload (concurrency/merge anchor)
-├─ status         draft | review | published
+├─ status         draft | published  (automatic; draft while edited, published on Publish)
 ├─ landingPage    URL the DOI resolves to (Crossref <resource>); envelope-level, per entry
 ├─ domains        [ CIE-division codes ]
 ├─ audit          createdBy/Date, modifiedBy/Date, modifiedComment
@@ -123,23 +141,25 @@ revision number, author, date and change comment.
   while the compact patch log gives git-like per-field history, lets the tool show
   *exactly what changed*, and can reconstruct any earlier revision by replaying
   patches `1..N` onto the empty document.
-- **Restore:** the History tab can load any prior revision back into the editor;
-  saving it commits a **new** revision (history is never rewritten).
+- **Revisions are created by Publish only.** A `history` entry is appended when you **Publish** an
+  entry; it holds the field-level diff since the previous published revision. Draft saves between
+  publishes are not recorded. History is never rewritten.
+- **Restore:** the History tab can load any prior revision back into the editor; you then **Publish**
+  it to commit a new revision.
 - **`metadataRevision`:** the payload carries an optional integer `metadataRevision` that mirrors
-  the entry `rev` — the revision of the **metadata file itself**. It is stamped automatically and
-  advances **only when the metadata content changes**, never on envelope-only edits (status, domains,
-  DOI landing page). It is exported with the `*.csv_metadata.json` file (unlike the envelope `rev`),
-  is shown read-only in the *Database entry* section of the Form tab, and is distinct from the DataCite
-  `version` field (which versions the described resource). Legacy files without it are treated as
-  revision 1.
+  the entry `rev` — the revision of the **metadata file itself**. It is stamped automatically on
+  **Publish** (drafts carry the *pending* number). It is exported with the `*.csv_metadata.json` file
+  (unlike the envelope `rev`), is shown read-only in the *Database entry* section of the Form tab, and
+  is distinct from the DataCite `version` field (which versions the described resource). Legacy files
+  without it are treated as revision 1.
 
 ## Identifiers (DOI)
 
 CIE dataset DOIs follow `10.25039/CIE.DS.$$$$$$$$` where the 8-character suffix is
 drawn from alphanumerics **excluding the confusable characters `o O l L 1 I 0`**.
 
-The **Update DOI** action (and the **New entry** dialog) generates a compliant
-suffix and checks uniqueness within the database.
+The **Update DOI** button — beside the **Identifier (DOI)** field in the Form tab — (and the
+**New entry** dialog) generates a compliant suffix and checks uniqueness within the database.
 For translations, which reuse the number with an appended ISO-639-1 language suffix
 (e.g. `10.25039/CIE.DS.mifmy4x4.ES`), enter the DOI manually in the identifier field.
 
@@ -160,7 +180,7 @@ Every entry carries a **DOI landing page** — the URL the DOI resolves to, i.e.
 Crossref `<resource>`. It is an **envelope-level** field (stored per entry, kept out
 of exported DataCite `*.csv_metadata.json` files), shown as a link next to the DOI
 in the entry header and editable in the **Database entry** section of the Form tab.
-Like other envelope changes (status, domains) it saves without a version bump.
+Like other envelope changes (domains) it saves without a version bump and does not change status.
 
 It is required for Crossref deposit: if it is empty when you **Export Crossref XML**,
 the tool prompts for the URL and saves it on the entry. Existing landing pages can be
@@ -262,7 +282,7 @@ You can then:
 
 ## Compare an entry with an external metadata file
 
-Open an entry → **Compare with file…** (action bar, next to *Revert to defaults*) →
+Open an entry → **Compare with file…** (action bar) →
 pick a `*.csv_metadata.json` file. The tool compares that file against the entry's
 **stored** payload and lists the differences. It is **read-only** — nothing is
 imported, applied or changed.
