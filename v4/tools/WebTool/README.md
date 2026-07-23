@@ -7,7 +7,7 @@ metadata records, with full git-like change history and safe concurrent-edit mer
 Modelled on the termdat curation workflow. Runs entirely in the browser from a
 local file — **no server, no network access, no external/CDN dependencies.**
 
-**Interface version 1.4.0** (shown in the header).
+**Interface version 1.6.0** (shown in the header).
 
 A **? Help** button in the toolbar opens an in-app summary of the features below,
 including the link to the Crossref deposit validator.
@@ -19,6 +19,7 @@ including the link to the Crossref deposit validator.
 | `CIEmetaDB.html` | The application. Open it in a browser. Self-contained (logo, styles, code, hashers, validator all embedded). |
 | `CIEmetaDB_schema.json` | JSON Schema (draft-07) for the metadatabase envelope — the **data model**. |
 | `CIEmetaDB_starter.json` | Starter database built from the 36 records in `../../examples/`. |
+| `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text). |
 | `README.md` | This file. |
 
 The metadata payload of each entry conforms to
@@ -166,6 +167,60 @@ the tool prompts for the URL and saves it on the entry. Existing landing pages c
 recovered from a registered DOI via the Crossref REST API
 (`https://api.crossref.org/works/<doi>` → `resource.primary.URL`) or by following
 `https://doi.org/<doi>`.
+
+## Column headers — bulk paste from Excel
+
+Each data-table entry's **Column headers** (Form tab → *Data table info*) can be
+filled in one at a time, or in bulk via the paste box shown above the list:
+
+- Prepare **7 rows** — Title, Quantity, Unit, Description, Wavelength first,
+  Wavelength last, Wavelength step — with **one column per data column**,
+  column-for-column with the CSV. A leading label column (e.g. "Title" in
+  column A) is optional and auto-detected and stripped.
+- Copy that range in Excel, click the paste box and press **Ctrl+V**. This
+  **replaces the whole Column headers list** (with a confirmation dialog if it
+  wasn't already empty).
+- **Copy current as text** does the reverse — copies the current column
+  headers back out in the same row/column layout, for editing in Excel and
+  pasting back.
+- Each column-header box is labelled **Column N** so a long list (e.g. 100
+  columns, as in some CIE colour-fidelity tables) stays legible while
+  scrolling.
+
+## New entry from an Excel workbook (.xlsx)
+
+The **+ New entry** dialog can build an entry directly from an Excel workbook.
+Under **Related data file** you first pick a **file type** — the default is **No
+data file** (blank draft); choosing any data-file type opens the file dialog
+automatically, filtered to that type. Choose **Excel .xlsx (7 header rows + data
+table)** and pick a **single-worksheet** workbook laid out as:
+
+- **Rows 1–7**, starting at cell **A1** (no leading label column), describe the
+  columns — **one worksheet column per data column**, in the order **Title,
+  Quantity, Unit, Description, Wavelength first, Wavelength last, Wavelength
+  step** (the same 7 fields as the bulk paste above).
+- **Row 8 onward** is the data table itself.
+
+On **Create entry** the tool fills the entry's **column headers** and
+**`datatableInfo.validations`**, computes the `md5`/`sha256` checksums, and
+**generates the header-less CSV** — named from the **File name** field (keep it
+concise, e.g. `CIE_xxx.csv`, matching the files in `published/`) — which is
+downloaded automatically. The generated CSV is what gets published and what the
+stored checksums and sums describe; the workbook itself is only the authoring
+source.
+
+Both **numeric** data (spectral/wavelength tables and plain numerical tables) and
+**text** data (e.g. multilingual vocabularies) are supported. For non-spectral
+columns, put `:unap` in the wavelength rows. `sumOfColumns` is written **only when
+every column is numeric**, so text/mixed tables get the sample row and row/column
+counts but no misleading sums.
+
+Ready-made examples are in **`examples/`**:
+`example_spectral_wavelength.xlsx`, `example_numerical.xlsx` and
+`example_text_vocabulary.xlsx`.
+
+> **Browsers:** reading `.xlsx` uses the built-in `DecompressionStream`
+> (Chromium/Edge, Firefox, Safari — 2020+). No external library is bundled.
 
 ## Validation against the CSV data file
 
