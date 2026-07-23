@@ -2186,12 +2186,20 @@ async function saveDb(saveAs){
   markSaved(DB.baseHash); renderList();
   toast("Copy downloaded — this browser can't overwrite files or detect parallel edits. Use a Chromium browser for in-place save.","warn");
 }
+/* metadata-file name for an entry: <base>.csv_metadata[.vN].json, with the
+   revision suffix (_v2, _v3, …) appended only when the metadata revision > 1
+   (e.g. CIE_cc_1964_10deg.csv_metadata_v2.json), matching the published files. */
+function metadataFileName(e){
+  const base=entryFilename(e)||sanitize(entryTitle(e));
+  const stem=base.endsWith(".csv")?base+"_metadata":base+".csv_metadata";
+  const rev=(e.payload&&e.payload.metadataRevision)||e.rev||1;
+  return stem+(rev>1?"_v"+rev:"")+".json";
+}
 /* export entries as individual DataCite files (strip envelope) */
 function exportDataCiteFiles(entries){
   entries=entries||DB.entries;
   if(entries.length===1){
-    const e=entries[0]; const base=entryFilename(e)||sanitize(entryTitle(e));
-    const fn=base.endsWith(".csv")?base+"_metadata.json":base+".csv_metadata.json";
+    const e=entries[0]; const fn=metadataFileName(e);
     download(fn, JSON.stringify(e.payload,null,"\t"));
     toast("Exported "+fn,"ok"); return;
   }
@@ -2199,8 +2207,7 @@ function exportDataCiteFiles(entries){
   if(!confirm(`Export ${entries.length} metadata (DataCite) files as separate downloads?`)) return;
   let n=0;
   const step=()=>{ if(n>=entries.length){ toast("Exported "+entries.length+" files","ok"); return; }
-    const e=entries[n++]; const base=entryFilename(e)||sanitize(entryTitle(e));
-    const fn=base.endsWith(".csv")?base+"_metadata.json":base+".csv_metadata.json";
+    const e=entries[n++]; const fn=metadataFileName(e);
     download(fn, JSON.stringify(e.payload,null,"\t")); setTimeout(step,250); };
   step();
 }
