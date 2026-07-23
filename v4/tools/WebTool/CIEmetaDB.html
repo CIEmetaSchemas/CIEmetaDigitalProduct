@@ -43,7 +43,7 @@
   input,select,textarea{font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px 8px;background:#fff;width:100%}
   input:focus,select:focus,textarea:focus{outline:2px solid var(--cie-sec2);border-color:var(--cie-sec1)}
   textarea{resize:vertical;font-family:"Cascadia Code",Consolas,monospace;font-size:12.5px;line-height:1.4}
-  .wrap{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:0;height:calc(100vh - 96px)}
+  .wrap{display:grid;grid-template-columns:minmax(380px,480px) 1fr;gap:0;height:calc(100vh - 96px)}
   .list-pane{border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;min-height:0}
   .list-filters{padding:10px 12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
   .list-filters .row{display:flex;gap:8px}
@@ -60,6 +60,7 @@
   a.doi-link:hover{color:var(--cie-main);border-bottom-style:solid}
   .chip{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:10px;background:var(--cie-sec3);color:#0a2a52;margin:1px 3px 1px 0}
   .chip.dom{background:#e3ecfb;border:1px solid var(--cie-sec2)}
+  .chip.rev{background:#eeece6;border:1px solid #d6d2c7;color:#6b665a}
   .badge{display:inline-block;font-size:10px;padding:1px 7px;border-radius:4px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
   .badge.draft{background:#fdf0d8;color:#8a5b00}
   .badge.review{background:#e0ecfb;color:#0a4aa0}
@@ -661,7 +662,13 @@ function newDB(){
     domains:clone(DEFAULT_DOMAINS), defaults:clone(DEFAULT_VALUES), entries:[]
   };
 }
-function computeDbBaseHash(db){ return sha256Str(db.entries.map(e=>e.contentHash).join("|")); }
+/* per-entry fingerprint for the DB hash: payload contentHash PLUS the envelope fields
+   (status/domains/landingPage) that are versioned outside the payload — so an envelope-only
+   edit still drifts the DB baseHash and marks the database unsaved. */
+function entryEnvFingerprint(e){
+  return e.contentHash+"~"+canonical({status:e.status||"", domains:(e.domains||[]).slice().sort(), landingPage:e.landingPage||""});
+}
+function computeDbBaseHash(db){ return sha256Str(db.entries.map(entryEnvFingerprint).join("|")); }
 function findEntry(id){ return DB.entries.find(e=>e.entryId===id); }
 
 function blankPayload(doi, filename){
@@ -1072,8 +1079,9 @@ function renderList(){
     const tr=document.createElement("tr");
     if(e.entryId===selectedId) tr.className="sel";
     const doms=(e.domains||[]).map(d=>`<span class="chip dom">${esc(d)}</span>`).join("");
+    const revChip=`<span class="chip rev" title="Metadata file revision">rev ${e.rev}</span>`;
     tr.innerHTML=`<td><div class="title-cell">${esc(entryTitle(e))}</div>
-        <div class="kv">${esc(entryFilename(e))}</div>${doms}</td>
+        <div class="kv">${esc(entryFilename(e))}</div>${doms}${revChip}</td>
       <td><div class="doi-cell">${esc(entryDoi(e))}</div>${dupIds.has(e.entryId)?'<span class="badge dup" title="Duplicate DOI — must be fixed">duplicate DOI</span>':''}</td>
       <td><span class="badge ${esc(e.status)}">${esc(e.status)}</span></td>
       <td class="kv">${esc((e.audit.modifiedDate||"").replace("T"," ").slice(0,19))}<br>${esc(e.audit.modifiedBy)}<br>rev ${e.rev}</td>`;
