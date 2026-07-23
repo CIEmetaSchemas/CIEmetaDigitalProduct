@@ -158,7 +158,7 @@
   <button id="btnNewEntry" class="sec">+ New entry</button>
   <button id="btnDomains" class="ghost">Domains&hellip;</button>
   <button id="btnDefaults" class="ghost">Edit defaults&hellip;</button>
-  <button id="btnExportDataCite" class="ghost">Export Metadata&hellip;</button>
+  <button id="btnExportDataCite" class="ghost" title="Export all entries as *.csv_metadata.json files">Export metadata-files&hellip;</button>
   <button id="btnHelp" class="ghost" title="Help &amp; information">? Help</button>
   <span class="kv" id="dbStat"></span>
 </div>
@@ -260,7 +260,7 @@ const DEFAULT_VALUES = {
   interpolationMethod: ":unap",
   extrapolationMethod: ":unap",
   dataQuality: ":unap",
-  // Crossref deposit header / database-level metadata (used by "Export Crossref XML")
+  // Crossref deposit header / database-level metadata (used by "Export to Crossref-file (XML)")
   crDepositorName: "CIE",
   crDepositorEmail: "ciecb@cie.co.at",
   crRegistrant: "International Commission on Illumination (CIE)",
@@ -490,7 +490,7 @@ function diffPatch(a, b, base){
 function esc6902(k){ return String(k).replace(/~/g,"~0").replace(/\//g,"~1"); }
 /* granular field diff: like diffPatch but recurses into arrays by index so a single
    changed element yields a precise leaf path (e.g. /checksums/1/checksum) instead of a
-   whole-array replace. Used by the "Compare with file" view. */
+   whole-array replace. Used by the "Compare with metadata-file (JSON)" view. */
 function deepDiff(a, b, base){
   base = base||"";
   const ops=[];
@@ -1154,11 +1154,11 @@ function renderDetail(){
       <button id="btnPublish" title="Create a new revision and mark the entry published">Publish entry</button>
       <button class="ghost" id="btnRevert" title="Discard unsaved editor changes and return to the last saved version">Undo changes</button>
       <button class="ghost" id="btnRevertPublished" title="Discard unpublished draft edits and restore the last published revision">Revert to last published</button>
-      <button class="ghost" id="btnCompareFile">Compare with file&hellip;</button>
-      <button class="ghost" id="btnValidateCsv">Validate against CSV&hellip;</button>
+      <button class="ghost" id="btnCompareFile" title="Compare this entry with an exported *.csv_metadata.json file">Compare with<br>metadata-file (JSON)</button>
+      <button class="ghost" id="btnValidateCsv" title="Validate this entry against its CSV data file">Validate against<br>data-file (CSV, &hellip;)</button>
+      <button class="ghost" id="btnExportOne" title="Export this entry as a *.csv_metadata.json file">Export to<br>metadata-file (JSON)</button>
+      <button class="ghost" id="btnExportCrossref" title="Export a Crossref 5.3.1 deposit file for this entry">Export to<br>Crossref-file (XML)</button>
       <button class="ghost" id="btnDupe">Duplicate</button>
-      <button class="ghost" id="btnExportOne">Export Metadata file</button>
-      <button class="ghost" id="btnExportCrossref">Export Crossref XML&hellip;</button>
       <button class="danger" id="btnDelete">Delete</button>
     </div>`;
   pane.appendChild(head);
@@ -2539,7 +2539,7 @@ function exportCrossrefXml(e){
   doCrossrefExport(e, lp);
 }
 function doCrossrefExport(e, landingPage){
-  if(!entryDoi(e)){ if(!confirm("This entry has no DOI. Export Crossref XML anyway (with an empty <doi>)?")) return; }
+  if(!entryDoi(e)){ if(!confirm("This entry has no DOI. Export to Crossref-file (XML) anyway (with an empty <doi>)?")) return; }
   const {xml, batchId, skipped}=buildCrossrefXml(e, landingPage);
   download(batchId+".xml", xml, "application/xml");
   if(skipped.length) toast("Exported "+batchId+".xml — skipped unmapped relation(s): "+[...new Set(skipped)].join(", "),"err");
@@ -2634,7 +2634,7 @@ function openHelpDialog(){
         metadatabase JSON (see <i>Saving &amp; concurrent edits</i> below).</li>
       <li><b>Import / Merge…</b> — reconcile another database or import individual
         <code>*.csv_metadata.json</code> files, with per-entry conflict resolution and DOI checks.</li>
-      <li><b>+ New entry</b>, <b>Domains…</b>, <b>Edit defaults…</b>, <b>Export Metadata…</b>.</li>
+      <li><b>+ New entry</b>, <b>Domains…</b>, <b>Edit defaults…</b>, <b>Export metadata-files…</b>.</li>
       <li><b>? Help</b> — this dialog.</li>
     </ul>
 
@@ -2727,8 +2727,8 @@ function openHelpDialog(){
       section of the Form tab. Crossref requires it for the <code>&lt;resource&gt;</code> element;
       if it is empty when you export, the tool prompts for it and saves it on the entry.</p>
 
-    <h4>Export to Crossref XML <span class="kv">(new)</span></h4>
-    <p style="margin:4px 0">The per-entry <b>Export Crossref XML…</b> button (entry action bar)
+    <h4>Export to Crossref-file (XML) <span class="kv">(new)</span></h4>
+    <p style="margin:4px 0">The per-entry <b>Export to Crossref-file (XML)</b> button (entry action bar)
       generates a Crossref 5.3.1 <code>&lt;doi_batch&gt;</code> deposit file for the selected entry,
       ready for DOI registration.</p>
     <ul>
@@ -2744,9 +2744,9 @@ function openHelpDialog(){
     <p style="margin:4px 0"><b>Validate the generated XML</b> with the Crossref deposit parser:<br>
       <a href="https://data.crossref.org/reports/parser.html" target="_blank" rel="noopener noreferrer">https://data.crossref.org/reports/parser.html</a></p>
 
-    <h4>Compare with an external metadata file <span class="kv">(new)</span></h4>
-    <p style="margin:4px 0">The per-entry <b>Compare with file…</b> button (entry action bar, next to
-      <b>Revert to defaults</b>) checks the selected database entry against an external
+    <h4>Compare with a metadata-file (JSON) <span class="kv">(new)</span></h4>
+    <p style="margin:4px 0">The per-entry <b>Compare with metadata-file (JSON)</b> button (entry action bar)
+      checks the selected database entry against an external
       <code>*.csv_metadata.json</code> file — useful to see whether a published or exported file still
       matches what the database holds. It is <b>read-only</b>: nothing is imported or changed.</p>
     <ul>

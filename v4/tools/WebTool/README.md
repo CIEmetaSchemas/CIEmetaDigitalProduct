@@ -76,7 +76,7 @@ new entries always use the current year.
 The same dialog also holds the **Crossref deposit-header defaults** — depositor name
 and email, registrant, database title, publisher name and the institution fields
 (name, acronym, place, department). These are organisation-wide values used by
-**Export Crossref XML** (see below); set them once and they apply to every deposit.
+**Export to Crossref-file (XML)** (see below); set them once and they apply to every deposit.
 
 ## Draft & publish workflow
 
@@ -182,7 +182,7 @@ of exported DataCite `*.csv_metadata.json` files), shown as a link next to the D
 in the entry header and editable in the **Database entry** section of the Form tab.
 Like other envelope changes (domains) it saves without a version bump and does not change status.
 
-It is required for Crossref deposit: if it is empty when you **Export Crossref XML**,
+It is required for Crossref deposit: if it is empty when you **Export to Crossref-file (XML)**,
 the tool prompts for the URL and saves it on the entry. Existing landing pages can be
 recovered from a registered DOI via the Crossref REST API
 (`https://api.crossref.org/works/<doi>` → `resource.primary.URL`) or by following
@@ -282,7 +282,7 @@ You can then:
 
 ## Compare an entry with an external metadata file
 
-Open an entry → **Compare with file…** (action bar) →
+Open an entry → **Compare with metadata-file (JSON)** (action bar) →
 pick a `*.csv_metadata.json` file. The tool compares that file against the entry's
 **stored** payload and lists the differences. It is **read-only** — nothing is
 imported, applied or changed.
@@ -359,14 +359,14 @@ more per entry. Entries can be filtered by domain in the list.
 ## Export
 
 - **Save DB** / **Save DB As…** — the whole metadatabase (with history and audit).
-- **Export Metadata…** (toolbar) or **Export Metadata file** (per entry) — emits
+- **Export metadata-files…** (toolbar) or **Export to metadata-file (JSON)** (per entry) — emits
   standard `*.csv_metadata.json` files matching the format in `../../examples/`
   (envelope, history and audit stripped), ready for publication.
-- **Export Crossref XML…** (per entry) — see below.
+- **Export to Crossref-file (XML)** (per entry) — see below.
 
-### Export to Crossref XML (DOI registration)
+### Export to Crossref-file (XML) (DOI registration)
 
-The per-entry **Export Crossref XML…** button (entry action bar) generates a
+The per-entry **Export to Crossref-file (XML)** button (entry action bar) generates a
 **Crossref 5.3.1 `<doi_batch>`** deposit file for the selected entry, ready to
 register the DOI. The file is named `<dataset>(<YYYYMMDDHHMMSS>).xml`.
 
