@@ -43,7 +43,7 @@
   input,select,textarea{font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px 8px;background:#fff;width:100%}
   input:focus,select:focus,textarea:focus{outline:2px solid var(--cie-sec2);border-color:var(--cie-sec1)}
   textarea{resize:vertical;font-family:"Cascadia Code",Consolas,monospace;font-size:12.5px;line-height:1.4}
-  .wrap{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:0;height:calc(100vh - 96px)}
+  .wrap{display:grid;grid-template-columns:minmax(380px,480px) 1fr;gap:0;height:calc(100vh - 96px)}
   .list-pane{border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;min-height:0}
   .list-filters{padding:10px 12px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
   .list-filters .row{display:flex;gap:8px}
@@ -60,6 +60,7 @@
   a.doi-link:hover{color:var(--cie-main);border-bottom-style:solid}
   .chip{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:10px;background:var(--cie-sec3);color:#0a2a52;margin:1px 3px 1px 0}
   .chip.dom{background:#e3ecfb;border:1px solid var(--cie-sec2)}
+  .chip.rev{background:#eeece6;border:1px solid #d6d2c7;color:#6b665a}
   .badge{display:inline-block;font-size:10px;padding:1px 7px;border-radius:4px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
   .badge.draft{background:#fdf0d8;color:#8a5b00}
   .badge.review{background:#e0ecfb;color:#0a4aa0}
@@ -157,7 +158,7 @@
   <button id="btnNewEntry" class="sec">+ New entry</button>
   <button id="btnDomains" class="ghost">Domains&hellip;</button>
   <button id="btnDefaults" class="ghost">Edit defaults&hellip;</button>
-  <button id="btnExportDataCite" class="ghost">Export Metadata&hellip;</button>
+  <button id="btnExportDataCite" class="ghost" title="Export all entries as *.csv_metadata.json files">Export metadata-files&hellip;</button>
   <button id="btnHelp" class="ghost" title="Help &amp; information">? Help</button>
   <span class="kv" id="dbStat"></span>
 </div>
@@ -173,7 +174,6 @@
         <select id="filterStatus">
           <option value="">All statuses</option>
           <option value="draft">Draft</option>
-          <option value="review">Review</option>
           <option value="published">Published</option>
         </select>
       </div>
@@ -221,7 +221,7 @@
 
 /* ---------- constants ---------- */
 const APP = {
-  VERSION: "1.4.0",
+  VERSION: "1.8.0",
   DB_SCHEMA_NAME: "CIEmetaDB",
   DB_SCHEMA_VERSION: 1,
   DOI_PREFIX: "10.25039/CIE.DS.",
@@ -260,7 +260,7 @@ const DEFAULT_VALUES = {
   interpolationMethod: ":unap",
   extrapolationMethod: ":unap",
   dataQuality: ":unap",
-  // Crossref deposit header / database-level metadata (used by "Export Crossref XML")
+  // Crossref deposit header / database-level metadata (used by "Create Crossref-file (XML)")
   crDepositorName: "CIE",
   crDepositorEmail: "ciecb@cie.co.at",
   crRegistrant: "International Commission on Illumination (CIE)",
@@ -316,21 +316,6 @@ const DEFAULT_FIELDS = [
 function defaults(){ return (DB && DB.defaults) || DEFAULT_VALUES; }
 function defCreator(){ const d=defaults(); return {name:d.creatorName||"", nameType:d.creatorNameType||"Organizational"}; }
 function defRights(){ const d=defaults(); const r={rights:d.rights||""}; if(d.rightsURI)r.rightsURI=d.rightsURI; if(d.rightsIdentifier)r.rightsIdentifier=d.rightsIdentifier; return r; }
-/* apply the default-managed fields onto a payload (used by "Revert to defaults") */
-function applyDefaultsToPayload(p){
-  const d=defaults();
-  p.creators=[defCreator()];
-  p.publisher=d.publisher||"";
-  p.language=d.language||"";
-  p.formats=[d.format||"text/csv"];
-  p.types={resourceType:d.resourceType||"", resourceTypeGeneral:d.resourceTypeGeneral||"Dataset"};
-  p.rightsList=[defRights()];
-  p.datatableInfo=p.datatableInfo||{};
-  p.datatableInfo.interpolationMethod=d.interpolationMethod||"";
-  p.datatableInfo.extrapolationMethod=d.extrapolationMethod||"";
-  p.datatableInfo.dataQuality=d.dataQuality||"";
-  return p;
-}
 
 /* ============================================================================
    Hashers (pure JS, work on raw bytes — reliable from file://)
@@ -503,6 +488,33 @@ function diffPatch(a, b, base){
   return ops;
 }
 function esc6902(k){ return String(k).replace(/~/g,"~0").replace(/\//g,"~1"); }
+/* granular field diff: like diffPatch but recurses into arrays by index so a single
+   changed element yields a precise leaf path (e.g. /checksums/1/checksum) instead of a
+   whole-array replace. Used by the "Compare with metadata-file (JSON)" view. */
+function deepDiff(a, b, base){
+  base = base||"";
+  const ops=[];
+  const isObj=x=>x&&typeof x==="object"&&!Array.isArray(x);
+  if(isObj(a)&&isObj(b)){
+    for(const k of Object.keys(a)){ if(!(k in b)) ops.push({op:"remove",path:base+"/"+esc6902(k)}); }
+    for(const k of Object.keys(b)){
+      const p=base+"/"+esc6902(k);
+      if(!(k in a)) ops.push({op:"add",path:p,value:clone(b[k])});
+      else ops.push(...deepDiff(a[k],b[k],p));
+    }
+  }else if(Array.isArray(a)&&Array.isArray(b)){
+    const n=Math.max(a.length,b.length);
+    for(let i=0;i<n;i++){
+      const p=base+"/"+i;
+      if(i>=a.length) ops.push({op:"add",path:p,value:clone(b[i])});
+      else if(i>=b.length) ops.push({op:"remove",path:p});
+      else ops.push(...deepDiff(a[i],b[i],p));
+    }
+  }else{
+    if(canonical(a)!==canonical(b)) ops.push({op:"replace",path:base,value:clone(b)});
+  }
+  return ops;
+}
 /* reconstruct payload at revision rev (1-based) from history forward patches */
 function reconstruct(history, rev){
   let doc={};
@@ -618,7 +630,7 @@ function buildCieSchema(){
 let DB = null;          // current metadatabase
 let selectedId = null;  // selected entryId
 let editModel = null;   // working payload copy of selected entry
-let editMeta = null;    // working copy of entry envelope (status/domains/landingPage)
+let editMeta = null;    // working copy of editable envelope fields (domains/landingPage); status is read-only
 let editDirty = false;
 let sort = {key:"title", dir:1};
 let dbFileHandle = null; // File System Access API handle (if used)
@@ -634,7 +646,13 @@ function newDB(){
     domains:clone(DEFAULT_DOMAINS), defaults:clone(DEFAULT_VALUES), entries:[]
   };
 }
-function computeDbBaseHash(db){ return sha256Str(db.entries.map(e=>e.contentHash).join("|")); }
+/* per-entry fingerprint for the DB hash: payload contentHash PLUS the envelope fields
+   (status/domains/landingPage) that are versioned outside the payload — so an envelope-only
+   edit still drifts the DB baseHash and marks the database unsaved. */
+function entryEnvFingerprint(e){
+  return e.contentHash+"~"+canonical({status:e.status||"", domains:(e.domains||[]).slice().sort(), landingPage:e.landingPage||""});
+}
+function computeDbBaseHash(db){ return sha256Str(db.entries.map(entryEnvFingerprint).join("|")); }
 function findEntry(id){ return DB.entries.find(e=>e.entryId===id); }
 
 function blankPayload(doi, filename){
@@ -660,36 +678,63 @@ function blankPayload(doi, filename){
   return p;
 }
 
-/* create a new entry committed at rev 1 */
+/* create a new entry. New/duplicated entries start as an unpublished draft (rev 0, no revision
+   history yet); entries created as already-published (e.g. DataCite import) are seeded with a
+   published baseline revision so their history/filename are consistent. */
 function createEntry(payload, opts){
   opts=opts||{};
-  if(payload && payload.metadataRevision==null) payload.metadataRevision=1; // metadata-file revision starts at 1
+  const published = opts.status==="published";
   const now=nowISO(), user=currentUser();
-  const patch=diffPatch({}, payload, "");
+  if(payload && payload.metadataRevision==null) payload.metadataRevision=1; // metadata-file revision starts at 1
+  const rev = published ? ((payload && payload.metadataRevision) || 1) : 0;
   const e={
-    entryId:uuid(), rev:1, contentHash:contentHash(payload),
-    status:opts.status||"draft",
+    entryId:uuid(), rev:rev, contentHash:contentHash(payload),
+    status: published ? "published" : "draft",
     landingPage:opts.landingPage||"",
     domains:opts.domains||[],
     audit:{createdBy:user, createdDate:now, modifiedBy:user, modifiedDate:now, modifiedComment:opts.comment||"Created"},
     payload:clone(payload),
-    history:[{rev:1, by:user, date:now, comment:opts.comment||"Created", baseHash:null, patch:patch}]
+    history: published ? [{rev:rev, by:user, date:now, comment:opts.comment||"Created", baseHash:null, patch:diffPatch({}, payload, "")}] : []
   };
   return e;
 }
 /* payload diff for change detection: ignores the bookkeeping metadataRevision field so it never
    triggers (or suppresses) a revision on its own */
 function contentDiff(a,b){ const x=clone(a||{}),y=clone(b||{}); delete x.metadataRevision; delete y.metadataRevision; return diffPatch(x,y,""); }
-/* commit an edit to an existing entry */
-function commitEdit(entry, newPayload, comment){
-  const now=nowISO(), user=currentUser();
-  const oldPayload=entry.payload;
-  if(contentDiff(oldPayload, newPayload).length===0) return false; // no genuine content change
-  entry.rev+=1;
+/* the version a draft will become when published — used for filename/display only. Published
+   entries simply show their own rev. */
+function pendingRev(e){ return e.status==="published" ? e.rev : (e.rev||0)+1; }
+/* store a draft edit WITHOUT creating a revision: updates the saved payload and flips the entry to
+   draft (unless the payload matches the last published revision again, in which case it snaps back
+   to published). Never touches rev or history. Returns true if the stored payload changed. */
+function storeDraft(entry, newPayload){
   const stored=clone(newPayload);
-  stored.metadataRevision=entry.rev;                 // metadata-file revision follows the payload rev
-  const patch=diffPatch(oldPayload, stored, "");      // history/reconstruct include the metadataRevision bump
-  entry.history.push({rev:entry.rev, by:user, date:now, comment:comment||"", baseHash:entry.contentHash, patch:patch});
+  if(contentDiff(entry.payload, stored).length===0) return false; // nothing changed
+  const lastPublished = entry.history.length ? reconstruct(entry.history, entry.rev) : {};
+  const backToPublished = entry.rev>0 && contentDiff(lastPublished, stored).length===0;
+  // a draft represents the pending next revision (last published + 1); rev itself is untouched
+  stored.metadataRevision = backToPublished ? entry.rev : (entry.rev||0)+1;
+  entry.status = backToPublished ? "published" : "draft";
+  entry.payload=stored;
+  entry.contentHash=contentHash(stored);
+  const now=nowISO(), user=currentUser();
+  entry.audit.modifiedBy=user; entry.audit.modifiedDate=now; entry.audit.modifiedComment="";
+  return true;
+}
+/* publish the current payload as a new revision. This is the ONLY action that creates a revision:
+   it records one history entry holding the diff from the previously published revision, bumps rev,
+   and marks the entry published. Returns false when there is nothing new to publish. */
+function publishEntry(entry, newPayload, comment){
+  const now=nowISO(), user=currentUser();
+  const lastPublished = entry.history.length ? reconstruct(entry.history, entry.rev) : {};
+  const stored=clone(newPayload);
+  if(contentDiff(lastPublished, stored).length===0) return false; // no changes since last publish
+  const newRev=(entry.rev||0)+1;
+  stored.metadataRevision=newRev;                    // metadata-file revision follows the published rev
+  const patch=diffPatch(lastPublished, stored, "");
+  entry.history.push({rev:newRev, by:user, date:now, comment:comment||"", baseHash:entry.contentHash, patch:patch});
+  entry.rev=newRev;
+  entry.status="published";
   entry.payload=stored;
   entry.contentHash=contentHash(stored);
   entry.audit.modifiedBy=user; entry.audit.modifiedDate=now; entry.audit.modifiedComment=comment||"";
@@ -870,6 +915,102 @@ function readFileBytes(file){
 }
 
 /* ============================================================================
+   XLSX reader — pure browser, no external libs (runs from file://)
+   .xlsx is a ZIP of XML parts. We unzip (built-in DecompressionStream for the
+   deflated parts), then read sharedStrings + the first worksheet with DOMParser.
+   ==========================================================================*/
+function csvField(v){ const s=(v==null?"":String(v)); return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; }
+async function inflateRaw(bytes){
+  if(typeof DecompressionStream==="undefined")
+    throw new Error("this browser cannot read .xlsx (no DecompressionStream) — export the sheet to CSV manually");
+  const ds=new DecompressionStream("deflate-raw");
+  const ab=await new Response(new Blob([bytes]).stream().pipeThrough(ds)).arrayBuffer();
+  return new Uint8Array(ab);
+}
+async function unzip(bytes){
+  const u16=(o)=>bytes[o]|(bytes[o+1]<<8);
+  const u32=(o)=>(bytes[o]|(bytes[o+1]<<8)|(bytes[o+2]<<16)|(bytes[o+3]<<24))>>>0;
+  // End of Central Directory: scan backwards for its signature
+  let eo=-1;
+  for(let i=bytes.length-22;i>=0 && i>=bytes.length-22-65536;i--){ if(u32(i)===0x06054b50){ eo=i; break; } }
+  if(eo<0) throw new Error("not a valid .xlsx (no ZIP directory)");
+  const n=u16(eo+10); let p=u32(eo+16);
+  const dec=new TextDecoder("utf-8"), entries=[];
+  for(let i=0;i<n && p+46<=bytes.length;i++){
+    if(u32(p)!==0x02014b50) break;
+    const method=u16(p+10), compSize=u32(p+20);
+    const nameLen=u16(p+28), extraLen=u16(p+30), commLen=u16(p+32), lho=u32(p+42);
+    const name=dec.decode(bytes.subarray(p+46,p+46+nameLen));
+    entries.push({name,method,compSize,lho});
+    p+=46+nameLen+extraLen+commLen;
+  }
+  const map=new Map();
+  for(const e of entries){
+    if(u32(e.lho)!==0x04034b50) continue;
+    const nl=u16(e.lho+26), el=u16(e.lho+28), start=e.lho+30+nl+el;
+    const comp=bytes.subarray(start,start+e.compSize);
+    if(e.method===0) map.set(e.name,comp);
+    else if(e.method===8) map.set(e.name,await inflateRaw(comp));
+  }
+  return map;
+}
+function colRefToIdx(ref){
+  const m=String(ref).match(/^[A-Z]+/); if(!m) return 0;
+  let n=0; for(const ch of m[0]) n=n*26+(ch.charCodeAt(0)-64); return n-1;
+}
+/* parse .xlsx bytes → {headerRows: string[7][], dataRows: string[][]}.
+   Rows 1-7 (A1 down) are the column descriptors; row 8+ is the data table. */
+async function parseXlsx(bytes){
+  const map=await unzip(bytes);
+  const xmlOf=(name)=>{ const b=map.get(name); return b?new TextDecoder("utf-8").decode(b):null; };
+  const parse=(txt)=>new DOMParser().parseFromString(txt,"application/xml");
+  // shared strings
+  const ss=[]; const ssTxt=xmlOf("xl/sharedStrings.xml");
+  if(ssTxt){ const sis=parse(ssTxt).getElementsByTagName("si");
+    for(const si of sis){ const ts=si.getElementsByTagName("t"); let s=""; for(const t of ts) s+=t.textContent; ss.push(s); } }
+  // locate first worksheet (via workbook + rels, else first sheetN.xml)
+  let sheetPath=null;
+  const wb=xmlOf("xl/workbook.xml"), rels=xmlOf("xl/_rels/workbook.xml.rels");
+  if(wb && rels){
+    const sheet=parse(wb).getElementsByTagName("sheet")[0];
+    let rid=null; if(sheet) for(const a of sheet.attributes){ if(a.name==="r:id"||a.localName==="id"){ rid=a.value; break; } }
+    if(rid){ for(const r of parse(rels).getElementsByTagName("Relationship")){
+      if(r.getAttribute("Id")===rid){ let t=r.getAttribute("Target")||""; t=t.replace(/^\//,""); if(!/^xl\//.test(t)) t="xl/"+t; sheetPath=t; break; } } }
+  }
+  if(!sheetPath || !map.has(sheetPath)){ for(const k of map.keys()){ if(/^xl\/worksheets\/sheet\d+\.xml$/i.test(k)){ sheetPath=k; break; } } }
+  const sheetTxt=sheetPath && xmlOf(sheetPath);
+  if(!sheetTxt) throw new Error("no worksheet found in .xlsx");
+  // build a sparse grid
+  const grid=[]; let maxCol=0;
+  for(const row of parse(sheetTxt).getElementsByTagName("row")){
+    const ri=parseInt(row.getAttribute("r"),10)-1; if(!(ri>=0)) continue;
+    const arr=grid[ri]||(grid[ri]=[]);
+    let auto=0;
+    for(const c of row.getElementsByTagName("c")){
+      const ref=c.getAttribute("r"), ci=ref?colRefToIdx(ref):auto; auto=ci+1;
+      const t=c.getAttribute("t"); let val="";
+      if(t==="s"){ const v=c.getElementsByTagName("v")[0]; if(v) val=ss[parseInt(v.textContent,10)]||""; }
+      else if(t==="inlineStr"){ const is=c.getElementsByTagName("t")[0]; if(is) val=is.textContent; }
+      else { const v=c.getElementsByTagName("v")[0]; if(v) val=v.textContent; }
+      arr[ci]=val; if(ci+1>maxCol) maxCol=ci+1;
+    }
+  }
+  // column count comes from the 7 header rows
+  let ncol=0; for(let r=0;r<7;r++){ const a=grid[r]; if(a && a.length>ncol) ncol=a.length; }
+  if(!ncol) ncol=maxCol;
+  const pick=(r)=>{ const a=grid[r]||[]; const out=new Array(ncol); for(let c=0;c<ncol;c++) out[c]=(a[c]==null?"":String(a[c])); return out; };
+  const headerRows=[]; for(let r=0;r<7;r++) headerRows.push(pick(r));
+  const dataRows=[];
+  for(let r=7;r<grid.length;r++){
+    if(!grid[r]) continue;
+    const cells=pick(r);
+    if(cells.every(x=>x==="")) continue;   // skip fully-empty rows
+    dataRows.push(cells);
+  }
+  return {headerRows, dataRows};
+}
+
+/* ============================================================================
    rendering: entry list
    ==========================================================================*/
 function entryTitle(e){ const t=e.payload&&e.payload.titles&&e.payload.titles[0]; return t&&t.title?t.title:"(untitled)"; }
@@ -949,11 +1090,12 @@ function renderList(){
     const tr=document.createElement("tr");
     if(e.entryId===selectedId) tr.className="sel";
     const doms=(e.domains||[]).map(d=>`<span class="chip dom">${esc(d)}</span>`).join("");
+    const revChip=`<span class="chip rev" title="${e.status==="draft"?"Pending revision (draft — not yet published)":"Published revision"}">rev ${pendingRev(e)}${e.status==="draft"?" draft":""}</span>`;
     tr.innerHTML=`<td><div class="title-cell">${esc(entryTitle(e))}</div>
-        <div class="kv">${esc(entryFilename(e))}</div>${doms}</td>
+        <div class="kv">${esc(entryFilename(e))}</div>${doms}${revChip}</td>
       <td><div class="doi-cell">${esc(entryDoi(e))}</div>${dupIds.has(e.entryId)?'<span class="badge dup" title="Duplicate DOI — must be fixed">duplicate DOI</span>':''}</td>
       <td><span class="badge ${esc(e.status)}">${esc(e.status)}</span></td>
-      <td class="kv">${esc((e.audit.modifiedDate||"").replace("T"," ").slice(0,19))}<br>${esc(e.audit.modifiedBy)}<br>rev ${e.rev}</td>`;
+      <td class="kv">${esc((e.audit.modifiedDate||"").replace("T"," ").slice(0,19))}<br>${esc(e.audit.modifiedBy)}<br>rev ${pendingRev(e)}</td>`;
     tr.onclick=()=>selectEntry(e.entryId);
     tb.appendChild(tr);
   }
@@ -982,11 +1124,11 @@ function selectEntry(id, keepTab){
   selectedId=id; editDirty=false;
   const e=findEntry(id);
   editModel = e?clone(e.payload):null;
-  editMeta = e?{status:e.status, domains:clone(e.domains||[]), landingPage:e.landingPage||""}:null;
+  editMeta = e?{domains:clone(e.domains||[]), landingPage:e.landingPage||""}:null; // status is read-only, not buffered
   if(!keepTab) activeTab="form";
   renderList(); renderDetail();
 }
-function resetEditMeta(e){ editMeta = {status:e.status, domains:clone(e.domains||[]), landingPage:e.landingPage||""}; }
+function resetEditMeta(e){ editMeta = {domains:clone(e.domains||[]), landingPage:e.landingPage||""}; }
 function markDirty(){ editDirty=true; syncJsonView(); const s=el("saveState"); if(s) s.textContent="● unsaved"; }
 
 function renderDetail(){
@@ -1001,20 +1143,22 @@ function renderDetail(){
     <div class="meta">
       ${doi?`<a class="mono doi-link" href="https://doi.org/${esc(doi)}" target="_blank" rel="noopener noreferrer">https://doi.org/${esc(doi)}</a>`:'<span class="mono">(no DOI)</span>'}
       ${e.landingPage?`<a class="mono doi-link" href="${esc(e.landingPage)}" target="_blank" rel="noopener noreferrer" title="DOI landing page (Crossref resource)">↪ landing page</a>`:'<span class="mono" style="color:var(--muted)">(no landing page)</span>'}
-      <span>rev ${e.rev}</span>
+      <span class="badge ${esc(e.status)}" title="Status is set automatically: draft while edited, published when you press Publish">${esc(e.status)}</span>
+      <span title="${e.status==="draft"?"Pending revision — becomes this number when published":"Published revision"}">rev ${pendingRev(e)}</span>
       <span>created ${esc((e.audit.createdDate||"").slice(0,10))} by ${esc(e.audit.createdBy)}</span>
       <span>modified ${esc((e.audit.modifiedDate||"").slice(0,10))} by ${esc(e.audit.modifiedBy)}</span>
       <span id="saveState"></span>
     </div>
     <div class="detail-actions">
-      <button id="btnSaveEntry">Save entry</button>
-      <button class="ghost" id="btnRevert">Revert</button>
-      <button class="ghost" id="btnGenDoi">Update DOI</button>
-      <button class="ghost" id="btnRevertDefaults">Revert to defaults</button>
-      <button class="ghost" id="btnValidateCsv">Validate against CSV&hellip;</button>
+      <button id="btnSaveEntry">Save draft</button>
+      <button id="btnPublish" title="Create a new revision and mark the entry published">Publish entry</button>
+      <button class="ghost" id="btnRevert" title="Discard unsaved editor changes and return to the last saved version">Undo changes</button>
+      <button class="ghost" id="btnRevertPublished" title="Discard unpublished draft edits and restore the last published revision">Revert to <br>last published</button>
+      <button class="ghost" id="btnCompareFile" title="Compare this entry with an exported *.csv_metadata.json file">Compare with<br>metadata-file (JSON)</button>
+      <button class="ghost" id="btnValidateCsv" title="Validate this entry against its CSV data file">Validate against<br>data-file (CSV, &hellip;)</button>
+      <button class="ghost" id="btnExportOne" title="Export this entry as a *.csv_metadata.json file">Export<br>metadata-file (JSON)</button>
+      <button class="ghost" id="btnExportCrossref" title="Create a Crossref 5.3.1 deposit file for this entry">Create <br>Crossref-file (XML)</button>
       <button class="ghost" id="btnDupe">Duplicate</button>
-      <button class="ghost" id="btnExportOne">Export Metadata file</button>
-      <button class="ghost" id="btnExportCrossref">Export Crossref XML&hellip;</button>
       <button class="danger" id="btnDelete">Delete</button>
     </div>`;
   pane.appendChild(head);
@@ -1029,13 +1173,14 @@ function renderDetail(){
   const page=document.createElement("div"); page.className="tabpage"; page.id="tabpage"; pane.appendChild(page);
 
   el("btnSaveEntry").onclick=saveEntry;
-  el("btnRevert").onclick=()=>{ editModel=clone(e.payload); resetEditMeta(e); editDirty=false; renderDetail(); toast("Reverted to saved version"); };
+  el("btnPublish").onclick=publishEntryAction;
+  el("btnRevert").onclick=()=>{ editModel=clone(e.payload); resetEditMeta(e); editDirty=false; renderDetail(); toast("Changes undone — back to the last saved version"); };
+  el("btnRevertPublished").onclick=()=>revertToPublished(e);
   el("btnValidateCsv").onclick=()=>{ activeTab="validate"; renderDetail(); };
-  el("btnGenDoi").onclick=()=>openDoiDialog(e);
-  el("btnRevertDefaults").onclick=revertToDefaults;
   el("btnDupe").onclick=()=>duplicateEntry(e);
   el("btnExportOne").onclick=()=>exportDataCiteFiles([e]);
   el("btnExportCrossref").onclick=()=>exportCrossrefXml(e);
+  el("btnCompareFile").onclick=()=>openCompareDialog(e);
   el("btnDelete").onclick=()=>deleteEntry(e);
   if(editDirty) el("saveState").textContent="● unsaved";
 
@@ -1087,14 +1232,49 @@ function arraySection(parent, title, arr, itemRender, factory){
 }
 function g2(g,label,node){ const l=document.createElement("label"); l.textContent=label; g.appendChild(l); g.appendChild(node); }
 
+const COLUMN_HEADER_FIELD_LABELS=["Title","Quantity","Unit","Description","Wavelength first","Wavelength last","Wavelength step"];
+const COLUMN_HEADER_FIELD_KEYS=["title","quantity","unit","description","wavelength_first","wavelength_last","wavelength_step"];
+function parseColumnHeaderPaste(text){
+  let lines=text.replace(/\r\n?/g,"\n").split("\n");
+  while(lines.length && lines[lines.length-1].trim()==="") lines.pop();
+  if(!lines.length) return null;
+  let rows=lines.map(l=>l.split("\t"));
+  if(rows.length && (rows[0][0]||"").trim().toLowerCase()==="title") rows=rows.map(r=>r.slice(1));
+  if(rows.length<7) return null;
+  rows=rows.slice(0,7);
+  const n=Math.max(...rows.map(r=>r.length));
+  const out=[];
+  for(let i=0;i<n;i++){
+    const obj={};
+    COLUMN_HEADER_FIELD_KEYS.forEach((key,rowIdx)=>{
+      const cell=(rows[rowIdx][i]||"").trim();
+      if(key==="title"||key==="quantity"||key==="unit"){ obj[key]=cell; }
+      else if(key==="description"){ if(cell!=="") obj[key]=cell; }
+      else{ if(cell!=="") obj[key]=cell.startsWith(":")?cell:parseFloat(cell); }
+    });
+    out.push(obj);
+  }
+  return out;
+}
+function columnHeadersToTsv(arr){
+  return COLUMN_HEADER_FIELD_KEYS.map((key,rowIdx)=>{
+    const cells=arr.map(it=>it[key]==null?"":String(it[key]));
+    return [COLUMN_HEADER_FIELD_LABELS[rowIdx],...cells].join("\t");
+  }).join("\n");
+}
+
 function renderForm(page,e){
   const p=editModel;
   // sidebar meta fieldset
   const fsMeta=document.createElement("fieldset");
   fsMeta.innerHTML='<legend>Database entry</legend>';
   const gm=document.createElement("div"); gm.className="grid";
-  // status/domains/landingPage edit the envelope buffer (editMeta); committed via Save entry
-  gm.appendChild(field("Status", sel(editMeta,"status",["draft","review","published"])));
+  // status is read-only: set automatically (draft while edited, published via Publish entry).
+  // domains/landingPage edit the envelope buffer (editMeta); committed via Save draft.
+  const statusView=document.createElement("div"); statusView.style.padding="4px 0";
+  statusView.innerHTML=`<span class="badge ${esc(e.status)}">${esc(e.status)}</span>`;
+  statusView.title="Set automatically — 'draft' while an entry has unpublished edits, 'published' after you press Publish entry.";
+  gm.appendChild(field("Status", statusView));
   const domWrap=document.createElement("div");
   DB.domains.forEach(d=>{
     const lab=document.createElement("label"); lab.style.display="inline-flex"; lab.style.alignItems="center"; lab.style.gap="4px"; lab.style.marginRight="12px"; lab.style.padding="0";
@@ -1104,10 +1284,10 @@ function renderForm(page,e){
   });
   gm.appendChild(field("Domains", domWrap));
   gm.appendChild(field("DOI landing page (Crossref resource URL)", inp(editMeta,"landingPage",{placeholder:"https://cie.co.at/datatable/…"})));
-  // metadata-file revision: read-only; increments only on metadata-content changes (not on envelope edits)
+  // metadata-file revision: read-only; only Publish entry mints a new revision.
   const revView=document.createElement("div"); revView.style.padding="6px 0"; revView.className="mono";
-  revView.textContent=(p.metadataRevision==null?"1":String(p.metadataRevision));
-  revView.title="Revision of this JSON metadata file. Increments only when the metadata content changes — not when the CIE division or DOI landing page is edited.";
+  revView.textContent = e.status==="draft" ? (pendingRev(e)+" (draft — not yet published)") : String(e.rev);
+  revView.title="Revision of this JSON metadata file. A new revision is created only when you press Publish entry — not when saving a draft or editing the CIE division / DOI landing page.";
   gm.appendChild(field("Metadata revision", revView));
   fsMeta.appendChild(gm); page.appendChild(fsMeta);
 
@@ -1115,7 +1295,12 @@ function renderForm(page,e){
   const fsId=document.createElement("fieldset"); fsId.innerHTML='<legend>Identifier</legend>';
   const gi=document.createElement("div"); gi.className="grid";
   p.identifier=p.identifier||{identifier:"",identifierType:"DOI"};
-  gi.appendChild(field("Identifier (DOI)", inp(p.identifier,"identifier",{placeholder:APP.DOI_PREFIX+"xxxxxxxx"})));
+  const doiInput=inp(p.identifier,"identifier",{placeholder:APP.DOI_PREFIX+"xxxxxxxx"});
+  doiInput.style.flex="1"; doiInput.style.minWidth="0";
+  const doiRow=document.createElement("div"); doiRow.style.display="flex"; doiRow.style.gap="6px"; doiRow.style.alignItems="center";
+  doiRow.appendChild(doiInput);
+  doiRow.appendChild(mkBtn("Update DOI…","ghost small",()=>openDoiDialog(e)));
+  gi.appendChild(field("Identifier (DOI)", doiRow));
   gi.appendChild(field("Identifier type", inp(p.identifier,"identifierType")));
   const idHint=document.createElement("div"); idHint.className="hint";
   idHint.textContent="Format 10.25039/CIE.DS.①②③④⑤⑥⑦⑧ (8 chars, excludes o O l L 1 I 0).";
@@ -1229,7 +1414,31 @@ function renderForm(page,e){
   },()=>({validationType:"sumOfColumns",validationValue:""}));
 
   di.columnHeaders=di.columnHeaders||[];
-  arraySection(page,"Column headers",di.columnHeaders,(g,it)=>{
+  const chTools=document.createElement("div"); chTools.style.margin="0 0 8px";
+  const chHint=document.createElement("p"); chHint.className="hint"; chHint.style.margin="0 0 6px";
+  chHint.textContent='Paste column headers from Excel: prepare 7 rows (Title, Quantity, Unit, Description, Wavelength first, Wavelength last, Wavelength step), one column per data column — column-for-column with the CSV. A leading label column is optional and auto-detected. Pasting replaces the whole list below.';
+  chTools.appendChild(chHint);
+  const chRow=document.createElement("div"); chRow.style.display="flex"; chRow.style.gap="8px"; chRow.style.alignItems="flex-start";
+  const chPaste=document.createElement("textarea"); chPaste.rows=2; chPaste.placeholder="Click here, then Ctrl+V to paste rows copied from Excel…"; chPaste.style.flex="1";
+  chPaste.addEventListener("paste",(ev)=>{
+    ev.preventDefault();
+    const text=(ev.clipboardData||window.clipboardData).getData("text");
+    const parsed=parseColumnHeaderPaste(text);
+    if(!parsed || !parsed.length){ toast("Clipboard did not contain 7 tab-separated rows (Title/Quantity/Unit/Description/Wavelength first/last/step)","warn"); return; }
+    if(di.columnHeaders.length && !confirm(`Replace all ${di.columnHeaders.length} existing column header(s) with ${parsed.length} pasted column(s)?`)) return;
+    di.columnHeaders=parsed; markDirty(); renderDetail();
+    toast(`Pasted ${parsed.length} column header(s)`,"ok");
+  });
+  chRow.appendChild(chPaste);
+  const chCopy=document.createElement("button"); chCopy.type="button"; chCopy.className="ghost small"; chCopy.textContent="Copy current as text";
+  chCopy.onclick=()=>{ navigator.clipboard&&navigator.clipboard.writeText(columnHeadersToTsv(di.columnHeaders)); toast("Column headers copied","ok"); };
+  chRow.appendChild(chCopy);
+  chTools.appendChild(chRow);
+  page.appendChild(chTools);
+  arraySection(page,"Column headers",di.columnHeaders,(g,it,idx)=>{
+    const numLbl=document.createElement("div"); numLbl.style.gridColumn="1/-1"; numLbl.style.fontWeight="600"; numLbl.style.color="var(--cie-main)"; numLbl.style.marginBottom="2px";
+    numLbl.textContent="Column "+(idx+1);
+    g.appendChild(numLbl);
     g2(g,"Title",inp(it,"title"));
     g2(g,"Quantity",inp(it,"quantity"));
     g2(g,"Unit",inp(it,"unit"));
@@ -1432,7 +1641,7 @@ function renderCsvResult(out,e,filename,md5,sha,a){
   const btn=document.createElement("button"); btn.className="sec"; btn.textContent="Fill checksums, validations & wavelength range";
   btn.onclick=()=>{
     applyCsvToPayload(p, a, {md5, sha, filename, mode:"csvWavelength", sampleRow:rowInp.value});
-    markDirty(); toast("Metadata fields filled from CSV — review and Save entry","ok");
+    markDirty(); toast("Metadata fields filled from CSV — review and Save draft","ok");
     activeTab="form"; renderDetail();
   };
   gen.appendChild(p1); gen.appendChild(rowInp); gen.appendChild(document.createElement("br")); gen.appendChild(document.createElement("br")); gen.appendChild(btn);
@@ -1444,7 +1653,7 @@ function fmtNum(x){ if(!Number.isFinite(x)) return "0"; if(Number.isInteger(x)) 
 /* ---- history ---- */
 function renderHistory(page,e){
   const info=document.createElement("p"); info.className="hint";
-  info.textContent="Newest first. Each revision stores the field-level change (RFC-6902 JSON-Patch) from the previous one; earlier revisions are reconstructed by replaying patches.";
+  info.textContent="Newest first. A revision is created only when you Publish an entry; each one stores the field-level change (RFC-6902 JSON-Patch) from the previous published revision. Draft edits between publishes are not listed here.";
   page.appendChild(info);
   const hist=e.history.slice().reverse();
   for(const h of hist){
@@ -1457,7 +1666,7 @@ function renderHistory(page,e){
     const diff=document.createElement("div"); diff.className="diff"; diff.innerHTML=renderDiff(h.patch,h.rev,prev); box.appendChild(diff);
     if(h.rev<e.rev){
       const rb=document.createElement("button"); rb.className="ghost small"; rb.style.marginTop="6px"; rb.textContent="Restore this revision";
-      rb.onclick=()=>{ const old=reconstruct(e.history,h.rev); editModel=old; markDirty(); toast(`Loaded rev ${h.rev} into editor — Save to commit as new revision`,"ok"); activeTab="form"; renderDetail(); };
+      rb.onclick=()=>{ const old=reconstruct(e.history,h.rev); editModel=old; markDirty(); toast(`Loaded rev ${h.rev} into editor — Publish to commit as a new revision`,"ok"); activeTab="form"; renderDetail(); };
       box.appendChild(rb);
     }
     page.appendChild(box);
@@ -1482,42 +1691,70 @@ function renderDiff(patch,rev,prev){
 function shortVal(v){ if(v===undefined) return "∅"; const s=typeof v==="string"?v:JSON.stringify(v); return s.length>120?s.slice(0,117)+"…":s; }
 
 /* ---- entry actions ---- */
-function revertToDefaults(){
-  if(!editModel) return;
-  const labels=DEFAULT_FIELDS.map(f=>f.label).join(", ");
-  if(!confirm("Reset all default-managed fields to the database defaults?\n\nAffected: creators, "+labels+".\n\nKept: title, identifier, publication year, subjects, descriptions, related items, checksums and validations.")) return;
-  applyDefaultsToPayload(editModel); markDirty(); renderDetail();
-  toast("Fields reset to defaults — Save entry to commit","ok");
+/* discard unpublished draft edits and restore the entry to its last published revision.
+   Applied immediately (confirmed) — draft edits are unversioned and are lost. */
+function revertToPublished(e){
+  if(!e) return;
+  if(e.rev===0 || !e.history.length){ toast("This entry has never been published","warn"); return; }
+  const lastPublished=reconstruct(e.history, e.rev);
+  const clean = e.status==="published" && !editDirty && contentDiff(e.payload, lastPublished).length===0;
+  if(clean){ toast("Already at published rev "+e.rev); return; }
+  if(!confirm("Discard unpublished draft edits and restore published rev "+e.rev+"?")) return;
+  e.payload=clone(lastPublished);                 // its metadataRevision already equals e.rev
+  e.status="published";
+  e.contentHash=contentHash(e.payload);
+  e.audit.modifiedBy=currentUser(); e.audit.modifiedDate=nowISO(); e.audit.modifiedComment="Reverted to published rev "+e.rev;
+  editModel=clone(e.payload); resetEditMeta(e); editDirty=false;
+  persist(); renderList(); renderDetail();
+  toast("Restored published rev "+e.rev,"ok");
 }
+/* envelope (non-payload) changes: domains + landing page only. Status is no longer user-editable,
+   so it is not part of this comparison. */
 function metaChanged(e){
   if(!editMeta) return false;
-  return editMeta.status!==e.status
-    || (editMeta.landingPage||"")!==(e.landingPage||"")
+  return (editMeta.landingPage||"")!==(e.landingPage||"")
     || canonical((editMeta.domains||[]).slice().sort())!==canonical((e.domains||[]).slice().sort());
 }
-function saveEntry(){
-  const e=findEntry(selectedId); if(!e) return;
+/* pre-flight checks shared by Save and Publish; returns false to abort. */
+function preSaveChecks(e){
   const errs=validate(editModel,CIE_SCHEMA);
-  if(errs.length){ if(!confirm("The entry has "+errs.length+" schema issue(s):\n\n"+errs.slice(0,10).join("\n")+(errs.length>10?"\n…":"")+"\n\nSave anyway?")) return; }
+  if(errs.length){ if(!confirm("The entry has "+errs.length+" schema issue(s):\n\n"+errs.slice(0,10).join("\n")+(errs.length>10?"\n…":"")+"\n\nContinue anyway?")) return false; }
   const curDoi=editModel.identifier&&editModel.identifier.identifier;
   if(curDoi && DB.entries.some(x=>x.entryId!==e.entryId && entryDoi(x)===curDoi)){
-    if(!confirm("Another entry already uses this DOI:\n"+curDoi+"\n\nDOIs must be unique. Save anyway (the database will flag it as a duplicate to fix)?")) return;
+    if(!confirm("Another entry already uses this DOI:\n"+curDoi+"\n\nDOIs must be unique. Continue anyway (the database will flag it as a duplicate to fix)?")) return false;
   }
-  const patch=contentDiff(e.payload,editModel);
+  return true;
+}
+/* Save draft edits. Payload changes are stored WITHOUT creating a revision (the entry flips to
+   draft); envelope changes (domains / landing page) are stored as before. Publishing is the only
+   action that mints a revision — see publishEntry. */
+function saveEntry(){
+  const e=findEntry(selectedId); if(!e) return;
+  if(!preSaveChecks(e)) return;
+  const payloadChanged=contentDiff(e.payload,editModel).length>0;
   const meta=metaChanged(e);
-  if(patch.length===0 && !meta){ toast("No changes to save"); editDirty=false; renderDetail(); return; }
-  // payload changes are versioned in history (with a comment); envelope changes are not
-  if(patch.length){
-    const comment=prompt("Change comment (what changed and why):","");
-    if(comment===null) return; // cancelled
-    commitEdit(e,editModel,comment);
-  }
+  if(!payloadChanged && !meta){ toast("No changes to save"); editDirty=false; renderDetail(); return; }
+  if(payloadChanged) storeDraft(e,editModel);            // updates payload + status, no revision
   if(meta){
-    e.status=editMeta.status; e.domains=clone(editMeta.domains); e.landingPage=editMeta.landingPage||"";
-    if(!patch.length){ e.audit.modifiedBy=currentUser(); e.audit.modifiedDate=nowISO(); }
+    e.domains=clone(editMeta.domains); e.landingPage=editMeta.landingPage||"";
+    if(!payloadChanged){ e.audit.modifiedBy=currentUser(); e.audit.modifiedDate=nowISO(); }
   }
   resetEditMeta(e); editDirty=false; persist(); renderList(); renderDetail();
-  toast(patch.length?("Saved rev "+e.rev):"Saved entry changes","ok");
+  toast(e.status==="draft"?"Saved draft (not yet published)":"Saved entry changes","ok");
+}
+/* Publish the current editor content as a new revision (the only path that creates one). */
+function publishEntryAction(){
+  const e=findEntry(selectedId); if(!e) return;
+  if(!preSaveChecks(e)) return;
+  const lastPublished = e.history.length ? reconstruct(e.history, e.rev) : {};
+  if(contentDiff(lastPublished, editModel).length===0){ toast("No changes to publish since rev "+e.rev,"warn"); return; }
+  const comment=prompt("Revision text for rev "+((e.rev||0)+1)+" (what changed and why):","");
+  if(comment===null) return; // cancelled
+  // persist any envelope edits alongside the publish
+  if(metaChanged(e)){ e.domains=clone(editMeta.domains); e.landingPage=editMeta.landingPage||""; }
+  publishEntry(e,editModel,comment);
+  resetEditMeta(e); editDirty=false; persist(); renderList(); renderDetail();
+  toast("Published rev "+e.rev,"ok");
 }
 function deleteEntry(e){
   if(!confirm(`Delete entry "${entryTitle(e)}" (${entryDoi(e)})?\nThis removes it from the database.`)) return;
@@ -1558,17 +1795,12 @@ function openNewEntryDialog(){
   // ---- related data file (optional) ----
   let staged=null;   // {md5, sha, filename, fileType, analysis}
   const fset=document.createElement("fieldset"); fset.innerHTML="<legend>Related data file (optional)</legend>";
-  const picker=document.createElement("input"); picker.type="file"; picker.style.maxWidth="360px";
-  const pickInfo=document.createElement("span"); pickInfo.className="hint"; pickInfo.style.marginLeft="8px";
-  const clearBtn=document.createElement("button"); clearBtn.type="button"; clearBtn.className="ghost small";
-  clearBtn.textContent="✕"; clearBtn.title="Remove selected file"; clearBtn.style.marginLeft="8px"; clearBtn.style.display="none";
-  const pickRow=document.createElement("div"); pickRow.style.display="flex"; pickRow.style.alignItems="center";
-  pickRow.appendChild(picker); pickRow.appendChild(pickInfo); pickRow.appendChild(clearBtn);
-  fset.appendChild(pickRow);
-  const typeWrap=document.createElement("div"); typeWrap.style.marginTop="8px";
+  const typeWrap=document.createElement("div");
   const TYPES=[
+    {v:"none",          label:"No data file (blank draft)"},
     {v:"csvWavelength", label:"headerless CSV, first column wavelength"},
     {v:"csv",           label:"headerless CSV"},
+    {v:"xlsx",          label:"Excel .xlsx (7 header rows + data table)"},
     {v:"other",         label:"other filetype"}
   ];
   TYPES.forEach((t,i)=>{
@@ -1578,8 +1810,16 @@ function openNewEntryDialog(){
     lab.appendChild(r); lab.appendChild(document.createTextNode(t.label)); typeWrap.appendChild(lab);
   });
   fset.appendChild(typeWrap);
+  // file control — hidden until a data-file type is chosen (then the OS dialog auto-opens)
+  const picker=document.createElement("input"); picker.type="file"; picker.style.maxWidth="360px";
+  const pickInfo=document.createElement("span"); pickInfo.className="hint"; pickInfo.style.marginLeft="8px";
+  const clearBtn=document.createElement("button"); clearBtn.type="button"; clearBtn.className="ghost small";
+  clearBtn.textContent="✕"; clearBtn.title="Remove selected file"; clearBtn.style.marginLeft="8px"; clearBtn.style.display="none";
+  const pickRow=document.createElement("div"); pickRow.style.display="none"; pickRow.style.alignItems="center"; pickRow.style.marginTop="8px";
+  pickRow.appendChild(picker); pickRow.appendChild(pickInfo); pickRow.appendChild(clearBtn);
+  fset.appendChild(pickRow);
   const fhint=document.createElement("p"); fhint.className="hint";
-  fhint.textContent="Attach the data file to pre-fill metadata: CSV fills columns, sample row, sums (numeric only) and — for the wavelength option — the wavelength range; other filetypes set the file format. Checksums and file name are always filled. Leave empty for a blank draft.";
+  fhint.textContent="Choose a data-file type to attach a file — the file dialog opens automatically. CSV fills columns, sample row, sums (numeric only) and — for the wavelength option — the wavelength range; the .xlsx option reads 7 header rows (Title/Quantity/Unit/Description/Wavelength first/last/step) plus the data table, fills the column headers and validations, and generates the header-less CSV for download; other filetypes set the file format. Checksums and file name are always filled. Leave on “No data file” for a blank draft.";
   fset.appendChild(fhint);
   body.appendChild(fset);
 
@@ -1598,19 +1838,44 @@ function openNewEntryDialog(){
   const hint=document.createElement("p"); hint.className="hint"; hint.textContent="A draft DOI is generated locally. Real DOIs are assigned by CIE CB.";
   body.appendChild(hint);
 
-  picker.onchange=async()=>{
+  const selType=()=>(typeWrap.querySelector("input[name='newEntryFileType']:checked")||{}).value||"none";
+  const acceptFor=(m)=> m==="xlsx" ? ".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                       : (m==="csvWavelength"||m==="csv") ? ".csv,text/csv" : "";
+  async function stageFile(){
     const f=picker.files&&picker.files[0]; if(!f){ staged=null; pickInfo.textContent=""; clearBtn.style.display="none"; return; }
+    const mode=selType();
     pickInfo.textContent="reading…"; clearBtn.style.display="";
     try{
       const bytes=await readFileBytes(f);
-      const md5=md5Bytes(bytes), sha=sha256Bytes(bytes);
-      let analysis=null;
-      try{ analysis=analyzeCsv(new TextDecoder("utf-8").decode(bytes)); }catch(_){}
-      staged={md5, sha, filename:f.name, fileType:f.type||"", analysis};
-      if(!fileInp.value.trim()) fileInp.value=f.name;
-      pickInfo.textContent = analysis ? `${f.name} — ${analysis.nRows} rows × ${analysis.nCols} cols` : f.name;
-    }catch(err){ staged=null; pickInfo.textContent="could not read file"; }
-  };
+      if(mode==="xlsx"){
+        const {headerRows,dataRows}=await parseXlsx(bytes);
+        const columnHeaders=parseColumnHeaderPaste(headerRows.map(r=>r.join("\t")).join("\n"))||[];
+        const csvText=dataRows.map(r=>r.map(csvField).join(",")).join("\r\n");
+        const analysis=analyzeCsv(csvText);
+        const md5=md5Bytes(_enc.encode(csvText)), sha=sha256Bytes(_enc.encode(csvText));
+        const csvName=f.name.replace(/\.xlsx?$/i,".csv");
+        if(!fileInp.value.trim() || /\.xlsx?$/i.test(fileInp.value.trim())) fileInp.value=csvName;
+        staged={mode:"xlsx", md5, sha, filename:csvName, fileType:"", csvText, columnHeaders, analysis};
+        pickInfo.textContent=`${f.name} → CSV ${analysis.nRows} rows × ${analysis.nCols} cols, ${columnHeaders.length} header col(s)`;
+      }else{
+        const md5=md5Bytes(bytes), sha=sha256Bytes(bytes);
+        let analysis=null;
+        try{ analysis=analyzeCsv(new TextDecoder("utf-8").decode(bytes)); }catch(_){}
+        staged={mode, md5, sha, filename:f.name, fileType:f.type||"", analysis};
+        if(!fileInp.value.trim()) fileInp.value=f.name;
+        pickInfo.textContent = analysis ? `${f.name} — ${analysis.nRows} rows × ${analysis.nCols} cols` : f.name;
+      }
+    }catch(err){ staged=null; const msg=(err&&err.message)||String(err); pickInfo.textContent="could not read file: "+msg; toast("Could not read file: "+msg,"err"); }
+  }
+  picker.onchange=stageFile;
+  // selecting a data-file type reveals the file control and auto-opens the OS dialog;
+  // "No data file" hides it. The change event is a user gesture, so picker.click() is allowed.
+  typeWrap.querySelectorAll("input[name='newEntryFileType']").forEach(r=>r.addEventListener("change",()=>{
+    const mode=selType();
+    picker.value=""; staged=null; pickInfo.textContent=""; clearBtn.style.display="none";
+    if(mode==="none"){ pickRow.style.display="none"; return; }
+    picker.accept=acceptFor(mode); pickRow.style.display="flex"; picker.click();
+  }));
   clearBtn.onclick=()=>{ picker.value=""; staged=null; pickInfo.textContent=""; clearBtn.style.display="none"; };
 
   const create=mkBtn("Create entry","sec",()=>{
@@ -1623,10 +1888,17 @@ function openNewEntryDialog(){
     p.datatableInfo.extrapolationMethod=":unap";
     p.datatableInfo.dataQuality=":unap";
     if(staged){
-      const mode=(typeWrap.querySelector("input[name='newEntryFileType']:checked")||{}).value||"csvWavelength";
+      const mode=selType();
       const filename=fileInp.value.trim()||staged.filename;
-      applyCsvToPayload(p, mode==="other"?null:staged.analysis,
-        {md5:staged.md5, sha:staged.sha, filename, fileType:staged.fileType, mode});
+      if(mode==="xlsx"){
+        // auto: sums only if the whole table is numeric (text/vocabulary tables get none)
+        applyCsvToPayload(p, staged.analysis, {md5:staged.md5, sha:staged.sha, filename, mode:"csv"});
+        p.datatableInfo.columnHeaders=staged.columnHeaders;   // rich 7-row headers win
+        download(filename, staged.csvText, "text/csv");       // generated header-less CSV
+      }else{
+        applyCsvToPayload(p, mode==="other"?null:staged.analysis,
+          {md5:staged.md5, sha:staged.sha, filename, fileType:staged.fileType, mode});
+      }
     }
     const e=createEntry(p,{status:"draft",comment:"Created"});
     DB.entries.push(e); persist(); closeModal(); selectEntry(e.entryId); toast("New draft entry created","ok");
@@ -1725,7 +1997,7 @@ function loadWorkingCopy(){
 const hasFSA = ("showOpenFilePicker" in window) && ("showSaveFilePicker" in window);
 
 async function openDbFile(){
-  if(editDirty && !confirm("Discard unsaved entry changes?")) return;
+  if((editDirty || dbUnsaved()) && !confirm("Discard unsaved changes to the current database and open another?")) return;
   if(hasFSA){
     try{
       const [h]=await window.showOpenFilePicker({types:[{description:"CIE metadatabase JSON",accept:{"application/json":[".json"]}}]});
@@ -1768,6 +2040,8 @@ function migrateDb(obj){
     if(e.contentHash==null) e.contentHash=contentHash(e.payload);
     if(e.rev==null) e.rev=e.history.length;
     if(e.payload && e.payload.metadataRevision==null) e.payload.metadataRevision=e.rev; // backfill metadata-file revision
+    if(e.status==="review") e.status="draft"; // legacy three-state status collapses to draft/published
+    if(e.status!=="draft" && e.status!=="published") e.status="published";
     return e;
   });
   return obj;
@@ -1825,7 +2099,7 @@ function openImportConflictDialog(conflicts, added){
     let updated=0, dup=0, skipped=0;
     conflicts.forEach((c,idx)=>{
       const r=resolutions[idx]||"skip";
-      if(r==="update"){ if(commitEdit(c.existing, c.inc, "Updated from imported DataCite file")) updated++; else skipped++; }
+      if(r==="update"){ if(publishEntry(c.existing, c.inc, "Updated from imported DataCite file")) updated++; else skipped++; }
       else if(r==="dup"){ const e=createEntry(c.inc,{status:"published",comment:"Imported (duplicate DOI kept)"}); DB.entries.push(e); dup++; }
       else skipped++;
     });
@@ -1834,6 +2108,92 @@ function openImportConflictDialog(conflicts, added){
   }
   paint();
   modal("Resolve import DOI conflicts",body,[mkBtn("Skip remaining","ghost",finish)]);
+}
+
+/* Read-only comparison of a database entry against an external metadata JSON file.
+   Loads a file, diffs every field against the saved entry payload, shows the
+   differences. Never imports or modifies anything. */
+function openCompareDialog(e){
+  pickFile(".json,application/json", async (f)=>{
+    let obj;
+    try{ obj=JSON.parse(await f.text()); }
+    catch(err){ toast("Invalid JSON file","err"); return; }
+    // resolve which object holds the metadata payload
+    if(obj && (obj.dbSchemaName===APP.DB_SCHEMA_NAME || Array.isArray(obj.entries))){
+      toast("That is a database file — pick a single metadata file","err"); return;
+    }
+    let payload = (obj && obj.payload && obj.entryId) ? obj.payload : obj;
+    if(!payload || typeof payload!=="object"){ toast("File does not contain a metadata object","err"); return; }
+
+    const body=document.createElement("div");
+
+    // header line
+    const hd=document.createElement("p"); hd.className="hint";
+    hd.innerHTML=`Comparing database entry <b>${esc(entryTitle(e))}</b> `+
+      `(rev ${e.rev}${entryDoi(e)?`, <span class="mono">${esc(entryDoi(e))}</span>`:""}) `+
+      `with file <b>${esc(f.name)}</b>.`;
+    body.appendChild(hd);
+
+    // soft identity check — warn but still compare
+    const fileDoi = payload.identifier && payload.identifier.identifier;
+    const fileFn = (payload.alternateIdentifiers||[]).filter(x=>x&&x.alternateIdentifierType==="fileName").map(x=>x.alternateIdentifier)[0];
+    const mism=[];
+    if(entryDoi(e) && fileDoi && entryDoi(e)!==fileDoi) mism.push(`DOI (entry: ${entryDoi(e)} · file: ${fileDoi})`);
+    if(entryFilename(e) && fileFn && entryFilename(e)!==fileFn) mism.push(`fileName (entry: ${entryFilename(e)} · file: ${fileFn})`);
+    if(mism.length){
+      const w=document.createElement("div"); w.className="warnrow";
+      w.textContent="⚠ This file does not appear to describe the same dataset — mismatched "+mism.join("; ")+". Comparing anyway.";
+      body.appendChild(w);
+    }
+
+    // informational schema check on the file
+    try{
+      const errs=validate(payload, CIE_SCHEMA);
+      if(errs && errs.length){
+        const v=document.createElement("p"); v.className="hint";
+        v.style.color="var(--warn)";
+        v.textContent=`Note: the file has ${errs.length} schema issue(s) (comparison still shown).`;
+        body.appendChild(v);
+      }
+    }catch(_){}
+
+    // field-by-field diff (all metadata fields, granular into arrays).
+    // metadataRevision is internal revision bookkeeping (not part of the DataCite
+    // metadata and absent from exported files), so it is excluded from the field diff;
+    // it remains visible in the raw side-by-side below.
+    const A=clone(e.payload), B=clone(payload);
+    delete A.metadataRevision; delete B.metadataRevision;
+    const ops=deepDiff(A, B, "");
+    if(ops.length===0){
+      const ok=document.createElement("div"); ok.className="val-ok";
+      ok.textContent="✓ No differences — the file matches this entry's metadata.";
+      body.appendChild(ok);
+    }else{
+      const sum=document.createElement("p"); sum.className="hint";
+      sum.innerHTML=`<b>${ops.length}</b> field difference(s). Legend: `+
+        `<span class="op-replace">~ changed</span> (database → file), `+
+        `<span class="op-add">+ only in file</span>, `+
+        `<span class="op-remove">− only in database</span>.`;
+      body.appendChild(sum);
+      const box=document.createElement("div"); box.className="diff";
+      box.innerHTML=renderDiff(ops, 2, e.payload);
+      body.appendChild(box);
+    }
+
+    // raw side-by-side for full context
+    function payloadBox(title,p){
+      const d=document.createElement("div"); d.className="conflict";
+      d.innerHTML=`<h4>${esc(title)}</h4>`;
+      const s=document.createElement("div"); s.className="side"; const pre=document.createElement("pre");
+      pre.textContent=JSON.stringify(p,null,1); s.appendChild(pre); d.appendChild(s); return d;
+    }
+    const cols=document.createElement("div"); cols.className="cols2";
+    cols.appendChild(payloadBox(`Database entry (rev ${e.rev})`, e.payload));
+    cols.appendChild(payloadBox("File", payload));
+    body.appendChild(cols);
+
+    modal("Compare with metadata file", body, [mkBtn("Close","ghost",closeModal)]);
+  });
 }
 
 /* Import/Merge dialog: aggregate DB merge OR datacite files */
@@ -2000,12 +2360,26 @@ async function saveDb(saveAs){
   markSaved(DB.baseHash); renderList();
   toast("Copy downloaded — this browser can't overwrite files or detect parallel edits. Use a Chromium browser for in-place save.","warn");
 }
+/* metadata-file name for an entry: <base>.csv_metadata[_vN][_draft[_TIMESTAMP]].json. The revision
+   suffix (_v2, _v3, …) is appended only when the (pending) revision > 1 (e.g.
+   CIE_cc_1964_10deg.csv_metadata_v2.json), matching the published files. A draft entry uses its
+   PENDING revision — the version it will become when published — and gets a trailing _draft with a
+   timestamp (e.g. …_v2_draft_20260725T143022.json, or …_metadata_draft_20260725T143022.json for a
+   first, never-published draft). */
+function metadataFileName(e){
+  const base=entryFilename(e)||sanitize(entryTitle(e));
+  const stem=base.endsWith(".csv")?base+"_metadata":base+".csv_metadata";
+  const rev=pendingRev(e)||1;
+  const draftSuffix=e.status==="draft"
+    ?"_draft_"+new Date().toISOString().replace(/-/g,"").replace(/:/g,"").slice(0,15)
+    :"";
+  return stem+(rev>1?"_v"+rev:"")+draftSuffix+".json";
+}
 /* export entries as individual DataCite files (strip envelope) */
 function exportDataCiteFiles(entries){
   entries=entries||DB.entries;
   if(entries.length===1){
-    const e=entries[0]; const base=entryFilename(e)||sanitize(entryTitle(e));
-    const fn=base.endsWith(".csv")?base+"_metadata.json":base+".csv_metadata.json";
+    const e=entries[0]; const fn=metadataFileName(e);
     download(fn, JSON.stringify(e.payload,null,"\t"));
     toast("Exported "+fn,"ok"); return;
   }
@@ -2013,8 +2387,7 @@ function exportDataCiteFiles(entries){
   if(!confirm(`Export ${entries.length} metadata (DataCite) files as separate downloads?`)) return;
   let n=0;
   const step=()=>{ if(n>=entries.length){ toast("Exported "+entries.length+" files","ok"); return; }
-    const e=entries[n++]; const base=entryFilename(e)||sanitize(entryTitle(e));
-    const fn=base.endsWith(".csv")?base+"_metadata.json":base+".csv_metadata.json";
+    const e=entries[n++]; const fn=metadataFileName(e);
     download(fn, JSON.stringify(e.payload,null,"\t")); setTimeout(step,250); };
   step();
 }
@@ -2170,7 +2543,7 @@ function exportCrossrefXml(e){
   doCrossrefExport(e, lp);
 }
 function doCrossrefExport(e, landingPage){
-  if(!entryDoi(e)){ if(!confirm("This entry has no DOI. Export Crossref XML anyway (with an empty <doi>)?")) return; }
+  if(!entryDoi(e)){ if(!confirm("This entry has no DOI. Create a Crossref-file (XML) anyway (with an empty <doi>)?")) return; }
   const {xml, batchId, skipped}=buildCrossrefXml(e, landingPage);
   download(batchId+".xml", xml, "application/xml");
   if(skipped.length) toast("Exported "+batchId+".xml — skipped unmapped relation(s): "+[...new Set(skipped)].join(", "),"err");
@@ -2265,7 +2638,7 @@ function openHelpDialog(){
         metadatabase JSON (see <i>Saving &amp; concurrent edits</i> below).</li>
       <li><b>Import / Merge…</b> — reconcile another database or import individual
         <code>*.csv_metadata.json</code> files, with per-entry conflict resolution and DOI checks.</li>
-      <li><b>+ New entry</b>, <b>Domains…</b>, <b>Edit defaults…</b>, <b>Export Metadata…</b>.</li>
+      <li><b>+ New entry</b>, <b>Domains…</b>, <b>Edit defaults…</b>, <b>Export metadata-files…</b>.</li>
       <li><b>? Help</b> — this dialog.</li>
     </ul>
 
@@ -2290,19 +2663,67 @@ function openHelpDialog(){
         copy instead and cannot detect parallel changes.</li>
     </ul>
 
-    <h4>Editing an entry</h4>
+    <h4>Editing an entry — draft &amp; publish</h4>
     <ul>
-      <li><b>Form / JSON / Validation / History</b> tabs. Payload changes are versioned (RFC-6902
-        patches) and require a change comment on save; envelope changes (status, domains, DOI
-        landing page) are saved without a version bump. The payload's <span class="mono">metadataRevision</span>
-        field mirrors the revision and is stamped automatically — it advances only on metadata-content
-        changes, never on envelope edits.</li>
+      <li><b>Status is automatic</b> and read-only, with two values: <b>draft</b> and <b>published</b>.
+        Creating or duplicating an entry, or editing any payload field, sets it to <b>draft</b>.</li>
+      <li><b>Save draft</b> stores your edits <i>without</i> creating a revision — the revision number
+        does not change and no history entry is added. Domains and the DOI landing page are envelope
+        fields: editing them saves without touching status or revision.</li>
+      <li><b>Publish entry</b> is the only action that mints a revision: it asks for a short revision
+        text, records one <b>History</b> entry holding the change since the previous published
+        revision (RFC-6902 patch), bumps the revision number and sets status to <b>published</b>.
+        History therefore shows revision-to-revision changes, never intermediate draft saves.</li>
+      <li>The payload's <span class="mono">metadataRevision</span> mirrors the published revision and is
+        stamped automatically. Exporting a <b>draft</b> appends <span class="mono">_draft_TIMESTAMP</span> after
+        the (pending) revision number in the file name (e.g. <span class="mono">…_metadata_v2_draft_20260725T143022.json</span>).</li>
+      <li><b>Undo changes</b> discards unsaved editor edits and returns to the last <i>saved</i> version.
+        <b>Revert to last published</b> discards unpublished draft edits and restores the entry to its
+        last published revision (immediate, with a confirmation — draft edits are not versioned and are lost).</li>
       <li><b>Validation</b> tab — pick the CSV data file to check checksums, row/column counts,
         column sums, sample row and the wavelength range against the stored metadata, then fill or
         log the results.</li>
-      <li><b>Update DOI</b> generates a compliant <code>10.25039/CIE.DS.$$$$$$$$</code> suffix
-        (a local placeholder until CIE CB assigns the real DOI).</li>
+      <li><b>Update DOI</b> — the small button beside the <b>Identifier (DOI)</b> field generates a
+        compliant <code>10.25039/CIE.DS.$$$$$$$$</code> suffix (a local placeholder until CIE CB
+        assigns the real DOI).</li>
     </ul>
+
+    <h4>Column headers — bulk paste from Excel <span class="kv">(new)</span></h4>
+    <p style="margin:4px 0">In the Form tab's <b>Column headers</b> section (under <b>Data table info</b>),
+      the paste box above the list lets you bulk-fill columns from Excel instead of typing each one:</p>
+    <ul>
+      <li>Prepare <b>7 rows</b> — Title, Quantity, Unit, Description, Wavelength first, Wavelength last,
+        Wavelength step — with <b>one column per data column</b>, column-for-column with the CSV. A
+        leading label column (e.g. "Title" in column A) is optional and auto-detected.</li>
+      <li>Copy the range in Excel, click the paste box and press <b>Ctrl+V</b>. This <b>replaces the whole
+        Column headers list</b> (with a confirmation if it wasn't already empty).</li>
+      <li><b>Copy current as text</b> does the reverse — copies the current column headers back out in the
+        same layout, for editing in Excel and pasting back.</li>
+      <li>Each box is labelled <b>Column N</b> so a long list (e.g. 100 columns) stays legible while
+        scrolling.</li>
+    </ul>
+
+    <h4>New entry from an Excel workbook (.xlsx) <span class="kv">(new)</span></h4>
+    <p style="margin:4px 0">In <b>+ New entry</b>, under <b>Related data file</b>, choose the file type
+      <b>Excel .xlsx (7 header rows + data table)</b> — the file dialog opens automatically (filtered to
+      <code>.xlsx</code>) — and pick a single-worksheet workbook laid out as:</p>
+    <ul>
+      <li><b>Rows 1–7</b>, starting at cell <b>A1</b> (no leading label column), describe the columns —
+        one worksheet column per data column, in the order <b>Title, Quantity, Unit, Description,
+        Wavelength first, Wavelength last, Wavelength step</b> (same 7 fields as the bulk paste above).</li>
+      <li><b>Row 8 onward</b> is the data table itself.</li>
+      <li>On <b>Create entry</b> the tool fills the <b>column headers</b> and <b>validations</b>, computes the
+        checksums, and <b>generates the header-less CSV</b> — named from the <b>File name</b> field (keep it
+        concise, e.g. <code>CIE_xxx.csv</code>, matching the published files) — which downloads automatically.</li>
+      <li>Both <b>numeric</b> data (spectral / wavelength tables and plain numerical tables) and <b>text</b>
+        data (e.g. multilingual vocabularies) are supported. For non-spectral columns put <code>:unap</code>
+        in the wavelength rows. Column sums are written only when every column is numeric.</li>
+      <li>Example workbooks are in the <code>examples/</code> folder next to the tool
+        (spectral, numerical and text).</li>
+    </ul>
+    <p class="hint" style="margin:4px 0">Reading <code>.xlsx</code> uses the browser's built-in
+      decompression (Chromium/Edge, Firefox, Safari). The generated CSV is what gets published and what
+      the stored checksums and sums describe — not the workbook.</p>
 
     <h4>DOI landing page <span class="kv">(new)</span></h4>
     <p style="margin:4px 0">Each entry has a <b>DOI landing page</b> (the URL a DOI resolves to). It
@@ -2310,8 +2731,8 @@ function openHelpDialog(){
       section of the Form tab. Crossref requires it for the <code>&lt;resource&gt;</code> element;
       if it is empty when you export, the tool prompts for it and saves it on the entry.</p>
 
-    <h4>Export to Crossref XML <span class="kv">(new)</span></h4>
-    <p style="margin:4px 0">The per-entry <b>Export Crossref XML…</b> button (entry action bar)
+    <h4>Create a Crossref-file (XML) <span class="kv">(new)</span></h4>
+    <p style="margin:4px 0">The per-entry <b>Create a Crossref-file (XML)</b> button (entry action bar)
       generates a Crossref 5.3.1 <code>&lt;doi_batch&gt;</code> deposit file for the selected entry,
       ready for DOI registration.</p>
     <ul>
@@ -2326,6 +2747,24 @@ function openHelpDialog(){
     </ul>
     <p style="margin:4px 0"><b>Validate the generated XML</b> with the Crossref deposit parser:<br>
       <a href="https://data.crossref.org/reports/parser.html" target="_blank" rel="noopener noreferrer">https://data.crossref.org/reports/parser.html</a></p>
+
+    <h4>Compare with a metadata-file (JSON) <span class="kv">(new)</span></h4>
+    <p style="margin:4px 0">The per-entry <b>Compare with metadata-file (JSON)</b> button (entry action bar)
+      checks the selected database entry against an external
+      <code>*.csv_metadata.json</code> file — useful to see whether a published or exported file still
+      matches what the database holds. It is <b>read-only</b>: nothing is imported or changed.</p>
+    <ul>
+      <li>Pick a single metadata file; <b>every field is compared</b> and the differences are listed
+        field by field (arrays are compared element by element, so a single changed value — e.g.
+        <span class="mono">/checksums/1/checksum</span> — is pinpointed rather than shown as a whole-array change).</li>
+      <li>Colours follow the History diff: <span class="op-replace">~ changed</span> (database → file),
+        <span class="op-add">+ only in file</span>, <span class="op-remove">− only in database</span>.
+        A green banner confirms when there are <b>no differences</b>.</li>
+      <li>If the file's DOI or file name does not match the entry, a warning is shown but the comparison
+        still runs. The two payloads are also shown raw, side by side, for context.</li>
+      <li>The bookkeeping <span class="mono">metadataRevision</span> field is excluded from the field
+        comparison (exported files do not carry it), but remains visible in the raw side-by-side view.</li>
+    </ul>
 
     <h4>Reference links</h4>
     <ul>

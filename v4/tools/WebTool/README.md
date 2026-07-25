@@ -7,7 +7,7 @@ metadata records, with full git-like change history and safe concurrent-edit mer
 Modelled on the termdat curation workflow. Runs entirely in the browser from a
 local file — **no server, no network access, no external/CDN dependencies.**
 
-**Interface version 1.4.0** (shown in the header).
+**Interface version 1.8.0** (shown in the header).
 
 A **? Help** button in the toolbar opens an in-app summary of the features below,
 including the link to the Crossref deposit validator.
@@ -19,6 +19,7 @@ including the link to the Crossref deposit validator.
 | `CIEmetaDB.html` | The application. Open it in a browser. Self-contained (logo, styles, code, hashers, validator all embedded). |
 | `CIEmetaDB_schema.json` | JSON Schema (draft-07) for the metadatabase envelope — the **data model**. |
 | `CIEmetaDB_starter.json` | Starter database built from the 36 records in `../../examples/`. |
+| `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text). |
 | `README.md` | This file. |
 
 The metadata payload of each entry conforms to
@@ -75,14 +76,32 @@ new entries always use the current year.
 The same dialog also holds the **Crossref deposit-header defaults** — depositor name
 and email, registrant, database title, publisher name and the institution fields
 (name, acronym, place, department). These are organisation-wide values used by
-**Export Crossref XML** (see below); set them once and they apply to every deposit.
+**Export to Crossref-file (XML)** (see below); set them once and they apply to every deposit.
 
-In the entry editor, **Revert to defaults** (in the action bar at the top, next to
-*Update DOI*) resets **all** default-managed fields of the current entry — creators,
-publisher, language, resource type, format, rights and the data-table methods — to
-the database defaults. Title, identifier, publication year, subjects, descriptions,
-related items, checksums and validations are left untouched. Like other edits it
-becomes *unsaved* until you Save the entry.
+## Draft & publish workflow
+
+Each entry is either a **draft** or **published**, and the status is **automatic and
+read-only** — you never set it by hand:
+
+- Creating or duplicating an entry, or editing any **payload** field, sets the entry to
+  **draft**.
+- **Save draft** stores your edits **without creating a revision** — the revision number is
+  unchanged, no history entry is added, and you are not asked for a comment. Envelope fields
+  (domains, DOI landing page) also save this way and never change status or revision.
+- **Publish entry** is the *only* action that mints a revision. It asks for a short **revision
+  text**, records **one** history entry holding the change since the previous published
+  revision, bumps the revision number and sets status to **published**. History therefore shows
+  revision-to-revision changes only, never intermediate draft saves.
+- Exporting a **draft** appends `_draft` after the (pending) revision number in the file name —
+  e.g. a new draft → `…_metadata_draft.json`, a draft on top of published v1 →
+  `…_metadata_v2_draft.json`.
+
+The action bar also offers two revert actions:
+
+- **Undo changes** — discards unsaved editor edits and returns to the last *saved* version.
+- **Revert to last published** — discards unpublished draft edits and restores the entry to its
+  last published revision (applied immediately, after a confirmation, since draft edits are not
+  versioned and are lost).
 
 ## Data model (metadatabase envelope)
 
@@ -99,9 +118,9 @@ Each entry wraps the DataCite payload with curation metadata:
 ```
 entry
 ├─ entryId        internal stable id (independent of the DOI; used for merge matching)
-├─ rev            revision counter, ++ on every committed change
+├─ rev            last published revision number (0 = never published); only Publish changes it
 ├─ contentHash    sha256 of the canonical payload (concurrency/merge anchor)
-├─ status         draft | review | published
+├─ status         draft | published  (automatic; draft while edited, published on Publish)
 ├─ landingPage    URL the DOI resolves to (Crossref <resource>); envelope-level, per entry
 ├─ domains        [ CIE-division codes ]
 ├─ audit          createdBy/Date, modifiedBy/Date, modifiedComment
@@ -122,23 +141,25 @@ revision number, author, date and change comment.
   while the compact patch log gives git-like per-field history, lets the tool show
   *exactly what changed*, and can reconstruct any earlier revision by replaying
   patches `1..N` onto the empty document.
-- **Restore:** the History tab can load any prior revision back into the editor;
-  saving it commits a **new** revision (history is never rewritten).
+- **Revisions are created by Publish only.** A `history` entry is appended when you **Publish** an
+  entry; it holds the field-level diff since the previous published revision. Draft saves between
+  publishes are not recorded. History is never rewritten.
+- **Restore:** the History tab can load any prior revision back into the editor; you then **Publish**
+  it to commit a new revision.
 - **`metadataRevision`:** the payload carries an optional integer `metadataRevision` that mirrors
-  the entry `rev` — the revision of the **metadata file itself**. It is stamped automatically and
-  advances **only when the metadata content changes**, never on envelope-only edits (status, domains,
-  DOI landing page). It is exported with the `*.csv_metadata.json` file (unlike the envelope `rev`),
-  is shown read-only in the *Database entry* section of the Form tab, and is distinct from the DataCite
-  `version` field (which versions the described resource). Legacy files without it are treated as
-  revision 1.
+  the entry `rev` — the revision of the **metadata file itself**. It is stamped automatically on
+  **Publish** (drafts carry the *pending* number). It is exported with the `*.csv_metadata.json` file
+  (unlike the envelope `rev`), is shown read-only in the *Database entry* section of the Form tab, and
+  is distinct from the DataCite `version` field (which versions the described resource). Legacy files
+  without it are treated as revision 1.
 
 ## Identifiers (DOI)
 
 CIE dataset DOIs follow `10.25039/CIE.DS.$$$$$$$$` where the 8-character suffix is
 drawn from alphanumerics **excluding the confusable characters `o O l L 1 I 0`**.
 
-The **Update DOI** action (and the **New entry** dialog) generates a compliant
-suffix and checks uniqueness within the database.
+The **Update DOI** button — beside the **Identifier (DOI)** field in the Form tab — (and the
+**New entry** dialog) generates a compliant suffix and checks uniqueness within the database.
 For translations, which reuse the number with an appended ISO-639-1 language suffix
 (e.g. `10.25039/CIE.DS.mifmy4x4.ES`), enter the DOI manually in the identifier field.
 
@@ -159,13 +180,67 @@ Every entry carries a **DOI landing page** — the URL the DOI resolves to, i.e.
 Crossref `<resource>`. It is an **envelope-level** field (stored per entry, kept out
 of exported DataCite `*.csv_metadata.json` files), shown as a link next to the DOI
 in the entry header and editable in the **Database entry** section of the Form tab.
-Like other envelope changes (status, domains) it saves without a version bump.
+Like other envelope changes (domains) it saves without a version bump and does not change status.
 
-It is required for Crossref deposit: if it is empty when you **Export Crossref XML**,
+It is required for Crossref deposit: if it is empty when you **Export to Crossref-file (XML)**,
 the tool prompts for the URL and saves it on the entry. Existing landing pages can be
 recovered from a registered DOI via the Crossref REST API
 (`https://api.crossref.org/works/<doi>` → `resource.primary.URL`) or by following
 `https://doi.org/<doi>`.
+
+## Column headers — bulk paste from Excel
+
+Each data-table entry's **Column headers** (Form tab → *Data table info*) can be
+filled in one at a time, or in bulk via the paste box shown above the list:
+
+- Prepare **7 rows** — Title, Quantity, Unit, Description, Wavelength first,
+  Wavelength last, Wavelength step — with **one column per data column**,
+  column-for-column with the CSV. A leading label column (e.g. "Title" in
+  column A) is optional and auto-detected and stripped.
+- Copy that range in Excel, click the paste box and press **Ctrl+V**. This
+  **replaces the whole Column headers list** (with a confirmation dialog if it
+  wasn't already empty).
+- **Copy current as text** does the reverse — copies the current column
+  headers back out in the same row/column layout, for editing in Excel and
+  pasting back.
+- Each column-header box is labelled **Column N** so a long list (e.g. 100
+  columns, as in some CIE colour-fidelity tables) stays legible while
+  scrolling.
+
+## New entry from an Excel workbook (.xlsx)
+
+The **+ New entry** dialog can build an entry directly from an Excel workbook.
+Under **Related data file** you first pick a **file type** — the default is **No
+data file** (blank draft); choosing any data-file type opens the file dialog
+automatically, filtered to that type. Choose **Excel .xlsx (7 header rows + data
+table)** and pick a **single-worksheet** workbook laid out as:
+
+- **Rows 1–7**, starting at cell **A1** (no leading label column), describe the
+  columns — **one worksheet column per data column**, in the order **Title,
+  Quantity, Unit, Description, Wavelength first, Wavelength last, Wavelength
+  step** (the same 7 fields as the bulk paste above).
+- **Row 8 onward** is the data table itself.
+
+On **Create entry** the tool fills the entry's **column headers** and
+**`datatableInfo.validations`**, computes the `md5`/`sha256` checksums, and
+**generates the header-less CSV** — named from the **File name** field (keep it
+concise, e.g. `CIE_xxx.csv`, matching the files in `published/`) — which is
+downloaded automatically. The generated CSV is what gets published and what the
+stored checksums and sums describe; the workbook itself is only the authoring
+source.
+
+Both **numeric** data (spectral/wavelength tables and plain numerical tables) and
+**text** data (e.g. multilingual vocabularies) are supported. For non-spectral
+columns, put `:unap` in the wavelength rows. `sumOfColumns` is written **only when
+every column is numeric**, so text/mixed tables get the sample row and row/column
+counts but no misleading sums.
+
+Ready-made examples are in **`examples/`**:
+`example_spectral_wavelength.xlsx`, `example_numerical.xlsx` and
+`example_text_vocabulary.xlsx`.
+
+> **Browsers:** reading `.xlsx` uses the built-in `DecompressionStream`
+> (Chromium/Edge, Firefox, Safari — 2020+). No external library is bundled.
 
 ## Validation against the CSV data file
 
@@ -204,6 +279,29 @@ You can then:
   md5, sha256, overall pass/fail and every per-check result) into the entry's
   append-only `validationLog`, stored in the database. Past logged validations are
   listed under **Logged validations** in the same tab.
+
+## Compare an entry with an external metadata file
+
+Open an entry → **Compare with metadata-file (JSON)** (action bar) →
+pick a `*.csv_metadata.json` file. The tool compares that file against the entry's
+**stored** payload and lists the differences. It is **read-only** — nothing is
+imported, applied or changed.
+
+- **All fields are compared**, and arrays are compared **element by element**, so a
+  single changed value is pinpointed to its exact path (e.g.
+  `/checksums/1/checksum`) instead of showing a whole array as changed.
+- Differences use the same colours as the History diff: **~ changed**
+  (database → file), **+ only in file**, **− only in database**. A green banner
+  confirms when the file matches the entry exactly.
+- If the file's **DOI** or **file name** differs from the entry, a warning banner is
+  shown but the comparison still runs (so you can compare deliberately). The file is
+  also validated against the schema and any issues are noted. Both payloads are shown
+  raw, side by side, for context.
+- The bookkeeping `metadataRevision` field is **excluded** from the field comparison
+  (exported files do not carry it) but stays visible in the raw side-by-side view.
+
+Use it, for example, to confirm an exported file matches the database, or to see
+exactly what changed between a stored entry and an older published file.
 
 ## Concurrency — optimistic per-entry merge
 
@@ -261,14 +359,14 @@ more per entry. Entries can be filtered by domain in the list.
 ## Export
 
 - **Save DB** / **Save DB As…** — the whole metadatabase (with history and audit).
-- **Export Metadata…** (toolbar) or **Export Metadata file** (per entry) — emits
+- **Export metadata-files…** (toolbar) or **Export to metadata-file (JSON)** (per entry) — emits
   standard `*.csv_metadata.json` files matching the format in `../../examples/`
   (envelope, history and audit stripped), ready for publication.
-- **Export Crossref XML…** (per entry) — see below.
+- **Export to Crossref-file (XML)** (per entry) — see below.
 
-### Export to Crossref XML (DOI registration)
+### Export to Crossref-file (XML) (DOI registration)
 
-The per-entry **Export Crossref XML…** button (entry action bar) generates a
+The per-entry **Export to Crossref-file (XML)** button (entry action bar) generates a
 **Crossref 5.3.1 `<doi_batch>`** deposit file for the selected entry, ready to
 register the DOI. The file is named `<dataset>(<YYYYMMDDHHMMSS>).xml`.
 
