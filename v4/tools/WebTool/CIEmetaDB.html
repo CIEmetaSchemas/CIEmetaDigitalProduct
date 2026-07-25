@@ -2360,16 +2360,20 @@ async function saveDb(saveAs){
   markSaved(DB.baseHash); renderList();
   toast("Copy downloaded — this browser can't overwrite files or detect parallel edits. Use a Chromium browser for in-place save.","warn");
 }
-/* metadata-file name for an entry: <base>.csv_metadata[_vN][_draft].json. The revision suffix
-   (_v2, _v3, …) is appended only when the (pending) revision > 1 (e.g.
+/* metadata-file name for an entry: <base>.csv_metadata[_vN][_draft[_TIMESTAMP]].json. The revision
+   suffix (_v2, _v3, …) is appended only when the (pending) revision > 1 (e.g.
    CIE_cc_1964_10deg.csv_metadata_v2.json), matching the published files. A draft entry uses its
-   PENDING revision — the version it will become when published — and gets a trailing _draft
-   (e.g. …_v2_draft.json, or …_metadata_draft.json for a first, never-published draft). */
+   PENDING revision — the version it will become when published — and gets a trailing _draft with a
+   timestamp (e.g. …_v2_draft_20260725T143022.json, or …_metadata_draft_20260725T143022.json for a
+   first, never-published draft). */
 function metadataFileName(e){
   const base=entryFilename(e)||sanitize(entryTitle(e));
   const stem=base.endsWith(".csv")?base+"_metadata":base+".csv_metadata";
   const rev=pendingRev(e)||1;
-  return stem+(rev>1?"_v"+rev:"")+(e.status==="draft"?"_draft":"")+".json";
+  const draftSuffix=e.status==="draft"
+    ?"_draft_"+new Date().toISOString().replace(/-/g,"").replace(/:/g,"").slice(0,15)
+    :"";
+  return stem+(rev>1?"_v"+rev:"")+draftSuffix+".json";
 }
 /* export entries as individual DataCite files (strip envelope) */
 function exportDataCiteFiles(entries){
@@ -2671,8 +2675,8 @@ function openHelpDialog(){
         revision (RFC-6902 patch), bumps the revision number and sets status to <b>published</b>.
         History therefore shows revision-to-revision changes, never intermediate draft saves.</li>
       <li>The payload's <span class="mono">metadataRevision</span> mirrors the published revision and is
-        stamped automatically. Exporting a <b>draft</b> appends <span class="mono">_draft</span> after
-        the (pending) revision number in the file name (e.g. <span class="mono">…_metadata_v2_draft.json</span>).</li>
+        stamped automatically. Exporting a <b>draft</b> appends <span class="mono">_draft_TIMESTAMP</span> after
+        the (pending) revision number in the file name (e.g. <span class="mono">…_metadata_v2_draft_20260725T143022.json</span>).</li>
       <li><b>Undo changes</b> discards unsaved editor edits and returns to the last <i>saved</i> version.
         <b>Revert to last published</b> discards unpublished draft edits and restores the entry to its
         last published revision (immediate, with a confirmation — draft edits are not versioned and are lost).</li>
