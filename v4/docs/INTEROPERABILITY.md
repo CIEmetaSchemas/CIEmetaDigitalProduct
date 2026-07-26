@@ -628,14 +628,17 @@ Independent of the recommendations above. These are defects in the published dat
 measured against the 39 entries in `CIEmetaDBdataset.json`. The affected share of the corpus
 is small — 8 defective columns out of 402, plus the subject-casing issue.
 
-**Defects 3 and 4 have since been corrected** in the database; the remaining data defects are
-1, 2, 5, 6 and 7.
+**Defects 3, 4 and 6 have since been corrected**; the remaining ones are 1, 2, 5, 7 and 8.
 
-Defects in the *schema file* — it was not valid JSON, it had no `$id`, its `wavelength_*`
+Defects in the *v4 schema file* — it was not valid JSON, it had no `$id`, its `wavelength_*`
 fields rejected the sentinel strings the documentation requires, and `funderIdentifierType`
 lacked ROR — have been corrected. See the version history in
 [README.md](README.md) and the `$comment` in
 [`../schema/CIEmetaDigitalProduct_schema_04.json`](../schema/CIEmetaDigitalProduct_schema_04.json).
+The **v3 schema file carried the same JSON-validity defect** — its descriptive header was 25
+`//` line comments inside the root object — and has been corrected the same way, so the v3
+example can now be checked against its own schema by a strict parser. `schemaVersion` stays
+`3` and no published metadata file is affected.
 
 | # | Defect | Extent | Datasets |
 |---|---|---|---|
@@ -644,8 +647,9 @@ lacked ROR — have been corrected. See the version history in
 | 3 | **`descrition` typo** instead of `description` — **fixed** | 15 columns in **1** dataset | `CIE_srf_CQS_5nm` |
 | 4 | `β15(λ)` — the only non-ASCII column title in the corpus, where every other dataset transliterates (`x_bar`, `lambda`) — **fixed**, now `beta15(lambda)` | 1 column | `CIE_srf_PS_5nm` |
 | 5 | **Subject casing is inconsistent** — the same concept appears under two spellings | 6 subject entries | `Perception of colour` (10) vs `Perception of Colour` (2); `Colour of objects` (10) vs `Colour of Objects` (2); `Colour vision` (10) vs `Colour Vision` (2) |
-| 6 | v3 example declares `"schemaName": "CIEmetaDataProduct"` (vs `CIEmetaDigitalProduct` in its own schema) and reuses the **v4** `schemaURL` DOI | 1 file | `v3/examples/CIE_cc_1931_2deg.csv_metadata.json` |
+| 6 | v3 example declared `"schemaName": "CIEmetaDataProduct"`, which its own schema rejects (`const: "CIEmetaDigitalProduct"`) — **fixed** | 1 file | `v3/examples/CIE_cc_1931_2deg.csv_metadata.json` |
 | 7 | **Stored `contentHash` does not match the payload**, and replaying `history[].patch` does not reproduce it | 38 of 39 entries | all except `CIE_std_illum_A_1nm` |
+| 8 | **One schema DOI for two schema versions** — `10.25039/CIE.SC.4taqevcd` is the mandated `schemaURL` of *both* v3 and v4 and the `$id` of v4, so `schemaURL` does not identify which schema a record was written against | both schema files, every published record | v3 and v4 schemas |
 
 Defect 3 was the one that silently lost information: a consumer reading `description` got
 nothing for those 15 columns. It was **far less widespread than the `../examples/` folder
@@ -657,6 +661,24 @@ Defect 5 is a direct illustration of why recommendation F matters. Fourteen dist
 strings are in use across 113 subject entries, all as bare strings with no
 `subjectScheme`, `schemeURI` or `valueURI` — nothing prevents the same concept being
 entered twice with different capitalisation, and nothing detects it afterwards.
+
+Defect 6 was a plain typo — `CIEmetaDataProduct` for `CIEmetaDigitalProduct` — and it was
+the only point on which the v3 example failed its own schema; it now validates with no
+errors. It had gone unnoticed because the v3 schema file could not be parsed (see above), so
+the example had never actually been run against it.
+
+Defect 8 came to light while fixing 6, and it is the one item in this register that cannot be
+repaired in this repository. Both schema versions declare
+`"schemaURL": {"const": "https://doi.org/10.25039/CIE.SC.4taqevcd"}`, and v4 additionally
+declares that DOI as its `$id`. A consumer holding a metadata file therefore learns the
+schema version only from `schemaVersion`, never from the identifier the record is required to
+carry — and resolving `schemaURL` returns whichever version is currently behind the DOI. For
+the same reason the v3 schema was **not** given an `$id` when its JSON validity was repaired:
+the only available identifier is already claimed by v4, and inventing a URI would be worse
+than leaving the gap (the same reasoning as in section 11.3). Repairing this needs CIE to
+mint a version-distinguishing identifier — a versioned DOI, or one DOI per schema version
+with the current one kept as a "latest" alias. It is the same persistence argument made for
+the e-ILV in recommendation G2, applied to CIE's own schema.
 
 Defect 7 is not visible in any published metadata file — it affects the WebTool database
 envelope, not the payloads. Recomputing `contentHash(payload)` with the tool's own
@@ -816,10 +838,12 @@ concept with no identifier — better an honest gap than a fabricated URI.
 - *Schema file: **done.*** Valid JSON, `$id`, sentinel-tolerant `wavelength_*`, ROR.
   `schemaVersion` stays `4`, the schema DOI is unchanged, and all 39 published records now
   validate against the file. See the version history in [README.md](README.md).
-- *Data (section 10): defects 3 and 4 **done**, 1, 2, 5, 6 and 7 outstanding.* Records
+- *Data (section 10): defects 3, 4 and 6 **done**, 1, 2, 5 and 7 outstanding.* Records
   touched increment `metadataRevision` per CIE 3 — note that 3 and 4 were applied in place
   without a bump, see section 10. Effort: small — 8 defective columns out of 402, plus the
   subject-casing variants and a recomputation of the database hashes.
+- *Schema identifier (defect 8): outstanding and not repairable here.* Needs a
+  version-distinguishing schema DOI from CIE; see section 10.
 
 **Phase 2 — semantic annotation.** Add `unitPID`, `quantityPID`, `symbol` as optional
 fields; publish the appendix table as a normative annex to README.md; extend the WebTool so

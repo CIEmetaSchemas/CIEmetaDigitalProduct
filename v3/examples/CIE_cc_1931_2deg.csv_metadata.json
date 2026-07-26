@@ -111,7 +111,7 @@
 }
         ]
     },
-    "schemaName":"CIEmetaDataProduct",
+    "schemaName":"CIEmetaDigitalProduct",
     "schemaVersion":3,
     "schemaURL":"https://doi.org/10.25039/CIE.SC.4taqevcd"
 }
