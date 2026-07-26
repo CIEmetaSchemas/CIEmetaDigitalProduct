@@ -98,15 +98,26 @@ same function rather than restating it. The tool and the checker therefore canno
 disagree about what a consistent entry looks like.
 
 What it checks, per entry: `history` length and numbering (**E1**), the
-`metadataRevision` the status implies (**E2**), that replaying the history reproduces
-the payload (**E3**), `contentHash` (**E4**), the `history[].baseHash` chain (**E5**),
-and that a draft actually differs from the revision it is pending against (**E6**);
-plus the database `baseHash` (**D1**).
+`metadataRevision` the entry's kind implies (**E2**), that replaying the history
+reproduces the payload (**E3**), `contentHash` (**E4**), the `history[].baseHash` chain
+(**E5**), and that the stored `status` matches what `kindOf()` derives (**E6**). Across
+the database: that each `revisionOf` resolves to exactly one published parent (**E7**),
+and the database `baseHash` (**D1**).
+
+E6 and E7 police the [three-state model](#draft-under-revision--published-workflow):
+`status` is derived, not chosen — `draft` when `rev` is 0, `review` when `revisionOf` is
+set, `published` otherwise — so a stored status that disagrees with `kindOf()` is stale,
+and because `status` feeds the fingerprint behind `baseHash` it also puts that out of
+step. E2 and E3 are keyed off `kindOf()` too rather than the stored status, so a status
+that has gone stale reports once as E6 instead of cascading into unrelated failures.
+Note that an *empty* revision — one whose payload still equals its parent's — is
+perfectly legitimate: you start a revision before editing it, and it stays `review`
+until published or discarded.
 
 Three limits are deliberate:
 
 - **It repairs derived fields only** — E1, E3, E4, E5, D1. Payload content is never
-  rewritten.
+  rewritten, and neither is a `status` or a `revisionOf`.
 - **It refuses to write if a repairable violation would survive the repair**, rather
   than replacing a stale hash with a fresh hash computed over a payload its own
   history contradicts. A visible defect is better than a hidden one. Violations it is
@@ -116,12 +127,12 @@ Three limits are deliberate:
 - **Only E2 is a warning.** A `metadataRevision` that disagrees with the entry's
   revision is a value the tool rewrites on the next edit anyway, and a gate that can
   never go green is a gate everyone learns to ignore. Everything else fails `--check`,
-  including E6, which `--fix` cannot resolve: whether an empty draft should be
-  published or given a real pending change is a decision for a curator.
+  including E6 and E7, which `--fix` cannot resolve: which record is published and
+  which revision belongs to which parent are editorial decisions.
 
-The hash chain is **not** reimplemented either. `canonical()`, `contentHash()`,
-`applyPatch()`, `diffPatch()`, `reconstruct()`, `repairDerivedFields()`,
-`contentDiff()` and `computeDbBaseHash()` are lifted verbatim out of
+Nothing here is reimplemented either. `canonical()`, `contentHash()`, `applyPatch()`,
+`diffPatch()`, `reconstruct()`, `repairDerivedFields()`, `contentDiff()`, `kindOf()`
+and `computeDbBaseHash()` are lifted verbatim out of
 `CIEmetaDB.html` at run time and
 evaluated in a sandbox — the same reasoning as the embedded schema above, applied to
 the hashing. Self-tests run before any repair and abort on failure; the sharpest one

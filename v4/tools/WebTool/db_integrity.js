@@ -5,21 +5,27 @@
  * contentHash is the sha256 of the canonical payload, history[].patch replays onto {} to
  * reproduce any revision, history[].baseHash is the hash of the payload before that patch,
  * and the database baseHash is a fingerprint over all entries. Nothing enforced them, and
- * they drifted: migrateDb() backfills the schema-4.1 field metadataRevision into legacy
- * payloads without recomputing contentHash and without recording it in the history, so the
- * stored hash describes the pre-backfill payload and the history no longer replays to it.
+ * they drifted: migrateDb() used to backfill the schema-4.1 field metadataRevision into
+ * legacy payloads without recomputing contentHash and without recording it in the history, so
+ * the stored hash described the pre-backfill payload and the history no longer replayed to it.
  * That silently disables historyContainsHash(), the ancestry test the merge path uses to
  * tell a fast-forward from a real conflict.
+ *
+ * A second group of fields is derived in the same sense but from the entry rather than the
+ * payload: status is whatever kindOf() says it is, given rev and revisionOf. Those are
+ * checked (E6, E7) and reported, never repaired - which revision belongs to which parent is
+ * an editorial matter.
  *
  *     node db_integrity.js --check    report violations; exit 1 if any
  *     node db_integrity.js --fix      repair the derived fields in place
  *
  * With no file arguments both modes act on the three databases stored beside this script.
  *
- * The hash chain is NOT reimplemented here. canonical(), contentHash(), applyPatch() and
- * friends are lifted verbatim out of CIEmetaDB.html at run time, so there is exactly one
- * implementation to keep correct - the same single-source-of-truth reasoning as
- * sync_schema.py. Self-tests below prove the lifted code reproduces hashes the tool wrote.
+ * Nothing here is reimplemented. canonical(), contentHash(), applyPatch(), kindOf(),
+ * repairDerivedFields() and friends are lifted verbatim out of CIEmetaDB.html at run time, so
+ * there is exactly one implementation to keep correct - the same single-source-of-truth
+ * reasoning as sync_schema.py. Self-tests below prove the lifted code reproduces hashes the
+ * tool wrote.
  */
 
 "use strict";
@@ -55,6 +61,7 @@ const FUNCTIONS = [
   "reconstruct",
   "repairDerivedFields",
   "contentDiff",
+  "kindOf",
   "entryEnvFingerprint",
   "computeDbBaseHash",
 ];
@@ -205,13 +212,19 @@ function entryName(e) {
    invariants
    ==========================================================================*/
 
-/* A draft's payload is deliberately ahead of its history: it holds the pending next
-   revision, which by design has not been recorded as a patch yet. E3 therefore applies to
-   published entries only, and E2 expects rev+1 rather than rev. */
+/* An unpublished payload is deliberately ahead of its history: a draft holds the first
+   revision and a revision the next one, neither of which is recorded as a patch until it is
+   published. E3 therefore applies to published entries only, and E2 expects rev+1 rather
+   than rev.
+
+   The kind is taken from kindOf(), the tool's own derivation from rev and revisionOf, rather
+   than from the stored status. E6 alone polices the stored status, so a status that has gone
+   stale reports once as E6 instead of cascading into unrelated E2 and E3 failures. */
 function checkEntry(api, entry) {
   const violations = [];
   const add = (code, detail) => violations.push({ code, detail });
-  const published = entry.status === "published";
+  const kind = api.kindOf(entry);
+  const published = kind === "published";
   const history = entry.history || [];
 
   if (history.length !== entry.rev) {
@@ -224,7 +237,7 @@ function checkEntry(api, entry) {
   const wantMdRev = published ? entry.rev : entry.rev + 1;
   const gotMdRev = entry.payload ? entry.payload.metadataRevision : undefined;
   if (gotMdRev !== wantMdRev) {
-    add("E2", `payload.metadataRevision ${gotMdRev} != ${wantMdRev} (status ${entry.status}, rev ${entry.rev})`);
+    add("E2", `payload.metadataRevision ${gotMdRev} != ${wantMdRev} (${kind}, rev ${entry.rev})`);
   }
 
   /* E1 failures make replay meaningless, so only walk the history when it is well-formed. */
@@ -251,17 +264,12 @@ function checkEntry(api, entry) {
     }
   }
 
-  /* A draft is a pending edit, so it has to differ from the revision it is pending against.
-     storeDraft() enforces this from the other side: when an edit brings the payload back to
-     the last published revision it sets the status back to published rather than keeping an
-     empty draft. A stored draft that matches its own rev is therefore a state the tool cannot
-     produce, and one it will silently discard on the next edit. Skipped at rev 0, where there
-     is no published revision to differ from. */
-  if (replayable && !published && entry.rev > 0) {
-    const lastPublished = api.reconstruct(history, entry.rev);
-    if (api.contentDiff(lastPublished, entry.payload).length === 0) {
-      add("E6", `status is ${entry.status} but the payload is identical to revision ${entry.rev}`);
-    }
+  /* status is derived, not chosen - CIEmetaDB_schema.json says so, and kindOf() is where the
+     tool derives it: revisionOf present means a revision under way, rev 0 means never
+     published, anything else is published. A stored status that disagrees is stale, and
+     because status feeds entryEnvFingerprint it also puts db.baseHash out of step. */
+  if (entry.status !== kind) {
+    add("E6", `status is "${entry.status}" but rev ${entry.rev}${entry.revisionOf ? " with revisionOf" : ""} makes it "${kind}"`);
   }
 
   return violations;
@@ -277,9 +285,47 @@ function describeDivergence(api, replay, payload) {
   return differing.length ? differing.map((k) => "/" + k).join(", ") : "(no top-level key differs)";
 }
 
+/* E7 needs the whole entry list, so it is checked here rather than per entry: a revisionOf
+   pointer is only meaningful relative to the other entries. These are the same three rules
+   migrateStatuses() applies on load - it drops a pointer whose parent is missing and demotes a
+   second revision claiming one parent - so a stored database breaking them is one that was
+   hand-edited or merged outside the tool. */
+function checkRevisionPairs(api, db) {
+  const out = [];
+  const entries = db.entries || [];
+  const byId = new Map(entries.map((e) => [e.entryId, e]));
+  const claimed = new Map();
+  /* A revision is a clone of its parent, so the two share a DOI and a filename by design.
+     Naming them alone would print the same string twice, and a truncated entryId can itself
+     collide, so these messages carry the whole thing - they are rare diagnostics. */
+  const ref = (e) => `${entryName(e)} [${e.entryId}]`;
+  for (const e of entries) {
+    if (!e.revisionOf) continue;
+    const parent = byId.get(e.revisionOf);
+    if (!parent) {
+      out.push({ code: "E7", detail: `${ref(e)} revises entryId ${e.revisionOf}, which is not in this database` });
+      continue;
+    }
+    if (parent === e) {
+      out.push({ code: "E7", detail: `${ref(e)} lists itself as revisionOf` });
+      continue;
+    }
+    if (api.kindOf(parent) !== "published") {
+      out.push({ code: "E7", detail: `${ref(e)} revises ${ref(parent)}, which is ${api.kindOf(parent)} rather than published` });
+    }
+    const first = claimed.get(e.revisionOf);
+    if (first) {
+      out.push({ code: "E7", detail: `${ref(parent)} is revised by both ${ref(first)} and ${ref(e)}; only one revision may be open` });
+    } else {
+      claimed.set(e.revisionOf, e);
+    }
+  }
+  return out;
+}
+
 function checkDb(api, db) {
   const entries = (db.entries || []).map((e) => ({ entry: e, violations: checkEntry(api, e) }));
-  const dbViolations = [];
+  const dbViolations = checkRevisionPairs(api, db);
   const wantBase = api.computeDbBaseHash(db);
   if (db.baseHash !== wantBase) dbViolations.push({ code: "D1", detail: "baseHash does not match the entries" });
   return { entries, dbViolations };
@@ -311,7 +357,8 @@ const CODES = {
   E3: "history does not replay to payload",
   E4: "contentHash stale",
   E5: "history baseHash inconsistent",
-  E6: "draft identical to its published revision",
+  E6: "stored status disagrees with kindOf()",
+  E7: "revisionOf does not resolve to one published parent",
   D1: "database baseHash stale",
 };
 
@@ -324,8 +371,8 @@ const CODES = {
    WARNINGS - what --check tolerates. E2 alone: a metadataRevision that disagrees with the
    entry's revision is a payload value the tool rewrites on the next edit anyway, and a gate
    that can never go green is a gate everyone learns to ignore. Everything else fails --check,
-   including codes --fix cannot repair - E6 is a genuinely invalid state that wants a human
-   decision, not silence. */
+   including codes --fix cannot repair - E6 and E7 are genuinely invalid states that want a
+   human decision, not silence. */
 const REPAIRABLE = new Set(["E1", "E3", "E4", "E5", "D1"]);
 const WARNINGS = new Set(["E2"]);
 const isFailure = (v) => !WARNINGS.has(v.code);
@@ -427,9 +474,12 @@ function main(argv) {
     const blocking = after.entries
       .map((e) => ({ entry: e.entry, violations: e.violations.filter((v) => REPAIRABLE.has(v.code)) }))
       .filter((e) => e.violations.length);
-    if (blocking.length || after.dbViolations.length) {
+    /* Database-level violations are filtered the same way as the per-entry ones. D1 is
+       repairable and so must be gone by now; E7 is not, and must not hold up the write. */
+    const blockingDb = after.dbViolations.filter((v) => REPAIRABLE.has(v.code));
+    if (blocking.length || blockingDb.length) {
       console.error(`${path.basename(file)}  NOT WRITTEN - violations remain after repair:`);
-      printReport(file, { entries: blocking, dbViolations: after.dbViolations }, api);
+      printReport(file, { entries: blocking, dbViolations: blockingDb }, api);
       console.error(
         `      These are payload-content problems, which this script does not touch. ` +
           `Resolve them in the tool (or by an explicit, documented edit) and run again.`
@@ -444,6 +494,9 @@ function main(argv) {
       for (const v of violations) {
         console.log(`${path.basename(file)}  note: ${entryName(entry)} ${v.code} ${v.detail} (not repaired)`);
       }
+    }
+    for (const v of after.dbViolations) {
+      console.log(`${path.basename(file)}  note: ${v.code} ${v.detail} (not repaired)`);
     }
 
     if (!touched.length && !baseChanged) {
