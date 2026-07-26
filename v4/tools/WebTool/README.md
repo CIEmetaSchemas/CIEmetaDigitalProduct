@@ -7,7 +7,7 @@ metadata records, with full git-like change history and safe concurrent-edit mer
 Modelled on the termdat curation workflow. Runs entirely in the browser from a
 local file — **no server, no network access, no external/CDN dependencies.**
 
-**Interface version 1.8.0** (shown in the header).
+**Interface version 1.10.0** (shown in the header).
 
 A **? Help** button in the toolbar opens an in-app summary of the features below,
 including the link to the Crossref deposit validator.
