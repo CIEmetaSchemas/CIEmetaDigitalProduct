@@ -7,7 +7,7 @@ metadata records, with full git-like change history and safe concurrent-edit mer
 Modelled on the termdat curation workflow. Runs entirely in the browser from a
 local file — **no server, no network access, no external/CDN dependencies.**
 
-**Interface version 1.8.0** (shown in the header).
+**Interface version 1.10.0** (shown in the header).
 
 A **? Help** button in the toolbar opens an in-app summary of the features below,
 including the link to the Crossref deposit validator.
@@ -98,15 +98,26 @@ same function rather than restating it. The tool and the checker therefore canno
 disagree about what a consistent entry looks like.
 
 What it checks, per entry: `history` length and numbering (**E1**), the
-`metadataRevision` the status implies (**E2**), that replaying the history reproduces
-the payload (**E3**), `contentHash` (**E4**), the `history[].baseHash` chain (**E5**),
-and that a draft actually differs from the revision it is pending against (**E6**);
-plus the database `baseHash` (**D1**).
+`metadataRevision` the entry's kind implies (**E2**), that replaying the history
+reproduces the payload (**E3**), `contentHash` (**E4**), the `history[].baseHash` chain
+(**E5**), and that the stored `status` matches what `kindOf()` derives (**E6**). Across
+the database: that each `revisionOf` resolves to exactly one published parent (**E7**),
+and the database `baseHash` (**D1**).
+
+E6 and E7 police the [three-state model](#draft-under-revision--published-workflow):
+`status` is derived, not chosen — `draft` when `rev` is 0, `review` when `revisionOf` is
+set, `published` otherwise — so a stored status that disagrees with `kindOf()` is stale,
+and because `status` feeds the fingerprint behind `baseHash` it also puts that out of
+step. E2 and E3 are keyed off `kindOf()` too rather than the stored status, so a status
+that has gone stale reports once as E6 instead of cascading into unrelated failures.
+Note that an *empty* revision — one whose payload still equals its parent's — is
+perfectly legitimate: you start a revision before editing it, and it stays `review`
+until published or discarded.
 
 Three limits are deliberate:
 
 - **It repairs derived fields only** — E1, E3, E4, E5, D1. Payload content is never
-  rewritten.
+  rewritten, and neither is a `status` or a `revisionOf`.
 - **It refuses to write if a repairable violation would survive the repair**, rather
   than replacing a stale hash with a fresh hash computed over a payload its own
   history contradicts. A visible defect is better than a hidden one. Violations it is
@@ -116,12 +127,12 @@ Three limits are deliberate:
 - **Only E2 is a warning.** A `metadataRevision` that disagrees with the entry's
   revision is a value the tool rewrites on the next edit anyway, and a gate that can
   never go green is a gate everyone learns to ignore. Everything else fails `--check`,
-  including E6, which `--fix` cannot resolve: whether an empty draft should be
-  published or given a real pending change is a decision for a curator.
+  including E6 and E7, which `--fix` cannot resolve: which record is published and
+  which revision belongs to which parent are editorial decisions.
 
-The hash chain is **not** reimplemented either. `canonical()`, `contentHash()`,
-`applyPatch()`, `diffPatch()`, `reconstruct()`, `repairDerivedFields()`,
-`contentDiff()` and `computeDbBaseHash()` are lifted verbatim out of
+Nothing here is reimplemented either. `canonical()`, `contentHash()`, `applyPatch()`,
+`diffPatch()`, `reconstruct()`, `repairDerivedFields()`, `contentDiff()`, `kindOf()`
+and `computeDbBaseHash()` are lifted verbatim out of
 `CIEmetaDB.html` at run time and
 evaluated in a sandbox — the same reasoning as the embedded schema above, applied to
 the hashing. Self-tests run before any repair and abort on failure; the sharpest one
@@ -182,29 +193,75 @@ and email, registrant, database title, publisher name and the institution fields
 (name, acronym, place, department). These are organisation-wide values used by
 **Export to Crossref-file (XML)** (see below); set them once and they apply to every deposit.
 
-## Draft & publish workflow
+## Draft, under revision & published workflow
 
-Each entry is either a **draft** or **published**, and the status is **automatic and
-read-only** — you never set it by hand:
+Each entry has one of **three** statuses, and the status is **automatic and read-only** — you
+never set it by hand:
 
-- Creating or duplicating an entry, or editing any **payload** field, sets the entry to
-  **draft**.
-- **Save draft** stores your edits **without creating a revision** — the revision number is
-  unchanged, no history entry is added, and you are not asked for a comment. Envelope fields
-  (domains, DOI landing page) also save this way and never change status or revision.
-- **Publish entry** is the *only* action that mints a revision. It asks for a short **revision
-  text**, records **one** history entry holding the change since the previous published
-  revision, bumps the revision number and sets status to **published**. History therefore shows
-  revision-to-revision changes only, never intermediate draft saves.
-- Exporting a **draft** appends `_draft` after the (pending) revision number in the file name —
-  e.g. a new draft → `…_metadata_draft.json`, a draft on top of published v1 →
-  `…_metadata_v2_draft.json`.
+| Status | Meaning |
+|---|---|
+| **draft** | a new record (New entry / Duplicate) that has never been published |
+| **under revision** | a revision of a published record, being prepared alongside it |
+| **published** | the current published record |
+
+### Revising a published entry
+
+The **payload** of a published entry is **read-only**. To change it, press **Start revision**:
+this creates a second entry with status **under revision**, and you edit that one.
+
+**Envelope fields are the exception.** **Domains** and the **DOI landing page** are not part of
+the versioned payload — they never mint a revision and never change status — so they stay
+editable on a published entry. Change them in place and press **Save domains & landing page**;
+the revision number and status are untouched. No revision is needed for them.
+
+The published version **stays in the list, unchanged, for the whole time** — you can open,
+compare and export it while the revision is in progress. Each half shows a banner linking to the
+other.
+
+The two halves deliberately **share one DOI** while the revision is open, and that is **not**
+reported as a duplicate. The DOI cannot be edited on a revision, because changing it would break
+the pair. Two *unrelated* entries sharing a DOI are still flagged as before.
+
+**Publishing the revision collapses the pair**: the revision becomes the published entry at the
+next revision number, inheriting the complete revision chain, and the previous published row
+disappears. The DOI is unique again.
+
+```
+[published rev 2]                          Start revision
+        |
+        v
+[published rev 2]  +  [under revision]     both available, same DOI
+        |                    |
+        |                    | Publish
+        v                    v
+              [published rev 3]            history: rev 1, 2, 3
+```
+
+### Saving and publishing
+
+- **Save draft** / **Save revision** stores your edits **without creating a revision** — the
+  revision number is unchanged, no history entry is added, and you are not asked for a comment.
+  Envelope fields (domains, DOI landing page) also save this way and never change status or revision.
+- **Publish** is the *only* action that mints a revision. It asks for a short **revision text**,
+  records **one** history entry holding the change since the previous published revision, bumps
+  the revision number and sets status to **published**. History therefore shows
+  revision-to-revision changes only, never intermediate saves.
+- Exporting anything **not yet published** appends `_draft_TIMESTAMP` after the (pending) revision
+  number in the file name — e.g. a new draft → `…_metadata_draft_20260725T143022.json`, a revision
+  of published v1 → `…_metadata_v2_draft_20260725T143022.json`.
+- A published entry with a revision in progress **cannot be deleted**; discard or publish the
+  revision first.
+- On a published entry the read-only payload fields are shown **greyed out**. Validation checks
+  can still be run, but **Log this validation to the entry** is disabled — it writes to the entry,
+  so log against a draft or a revision instead.
 
 The action bar also offers two revert actions:
 
 - **Undo changes** — discards unsaved editor edits and returns to the last *saved* version.
-- **Revert to last published** — discards unpublished draft edits and restores the entry to its
-  last published revision (applied immediately, after a confirmation, since draft edits are not
+- **Discard revision** — deletes a revision entirely and returns you to the published entry,
+  which is unaffected (applied immediately, after a confirmation).
+- **Revert to last published** — for a never-published draft, restores the entry to its last
+  published revision (applied immediately, after a confirmation, since unpublished edits are not
   versioned and are lost).
 
 ## Data model (metadatabase envelope)
@@ -224,7 +281,8 @@ entry
 ├─ entryId        internal stable id (independent of the DOI; used for merge matching)
 ├─ rev            last published revision number (0 = never published); only Publish changes it
 ├─ contentHash    sha256 of the canonical payload (concurrency/merge anchor)
-├─ status         draft | published  (automatic; draft while edited, published on Publish)
+├─ status         draft | review | published   (automatic; 'review' displays as "under revision")
+├─ revisionOf     on a 'review' entry only: entryId of the published entry it revises
 ├─ landingPage    URL the DOI resolves to (Crossref <resource>); envelope-level, per entry
 ├─ domains        [ CIE-division codes ]
 ├─ audit          createdBy/Date, modifiedBy/Date, modifiedComment

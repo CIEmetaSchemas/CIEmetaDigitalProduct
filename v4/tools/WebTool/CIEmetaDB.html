@@ -39,6 +39,15 @@
   button.danger{background:#fff;color:var(--err);border-color:var(--err)}
   button.danger:hover{background:#fbeeee}
   button:disabled{opacity:.45;cursor:not-allowed}
+  /* Read-only payload (published entry): greyed but still readable and selectable. Envelope
+     fieldsets (.envelope — domains, DOI landing page) are never disabled and keep the normal look. */
+  input:disabled,select:disabled,textarea:disabled{
+    background:#f1f3f5;color:#7a828b;border-color:#e2e6ea;cursor:not-allowed;opacity:1}
+  input:disabled::placeholder,textarea:disabled::placeholder{color:#b6bcc3}
+  .ro fieldset:not(.envelope) legend,
+  .ro fieldset:not(.envelope) label,
+  .ro fieldset:not(.envelope) .hint{color:#9aa1a9}
+  .ro fieldset:not(.envelope){background:#fafbfc}
   button.small{padding:3px 8px;font-size:12px}
   input,select,textarea{font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:5px 8px;background:#fff;width:100%}
   input:focus,select:focus,textarea:focus{outline:2px solid var(--cie-sec2);border-color:var(--cie-sec1)}
@@ -67,6 +76,8 @@
   .badge.published{background:#dcf1e5;color:#12683f}
   .badge.fail{background:#fbe6e6;color:#9a2a24}
   .badge.dup{background:#f7d7d4;color:#8f2721;border:1px solid #e39a94}
+  .pair-banner{margin:8px 0 0;padding:8px 10px;border-radius:6px;background:#e0ecfb;color:#0a4aa0;
+    border:1px solid #b9d3f2;font-size:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .db-warning{background:#fbe6e6;color:#8f2721;border-bottom:1px solid #e6b3b0;padding:9px 16px;font-size:13px}
   .db-warning b{font-weight:700}
   .db-warning a{color:#8f2721;text-decoration:underline;cursor:pointer;font-family:Consolas,monospace}
@@ -174,6 +185,7 @@
         <select id="filterStatus">
           <option value="">All statuses</option>
           <option value="draft">Draft</option>
+          <option value="review">Under revision</option>
           <option value="published">Published</option>
         </select>
       </div>
@@ -1178,7 +1190,7 @@
 
 /* ---------- constants ---------- */
 const APP = {
-  VERSION: "1.9.0",
+  VERSION: "1.10.0",
   DB_SCHEMA_NAME: "CIEmetaDB",
   DB_SCHEMA_VERSION: 1,
   DOI_PREFIX: "10.25039/CIE.DS.",
@@ -1670,9 +1682,52 @@ function createEntry(payload, opts){
 /* payload diff for change detection: ignores the bookkeeping metadataRevision field so it never
    triggers (or suppresses) a revision on its own */
 function contentDiff(a,b){ const x=clone(a||{}),y=clone(b||{}); delete x.metadataRevision; delete y.metadataRevision; return diffPatch(x,y,""); }
-/* the version a draft will become when published — used for filename/display only. Published
-   entries simply show their own rev. */
-function pendingRev(e){ return e.status==="published" ? e.rev : (e.rev||0)+1; }
+/* ---------- editorial status ----------------------------------------------
+   Three states, and status is DERIVED from the entry, never typed by a user:
+
+     draft           a new record (New entry / Duplicate) that has never been published
+     review          a revision of a published record, prepared in parallel with it.
+                     Displayed throughout as "under revision".
+     published       the current published record
+
+   A revision is a SEPARATE entry that clones its published parent — history and rev
+   included — carrying a fresh entryId and revisionOf = parent entryId. Both exist side
+   by side and share a DOI until the revision is published, at which point the pair
+   collapses back into one published entry (see publishRevisionPair).
+
+   Cloning the history is what lets publishEntry() append rev N+1 to an intact chain
+   with no special-casing.
+   -------------------------------------------------------------------------- */
+function kindOf(e){
+  if(!e) return "draft";
+  if(e.revisionOf) return "review";
+  return (e.rev||0)===0 ? "draft" : "published";
+}
+function statusLabel(e){ return kindOf(e)==="review" ? "under revision" : kindOf(e); }
+function isRevision(e){ return kindOf(e)==="review"; }
+/* the two halves of one revision pair — exempt from the duplicate-DOI rule */
+function isRevisionPair(a,b){
+  if(!a||!b||a===b) return false;
+  return a.revisionOf===b.entryId || b.revisionOf===a.entryId;
+}
+/* the open revision of a published entry, if one exists */
+function openRevisionOf(e){
+  if(!DB||!e) return null;
+  return DB.entries.find(x=>x.revisionOf===e.entryId) || null;
+}
+/* the published parent of a revision entry */
+function parentOf(e){
+  if(!DB||!e||!e.revisionOf) return null;
+  return DB.entries.find(x=>x.entryId===e.revisionOf) || null;
+}
+/* Published entries are read-only. Changing a published record means starting a revision:
+   that is what keeps the published version available while the new one is prepared, and what
+   stops the two halves of a pair diverging. Drafts and revisions are freely editable. */
+function isLocked(e){ return kindOf(e)==="published"; }
+
+/* the version a draft or revision will become when published — used for filename/display
+   only. Published entries simply show their own rev. */
+function pendingRev(e){ return kindOf(e)==="published" ? e.rev : (e.rev||0)+1; }
 /* store a draft edit WITHOUT creating a revision: updates the saved payload and flips the entry to
    draft (unless the payload matches the last published revision again, in which case it snaps back
    to published). Never touches rev or history. Returns true if the stored payload changed. */
@@ -1683,7 +1738,9 @@ function storeDraft(entry, newPayload){
   const backToPublished = entry.rev>0 && contentDiff(lastPublished, stored).length===0;
   // a draft represents the pending next revision (last published + 1); rev itself is untouched
   stored.metadataRevision = backToPublished ? entry.rev : (entry.rev||0)+1;
-  entry.status = backToPublished ? "published" : "draft";
+  // status is derived: a revision stays "review" even when its content matches the parent again
+  // (use Discard revision to drop it), a never-published record stays "draft"
+  entry.status = (!entry.revisionOf && backToPublished) ? "published" : kindOf(entry);
   entry.payload=stored;
   entry.contentHash=contentHash(stored);
   const now=nowISO(), user=currentUser();
@@ -1707,6 +1764,49 @@ function publishEntry(entry, newPayload, comment){
   entry.payload=stored;
   entry.contentHash=contentHash(stored);
   entry.audit.modifiedBy=user; entry.audit.modifiedDate=now; entry.audit.modifiedComment=comment||"";
+  return true;
+}
+
+/* ---------- revision pairs -------------------------------------------------
+   startRevision  published entry -> published entry + parallel "under revision" copy
+   discardRevision            the pair -> the untouched published entry
+   publishRevisionPair        the pair -> one published entry at rev N+1
+   -------------------------------------------------------------------------- */
+/* Create the parallel revision of a published entry. The published entry is left exactly
+   as it is and becomes read-only (isLocked); all editing happens on the returned copy,
+   which shares the parent's DOI until it is published. */
+function startRevision(parent){
+  const now=nowISO(), user=currentUser();
+  const rev={
+    entryId:uuid(),
+    revisionOf:parent.entryId,
+    rev:parent.rev,                       // same baseline; publishing appends rev+1
+    contentHash:parent.contentHash,
+    status:"review",
+    landingPage:parent.landingPage||"",
+    domains:clone(parent.domains||[]),
+    audit:{createdBy:user, createdDate:now, modifiedBy:user, modifiedDate:now,
+           modifiedComment:"Revision started from published rev "+parent.rev},
+    payload:clone(parent.payload),
+    history:clone(parent.history||[]),    // cloned so publishEntry() extends an intact chain
+    validationLog:clone(parent.validationLog||[])
+  };
+  return rev;
+}
+/* Drop a revision and go back to the published entry. The parent was never modified, so
+   nothing has to be restored. */
+function discardRevision(revEntry){
+  const parent=parentOf(revEntry);
+  DB.entries=DB.entries.filter(x=>x.entryId!==revEntry.entryId);
+  return parent;
+}
+/* Publish a revision: it becomes the single published entry at rev N+1, inheriting the
+   full revision chain, and the parent row disappears. Returns false if nothing changed. */
+function publishRevisionPair(revEntry, newPayload, comment){
+  const parent=parentOf(revEntry);
+  if(!publishEntry(revEntry, newPayload, comment)) return false;
+  delete revEntry.revisionOf;                                   // no longer half of a pair
+  if(parent) DB.entries=DB.entries.filter(x=>x.entryId!==parent.entryId);
   return true;
 }
 
@@ -2009,13 +2109,24 @@ function refreshPublicationFilter(){
     opts.map(([k,l])=>`<option value="${esc(k)}">${esc(l)}</option>`).join("");
   sel.value=cur; // preserved if still present; otherwise browser resets to "" (All)
 }
-/* DOIs must be unique: map of doi -> [entries] for any DOI used more than once */
+/* DOIs must be unique: map of doi -> [entries] for any DOI used more than once.
+   A published entry and its open revision legitimately share a DOI while the revision is
+   being prepared, so that pair is exempt (see isRevisionPair). */
 function duplicateDoiMap(){
   const m=new Map();
   if(!DB) return m;
   for(const e of DB.entries){ const d=entryDoi(e); if(!d) continue; if(!m.has(d)) m.set(d,[]); m.get(d).push(e); }
-  for(const [k,v] of [...m]) if(v.length<2) m.delete(k);
+  for(const [k,v] of [...m]){
+    // drop the pair members that only collide with each other
+    const real=v.filter(e=>v.some(o=>o!==e && !isRevisionPair(e,o)));
+    if(real.length<2) m.delete(k); else m.set(k,real);
+  }
   return m;
+}
+/* does any OTHER entry use this DOI, ignoring the entry's own revision pair? */
+function doiClashesWith(e, doi){
+  if(!DB||!doi) return null;
+  return DB.entries.find(x=>x.entryId!==e.entryId && entryDoi(x)===doi && !isRevisionPair(x,e)) || null;
 }
 function updateDbWarning(dups){
   const w=el("dbWarning"); if(!w) return;
@@ -2040,14 +2151,14 @@ function renderList(){
     return hay.includes(q);
   });
   if(fd) rows=rows.filter(e=>(e.domains||[]).includes(fd));
-  if(fs) rows=rows.filter(e=>e.status===fs);
+  if(fs) rows=rows.filter(e=>kindOf(e)===fs);
   if(fp) rows=rows.filter(e=>entryRelatedPubs(e).some(pub=>pub.key===fp));
   const total = DB?DB.entries.length:0;
   rows.sort((a,b)=>{
     let va,vb;
     switch(sort.key){
       case "doi": va=entryDoi(a); vb=entryDoi(b); break;
-      case "status": va=a.status; vb=b.status; break;
+      case "status": va=kindOf(a); vb=kindOf(b); break;
       case "modified": va=a.audit.modifiedDate||""; vb=b.audit.modifiedDate||""; break;
       case "pubyear": va=(a.payload.publicationYear||""); vb=(b.payload.publicationYear||""); break;
       default: va=entryTitle(a).toLowerCase(); vb=entryTitle(b).toLowerCase();
@@ -2059,11 +2170,12 @@ function renderList(){
     const tr=document.createElement("tr");
     if(e.entryId===selectedId) tr.className="sel";
     const doms=(e.domains||[]).map(d=>`<span class="chip dom">${esc(d)}</span>`).join("");
-    const revChip=`<span class="chip rev" title="${e.status==="draft"?"Pending revision (draft — not yet published)":"Published revision"}">rev ${pendingRev(e)}${e.status==="draft"?" draft":""}</span>`;
+    const pend=kindOf(e)!=="published";
+    const revChip=`<span class="chip rev" title="${pend?"Pending revision — not yet published":"Published revision"}">rev ${pendingRev(e)}${pend?(isRevision(e)?" pending":" draft"):""}</span>`;
     tr.innerHTML=`<td><div class="title-cell">${esc(entryTitle(e))}</div>
         <div class="kv">${esc(entryFilename(e))}</div>${doms}${revChip}</td>
       <td><div class="doi-cell">${esc(entryDoi(e))}</div>${dupIds.has(e.entryId)?'<span class="badge dup" title="Duplicate DOI — must be fixed">duplicate DOI</span>':''}</td>
-      <td><span class="badge ${esc(e.status)}">${esc(e.status)}</span></td>
+      <td><span class="badge ${esc(kindOf(e))}">${esc(statusLabel(e))}</span></td>
       <td class="kv">${esc((e.audit.modifiedDate||"").replace("T"," ").slice(0,19))}<br>${esc(e.audit.modifiedBy)}<br>rev ${pendingRev(e)}</td>`;
     tr.onclick=()=>selectEntry(e.entryId);
     tb.appendChild(tr);
@@ -2108,21 +2220,25 @@ function renderDetail(){
   pane.innerHTML="";
   const head=document.createElement("div"); head.className="detail-head";
   const doi=entryDoi(e);
+  const locked=isLocked(e);   // published half of an open pair: read-only, edit the revision instead
   head.innerHTML=`<h2>${esc(entryTitle(e))}</h2>
     <div class="meta">
       ${doi?`<a class="mono doi-link" href="https://doi.org/${esc(doi)}" target="_blank" rel="noopener noreferrer">https://doi.org/${esc(doi)}</a>`:'<span class="mono">(no DOI)</span>'}
       ${e.landingPage?`<a class="mono doi-link" href="${esc(e.landingPage)}" target="_blank" rel="noopener noreferrer" title="DOI landing page (Crossref resource)">↪ landing page</a>`:'<span class="mono" style="color:var(--muted)">(no landing page)</span>'}
-      <span class="badge ${esc(e.status)}" title="Status is set automatically: draft while edited, published when you press Publish">${esc(e.status)}</span>
-      <span title="${e.status==="draft"?"Pending revision — becomes this number when published":"Published revision"}">rev ${pendingRev(e)}</span>
+      <span class="badge ${esc(kindOf(e))}" title="Status is set automatically: 'draft' for a new record, 'under revision' while a published record is being revised, 'published' after you press Publish entry">${esc(statusLabel(e))}</span>
+      <span title="${kindOf(e)==="published"?"Published revision":"Pending revision — becomes this number when published"}">rev ${pendingRev(e)}</span>
       <span>created ${esc((e.audit.createdDate||"").slice(0,10))} by ${esc(e.audit.createdBy)}</span>
       <span>modified ${esc((e.audit.modifiedDate||"").slice(0,10))} by ${esc(e.audit.modifiedBy)}</span>
       <span id="saveState"></span>
     </div>
     <div class="detail-actions">
-      <button id="btnSaveEntry">Save draft</button>
-      <button id="btnPublish" title="Create a new revision and mark the entry published">Publish entry</button>
+      ${locked?`<button id="btnStartRevision" title="${openRevisionOf(e)?"A revision of this entry is already in progress — go to it":"Create a revision of this published entry. The published version stays available alongside it."}">${openRevisionOf(e)?"Go to revision<br>in progress":"Start revision"}</button>
+      <button class="ghost" id="btnSaveEnvelope" title="Save domains and the DOI landing page. These are envelope fields, outside the versioned payload: saving them does not mint a revision or change the status.">Save domains &amp;<br>landing page</button>
+      <button class="ghost" id="btnRevert" title="Discard unsaved edits to domains / landing page">Undo changes</button>`
+              :`<button id="btnSaveEntry">${isRevision(e)?"Save revision":"Save draft"}</button>
+      <button id="btnPublish" title="${isRevision(e)?"Publish this revision as rev "+((e.rev||0)+1)+", replacing the published entry":"Create a new revision and mark the entry published"}">Publish ${isRevision(e)?"revision":"entry"}</button>
       <button class="ghost" id="btnRevert" title="Discard unsaved editor changes and return to the last saved version">Undo changes</button>
-      <button class="ghost" id="btnRevertPublished" title="Discard unpublished draft edits and restore the last published revision">Revert to <br>last published</button>
+      <button class="ghost" id="btnRevertPublished" title="${isRevision(e)?"Delete this revision; the published entry is unaffected":"Discard unpublished draft edits and restore the last published revision"}">${isRevision(e)?"Discard<br>revision":"Revert to <br>last published"}</button>`}
       <button class="ghost" id="btnCompareFile" title="Compare this entry with an exported *.csv_metadata.json file">Compare with<br>metadata-file (JSON)</button>
       <button class="ghost" id="btnValidateCsv" title="Validate this entry against its CSV data file">Validate against<br>data-file (CSV, &hellip;)</button>
       <button class="ghost" id="btnExportOne" title="Export this entry as a *.csv_metadata.json file">Export<br>metadata-file (JSON)</button>
@@ -2131,6 +2247,24 @@ function renderDetail(){
       <button class="danger" id="btnDelete">Delete</button>
     </div>`;
   pane.appendChild(head);
+
+  /* explain the read-only / paired state, with a jump to the other half where there is one */
+  const other = locked ? openRevisionOf(e) : (isRevision(e) ? parentOf(e) : null);
+  if(locked || isRevision(e)){
+    const b=document.createElement("div"); b.className="pair-banner";
+    b.innerHTML = !locked
+      ? `This is a <b>revision</b> of published rev ${e.rev}, which stays available unchanged until you publish. Both share the same DOI. `
+      : other
+        ? `<b>Read-only.</b> A revision of this entry is in progress; this published rev ${e.rev} stays available for reference. Make your changes in the revision. `
+        : `<b>Read-only — published.</b> To change this record press <b>Start revision</b>: the revision is edited separately and this published rev ${e.rev} stays available alongside it. `;
+    if(other){
+      const jump=document.createElement("button"); jump.className="ghost small";
+      jump.textContent = locked ? "Go to the revision" : "Go to the published entry";
+      jump.onclick=()=>selectEntry(other.entryId);
+      b.appendChild(jump);
+    }
+    pane.appendChild(b);
+  }
 
   const tabs=document.createElement("div"); tabs.className="tabs";
   [["form","Form"],["json","JSON"],["validate","Validation"],["history","History ("+e.rev+")"]].forEach(([k,lbl])=>{
@@ -2141,10 +2275,16 @@ function renderDetail(){
 
   const page=document.createElement("div"); page.className="tabpage"; page.id="tabpage"; pane.appendChild(page);
 
-  el("btnSaveEntry").onclick=saveEntry;
-  el("btnPublish").onclick=publishEntryAction;
-  el("btnRevert").onclick=()=>{ editModel=clone(e.payload); resetEditMeta(e); editDirty=false; renderDetail(); toast("Changes undone — back to the last saved version"); };
-  el("btnRevertPublished").onclick=()=>revertToPublished(e);
+  if(locked){
+    el("btnStartRevision").onclick=()=>startRevisionAction(e);
+    el("btnSaveEnvelope").onclick=()=>saveEnvelope(e);
+    el("btnRevert").onclick=()=>{ resetEditMeta(e); editDirty=false; renderDetail(); toast("Changes undone"); };
+  }else{
+    el("btnSaveEntry").onclick=saveEntry;
+    el("btnPublish").onclick=publishEntryAction;
+    el("btnRevert").onclick=()=>{ editModel=clone(e.payload); resetEditMeta(e); editDirty=false; renderDetail(); toast("Changes undone — back to the last saved version"); };
+    el("btnRevertPublished").onclick=()=>revertToPublished(e);
+  }
   el("btnValidateCsv").onclick=()=>{ activeTab="validate"; renderDetail(); };
   el("btnDupe").onclick=()=>duplicateEntry(e);
   el("btnExportOne").onclick=()=>exportDataCiteFiles([e]);
@@ -2157,6 +2297,25 @@ function renderDetail(){
   else if(activeTab==="json") renderJson(page,e);
   else if(activeTab==="validate") renderValidate(page,e);
   else if(activeTab==="history") renderHistory(page,e);
+
+  /* A published entry is read-only for its PAYLOAD: disable the Form fields and the JSON editor.
+     Envelope fields (domains, DOI landing page) are not part of the versioned payload — they never
+     mint a revision or change status — so they stay editable and are excluded here via .envelope.
+     Validation and History stay interactive too; they do not change the payload. The action bar is
+     unaffected, so Duplicate/Export/Delete still work. */
+  if(locked && (activeTab==="form"||activeTab==="json")){
+    page.classList.add("ro");            // greys legends/labels of the non-envelope fieldsets
+    page.querySelectorAll("input,select,textarea,button").forEach(n=>{
+      if(!n.closest(".envelope")) n.disabled=true;
+    });
+  }
+  /* a revision must keep its parent's DOI: changing it would break the pair and silently
+     mint a second dataset */
+  if(isRevision(e) && activeTab==="form"){
+    page.querySelectorAll('input').forEach(n=>{
+      if(n.value && n.value===entryDoi(e)){ n.disabled=true; n.title="A revision keeps the DOI of the entry it revises."; }
+    });
+  }
 }
 
 /* ---- form building helpers ---- */
@@ -2243,14 +2402,16 @@ function columnHeadersToTsv(arr){
 function renderForm(page,e){
   const p=editModel;
   // sidebar meta fieldset
-  const fsMeta=document.createElement("fieldset");
+  // class "envelope": these fields live OUTSIDE the versioned payload, so they stay editable even
+  // on a published (read-only) entry and are excluded from the read-only sweep in renderDetail.
+  const fsMeta=document.createElement("fieldset"); fsMeta.className="envelope";
   fsMeta.innerHTML='<legend>Database entry</legend>';
   const gm=document.createElement("div"); gm.className="grid";
   // status is read-only: set automatically (draft while edited, published via Publish entry).
-  // domains/landingPage edit the envelope buffer (editMeta); committed via Save draft.
+  // domains/landingPage edit the envelope buffer (editMeta); committed via Save.
   const statusView=document.createElement("div"); statusView.style.padding="4px 0";
-  statusView.innerHTML=`<span class="badge ${esc(e.status)}">${esc(e.status)}</span>`;
-  statusView.title="Set automatically — 'draft' while an entry has unpublished edits, 'published' after you press Publish entry.";
+  statusView.innerHTML=`<span class="badge ${esc(kindOf(e))}">${esc(statusLabel(e))}</span>`;
+  statusView.title="Set automatically — 'draft' for a new record, 'under revision' while a published record is being revised, 'published' after you press Publish.";
   gm.appendChild(field("Status", statusView));
   const domWrap=document.createElement("div");
   DB.domains.forEach(d=>{
@@ -2263,7 +2424,8 @@ function renderForm(page,e){
   gm.appendChild(field("DOI landing page (Crossref resource URL)", inp(editMeta,"landingPage",{placeholder:"https://cie.co.at/datatable/…"})));
   // metadata-file revision: read-only; only Publish entry mints a new revision.
   const revView=document.createElement("div"); revView.style.padding="6px 0"; revView.className="mono";
-  revView.textContent = e.status==="draft" ? (pendingRev(e)+" (draft — not yet published)") : String(e.rev);
+  revView.textContent = kindOf(e)==="published" ? String(e.rev)
+    : pendingRev(e)+(isRevision(e)?" (under revision — not yet published)":" (draft — not yet published)");
   revView.title="Revision of this JSON metadata file. A new revision is created only when you press Publish entry — not when saving a draft or editing the CIE division / DOI landing page.";
   gm.appendChild(field("Metadata revision", revView));
   fsMeta.appendChild(gm); page.appendChild(fsMeta);
@@ -2283,10 +2445,15 @@ function renderForm(page,e){
   idHint.textContent="Format 10.25039/CIE.DS.①②③④⑤⑥⑦⑧ (8 chars, excludes o O l L 1 I 0).";
   fsId.appendChild(gi); fsId.appendChild(idHint);
   const curDoi=p.identifier&&p.identifier.identifier;
-  if(curDoi && DB.entries.some(x=>x.entryId!==e.entryId && entryDoi(x)===curDoi)){
+  if(curDoi && doiClashesWith(e,curDoi)){
     const dw=document.createElement("div"); dw.className="hint"; dw.style.color="var(--err)"; dw.style.fontWeight="600"; dw.style.marginTop="4px";
     dw.textContent="⚠ This DOI is already used by another entry — DOIs must be unique. Change it before saving.";
     fsId.appendChild(dw);
+  }
+  if(isRevision(e)){
+    const rh=document.createElement("div"); rh.className="hint"; rh.style.marginTop="4px";
+    rh.textContent="This revision shares the DOI of the published entry it revises — that is expected, and the DOI cannot be changed here.";
+    fsId.appendChild(rh);
   }
   page.appendChild(fsId);
 
@@ -2592,8 +2759,16 @@ function renderCsvResult(out,e,filename,md5,sha,a){
   chk.appendChild(ul);
   const logBtn=document.createElement("button"); logBtn.className="ghost"; logBtn.style.marginTop="8px";
   logBtn.textContent="Log this validation to the entry";
-  logBtn.title="Store these results with date and editor in the entry's validation log (saved in the database)";
+  // logging writes to the entry, so it is blocked on a published record — validate a draft or a
+  // revision instead. Running the checks themselves stays available on anything.
+  if(isLocked(e)){
+    logBtn.disabled=true;
+    logBtn.title="A published entry cannot be modified. Start a revision to log a validation against it.";
+  }else{
+    logBtn.title="Store these results with date and editor in the entry's validation log (saved in the database)";
+  }
   logBtn.onclick=()=>{
+    if(isLocked(e)) return;
     const passed=checks.every(c=>c.status!=="fail");
     const rec={date:nowISO(), by:currentUser(), fileName:filename, md5:md5, sha256:sha, passed:passed,
       results:checks.map(c=>({check:c.key||"", status:c.status, detail:c.text}))};
@@ -2668,13 +2843,39 @@ function renderDiff(patch,rev,prev){
 function shortVal(v){ if(v===undefined) return "∅"; const s=typeof v==="string"?v:JSON.stringify(v); return s.length>120?s.slice(0,117)+"…":s; }
 
 /* ---- entry actions ---- */
+/* Start a revision of a published entry: creates the parallel "under revision" copy and
+   selects it. The published entry stays in the list, unchanged and read-only, so both are
+   available at once. */
+function startRevisionAction(e){
+  if(!e || kindOf(e)!=="published") return;
+  const existing=openRevisionOf(e);
+  if(existing){ selectEntry(existing.entryId); toast("This entry already has a revision in progress"); return; }
+  if(editDirty && !confirm("Discard unsaved changes to the current entry?")) return;
+  const rev=startRevision(e);
+  DB.entries.push(rev);
+  persist(); renderList(); selectEntry(rev.entryId);
+  toast("Revision started — the published rev "+e.rev+" stays available alongside it","ok");
+}
+/* Discard a revision and return to its published entry. The published entry was never
+   modified, so nothing needs restoring. */
+function discardRevisionAction(e){
+  if(!e || !isRevision(e)) return;
+  const parent=parentOf(e);
+  if(!confirm(`Discard this revision of "${entryTitle(e)}"?\n\nThe published rev ${e.rev} is unaffected. Unpublished revision edits are lost.`)) return;
+  discardRevision(e);
+  editDirty=false; editModel=null;
+  persist(); renderList();
+  if(parent) selectEntry(parent.entryId); else { selectedId=null; renderDetail(); }
+  toast("Revision discarded","ok");
+}
 /* discard unpublished draft edits and restore the entry to its last published revision.
    Applied immediately (confirmed) — draft edits are unversioned and are lost. */
 function revertToPublished(e){
   if(!e) return;
+  if(isRevision(e)) return discardRevisionAction(e);   // for a revision, "revert" means discard it
   if(e.rev===0 || !e.history.length){ toast("This entry has never been published","warn"); return; }
   const lastPublished=reconstruct(e.history, e.rev);
-  const clean = e.status==="published" && !editDirty && contentDiff(e.payload, lastPublished).length===0;
+  const clean = kindOf(e)==="published" && !editDirty && contentDiff(e.payload, lastPublished).length===0;
   if(clean){ toast("Already at published rev "+e.rev); return; }
   if(!confirm("Discard unpublished draft edits and restore published rev "+e.rev+"?")) return;
   e.payload=clone(lastPublished);                 // its metadataRevision already equals e.rev
@@ -2697,10 +2898,22 @@ function preSaveChecks(e){
   const errs=validate(editModel,CIE_SCHEMA);
   if(errs.length){ if(!confirm("The entry has "+errs.length+" schema issue(s):\n\n"+errs.slice(0,10).join("\n")+(errs.length>10?"\n…":"")+"\n\nContinue anyway?")) return false; }
   const curDoi=editModel.identifier&&editModel.identifier.identifier;
-  if(curDoi && DB.entries.some(x=>x.entryId!==e.entryId && entryDoi(x)===curDoi)){
+  if(curDoi && doiClashesWith(e,curDoi)){   // a revision sharing its parent's DOI is not a clash
     if(!confirm("Another entry already uses this DOI:\n"+curDoi+"\n\nDOIs must be unique. Continue anyway (the database will flag it as a duplicate to fix)?")) return false;
   }
   return true;
+}
+/* Save envelope-only changes (domains, DOI landing page) on a read-only published entry.
+   These live outside the versioned payload, so they never mint a revision and never change the
+   status — which is why they remain editable without starting a revision. */
+function saveEnvelope(e){
+  if(!e) return;
+  if(!metaChanged(e)){ toast("No changes to domains or landing page"); editDirty=false; renderDetail(); return; }
+  e.domains=clone(editMeta.domains); e.landingPage=editMeta.landingPage||"";
+  e.audit.modifiedBy=currentUser(); e.audit.modifiedDate=nowISO();
+  resetEditMeta(e); editDirty=false;
+  persist(); renderList(); renderDetail();
+  toast("Saved domains / landing page — status and revision unchanged","ok");
 }
 /* Save draft edits. Payload changes are stored WITHOUT creating a revision (the entry flips to
    draft); envelope changes (domains / landing page) are stored as before. Publishing is the only
@@ -2717,11 +2930,16 @@ function saveEntry(){
     if(!payloadChanged){ e.audit.modifiedBy=currentUser(); e.audit.modifiedDate=nowISO(); }
   }
   resetEditMeta(e); editDirty=false; persist(); renderList(); renderDetail();
-  toast(e.status==="draft"?"Saved draft (not yet published)":"Saved entry changes","ok");
+  toast(kindOf(e)==="published"?"Saved entry changes"
+       :isRevision(e)?"Saved revision (not yet published)"
+       :"Saved draft (not yet published)","ok");
 }
-/* Publish the current editor content as a new revision (the only path that creates one). */
+/* Publish the current editor content as a new revision (the only path that creates one).
+   For a revision this also collapses the pair: the revision becomes the published entry at
+   rev N+1 with the chain intact, and the old published row is removed. */
 function publishEntryAction(){
   const e=findEntry(selectedId); if(!e) return;
+  if(isLocked(e)){ toast("This entry has a revision in progress — publish that instead","warn"); return; }
   if(!preSaveChecks(e)) return;
   const lastPublished = e.history.length ? reconstruct(e.history, e.rev) : {};
   if(contentDiff(lastPublished, editModel).length===0){ toast("No changes to publish since rev "+e.rev,"warn"); return; }
@@ -2729,11 +2947,18 @@ function publishEntryAction(){
   if(comment===null) return; // cancelled
   // persist any envelope edits alongside the publish
   if(metaChanged(e)){ e.domains=clone(editMeta.domains); e.landingPage=editMeta.landingPage||""; }
-  publishEntry(e,editModel,comment);
-  resetEditMeta(e); editDirty=false; persist(); renderList(); renderDetail();
-  toast("Published rev "+e.rev,"ok");
+  const wasRevision=isRevision(e);
+  if(wasRevision) publishRevisionPair(e,editModel,comment); else publishEntry(e,editModel,comment);
+  resetEditMeta(e); editDirty=false; persist(); renderList(); selectEntry(e.entryId,true);
+  toast(wasRevision?"Revision published as rev "+e.rev+" — it now replaces the previous published entry"
+                   :"Published rev "+e.rev,"ok");
 }
 function deleteEntry(e){
+  const open=openRevisionOf(e);
+  if(open){
+    alert(`"${entryTitle(e)}" has a revision in progress and cannot be deleted.\n\nDiscard or publish that revision first.`);
+    selectEntry(open.entryId); return;
+  }
   if(!confirm(`Delete entry "${entryTitle(e)}" (${entryDoi(e)})?\nThis removes it from the database.`)) return;
   DB.entries=DB.entries.filter(x=>x.entryId!==e.entryId);
   if(selectedId===e.entryId){ selectedId=null; editModel=null; editDirty=false; }
@@ -3025,12 +3250,12 @@ function migrateDb(obj){
   if(obj.lastModifiedBy==null) obj.lastModifiedBy="";
   obj.defaults=Object.assign(clone(DEFAULT_VALUES), obj.defaults||{}); // seed/fill missing default keys
   migrationRepairs=0;
+  /* Three passes, because each needs the previous one finished.
+     1. structural defaults, so rev / history / revisionOf are settled before anything derives
+        from them. */
   obj.entries=(obj.entries||[]).map(e=>{
     e.domains=e.domains||[]; if(e.landingPage==null) e.landingPage="";
-    // status first: whether the payload is a published revision or a pending draft edit
-    // decides which metadata-file revision it carries
-    if(e.status==="review") e.status="draft"; // legacy three-state status collapses to draft/published
-    if(e.status!=="draft" && e.status!=="published") e.status="published";
+    if(e.revisionOf==null) delete e.revisionOf;
     // a synthesised history holds one record standing for revision e.rev, so it must diff a
     // payload whose metadataRevision is that revision - not the pending one a draft carries
     if(!e.history){
@@ -3038,22 +3263,71 @@ function migrateDb(obj){
       e.history=[{rev:e.rev||1,by:"import",date:e.audit?e.audit.modifiedDate:nowISO(),comment:"Imported",baseHash:null,patch:diffPatch({},asRev,"")}];
     }
     if(e.rev==null) e.rev=e.history.length;
-    // backfill the metadata-file revision. pendingRev, not rev: a draft payload is the next
-    // revision waiting to be published, which is what storeDraft/publishEntry record.
-    if(e.payload && e.payload.metadataRevision==null) e.payload.metadataRevision=pendingRev(e);
-    // derived fields last of all, so they describe the payload as migrated rather than as
-    // read, and so the history replays to it. Without this the backfill above silently
-    // invalidated contentHash and every hash in the history - see defect 7 in
-    // ../../docs/INTEROPERABILITY.md.
-    migrationRepairs+=repairDerivedFields(e).length;
     return e;
   });
+  /* 2. statuses. This can split one legacy entry into a published parent AND its revision, so it
+        has to run before anything derived is computed: the parent it creates is a new entry that
+        pass 1 never saw. */
+  obj.entries=migrateStatuses(obj.entries);
+  /* 3. the payload backfill, then the derived fields, over the final list. pendingRev reads
+        kindOf, which depends on rev and revisionOf only - both settled in pass 1 - so it is
+        right for all three states: rev for a published entry, rev+1 for a draft or a revision.
+        The derived fields come last so they describe the payload as migrated rather than as
+        read. Doing the backfill without this repair is what silently invalidated contentHash
+        and every hash in the history - see defect 7 in ../../docs/INTEROPERABILITY.md. */
+  obj.entries.forEach(e=>{
+    if(e.payload && e.payload.metadataRevision==null) e.payload.metadataRevision=pendingRev(e);
+    migrationRepairs+=repairDerivedFields(e).length;
+  });
   return obj;
+}
+/* Bring entries onto the three-state model (draft / review = "under revision" / published).
+
+   Older files only had two effective states, and an edit of a published record was stored
+   in place as "draft" — the published version was not available alongside it. Such an entry
+   is split here into the published parent (reconstructed from its own history) plus a
+   revision entry pointing at it, which is what the same edit looks like in the new model.
+
+   Runs on every load, so it also repairs pairs left dangling by hand-edited files. */
+function migrateStatuses(entries){
+  const out=[];
+  for(const e of entries){
+    const hasHistory=(e.rev||0)>0 && e.history && e.history.length;
+    if(e.revisionOf){                                   // already a revision: keep, verified below
+      e.status="review"; out.push(e); continue;
+    }
+    if((e.status==="draft"||e.status==="review") && hasHistory){
+      // unpublished edits on top of a published revision -> published parent + revision
+      const parentPayload=reconstruct(e.history, e.rev);
+      const parent={
+        entryId:uuid(), rev:e.rev, contentHash:contentHash(parentPayload), status:"published",
+        landingPage:e.landingPage||"", domains:clone(e.domains||[]),
+        audit:clone(e.audit||{}), payload:clone(parentPayload),
+        history:clone(e.history), validationLog:clone(e.validationLog||[])
+      };
+      e.revisionOf=parent.entryId; e.status="review";
+      out.push(parent, e); continue;
+    }
+    if((e.rev||0)===0){ e.status="draft"; out.push(e); continue; }   // new, never published
+    e.status="published"; out.push(e);
+  }
+  // drop revisionOf pointers whose parent is missing, and demote duplicate revisions of one parent
+  const ids=new Set(out.map(x=>x.entryId)), claimed=new Set();
+  for(const e of out){
+    if(!e.revisionOf) continue;
+    if(!ids.has(e.revisionOf) || claimed.has(e.revisionOf)){
+      delete e.revisionOf; e.status=(e.rev||0)===0?"draft":"published";
+    }else claimed.add(e.revisionOf);
+  }
+  return out;
 }
 
 /* import individual DataCite metadata files as new entries, checking DOI conflicts */
 function importDataCiteObjects(objs){
-  const byDoi=new Map(); DB.entries.forEach(e=>{ const d=entryDoi(e); if(d) byDoi.set(d,e); });
+  // index by DOI, preferring the PUBLISHED half of a revision pair so an import never
+  // matches against a half-finished revision
+  const byDoi=new Map(); DB.entries.forEach(e=>{ const d=entryDoi(e); if(!d) return;
+    const prev=byDoi.get(d); if(!prev || (kindOf(prev)!=="published" && kindOf(e)==="published")) byDoi.set(d,e); });
   const conflicts=[]; let added=0, noId=0;
   for(const o of objs){
     const doi=o&&o.identifier&&o.identifier.identifier;
@@ -3231,7 +3505,10 @@ function openImportDialog(){
 function mergeDb(incoming, onComplete){
   if(!DB){ DB=incoming; persist(); refreshDomainFilter(); renderList(); if(onComplete) onComplete(); return; }
   const mine=new Map(DB.entries.map(e=>[e.entryId,e]));
-  const byDoi=new Map(); DB.entries.forEach(e=>{ const d=entryDoi(e); if(d) byDoi.set(d,e); });
+  // index by DOI, preferring the PUBLISHED half of a revision pair so an import never
+  // matches against a half-finished revision
+  const byDoi=new Map(); DB.entries.forEach(e=>{ const d=entryDoi(e); if(!d) return;
+    const prev=byDoi.get(d); if(!prev || (kindOf(prev)!=="published" && kindOf(e)==="published")) byDoi.set(d,e); });
   const conflicts=[]; let autoMerged=0, addedNew=0;
   for(const inc of incoming.entries){
     const cur=mine.get(inc.entryId);
@@ -3374,7 +3651,8 @@ function metadataFileName(e){
   const base=entryFilename(e)||sanitize(entryTitle(e));
   const stem=base.endsWith(".csv")?base+"_metadata":base+".csv_metadata";
   const rev=pendingRev(e)||1;
-  const draftSuffix=e.status==="draft"
+  // any unpublished entry (new draft or a revision in progress) exports as a dated draft
+  const draftSuffix=kindOf(e)!=="published"
     ?"_draft_"+new Date().toISOString().replace(/-/g,"").replace(/:/g,"").slice(0,15)
     :"";
   return stem+(rev>1?"_v"+rev:"")+draftSuffix+".json";
@@ -3667,26 +3945,48 @@ function openHelpDialog(){
         copy instead and cannot detect parallel changes.</li>
     </ul>
 
-    <h4>Editing an entry — draft &amp; publish</h4>
+    <h4>Editing an entry — draft, under revision &amp; published</h4>
     <ul>
-      <li><b>Status is automatic</b> and read-only, with two values: <b>draft</b> and <b>published</b>.
-        Creating or duplicating an entry, or editing any payload field, sets it to <b>draft</b>.</li>
-      <li><b>Save draft</b> stores your edits <i>without</i> creating a revision — the revision number
-        does not change and no history entry is added. Domains and the DOI landing page are envelope
-        fields: editing them saves without touching status or revision.</li>
-      <li><b>Publish entry</b> is the only action that mints a revision: it asks for a short revision
+      <li><b>Status is automatic</b> and read-only, with three values:
+        <b>draft</b> — a new record (New entry or Duplicate) that has never been published;
+        <b>under revision</b> — a revision of a published record, being prepared alongside it;
+        <b>published</b> — the current published record.</li>
+      <li><b>Revising a published entry.</b> The <i>payload</i> of a published entry is read-only. Press
+        <b>Start revision</b> to create a copy with status <b>under revision</b>; edit that. The
+        published version <i>stays in the list unchanged</i> for the whole time, so you can consult or
+        export it while the revision is in progress. Both halves show a banner linking to the other.</li>
+      <li><b>Envelope fields stay editable</b> on a published entry: <b>Domains</b> and the
+        <b>DOI landing page</b> are not part of the versioned payload, so no revision is needed to
+        change them. Edit them in place and press <b>Save domains &amp; landing page</b> — the
+        revision number and the status are untouched.</li>
+      <li>The pair deliberately <b>shares one DOI</b> while the revision is open, and that is
+        <i>not</i> reported as a duplicate. The DOI cannot be edited on a revision — changing it would
+        break the pair. Two <i>unrelated</i> entries sharing a DOI are still flagged as before.</li>
+      <li><b>Save revision</b> / <b>Save draft</b> stores your edits <i>without</i> creating a revision —
+        the revision number does not change and no history entry is added. Domains and the DOI landing
+        page are envelope fields: editing them saves without touching status or revision.</li>
+      <li><b>Publish</b> is the only action that mints a revision: it asks for a short revision
         text, records one <b>History</b> entry holding the change since the previous published
         revision (RFC-6902 patch), bumps the revision number and sets status to <b>published</b>.
-        History therefore shows revision-to-revision changes, never intermediate draft saves.</li>
+        History therefore shows revision-to-revision changes, never intermediate saves.
+        Publishing a revision also <b>collapses the pair</b>: the revision becomes the published entry
+        at the next revision number, inheriting the whole revision chain, and the previous published
+        row disappears — so the DOI is unique again.</li>
       <li>The payload's <span class="mono">metadataRevision</span> mirrors the published revision and is
-        stamped automatically. Exporting a <b>draft</b> appends <span class="mono">_draft_TIMESTAMP</span> after
-        the (pending) revision number in the file name (e.g. <span class="mono">…_metadata_v2_draft_20260725T143022.json</span>).</li>
+        stamped automatically. Exporting anything not yet published appends
+        <span class="mono">_draft_TIMESTAMP</span> after the (pending) revision number in the file name
+        (e.g. <span class="mono">…_metadata_v2_draft_20260725T143022.json</span>).</li>
       <li><b>Undo changes</b> discards unsaved editor edits and returns to the last <i>saved</i> version.
-        <b>Revert to last published</b> discards unpublished draft edits and restores the entry to its
-        last published revision (immediate, with a confirmation — draft edits are not versioned and are lost).</li>
+        <b>Discard revision</b> deletes a revision entirely and returns you to the published entry, which
+        is unaffected. For a never-published draft, <b>Revert to last published</b> restores the entry to
+        its last published revision (immediate, with a confirmation — unpublished edits are lost).</li>
+      <li>A published entry with a revision in progress cannot be deleted; discard or publish the
+        revision first.</li>
       <li><b>Validation</b> tab — pick the CSV data file to check checksums, row/column counts,
         column sums, sample row and the wavelength range against the stored metadata, then fill or
-        log the results.</li>
+        log the results. The checks can be run on any entry, but <b>Log this validation to the
+        entry</b> writes to the entry and is therefore disabled on a <b>published</b> record —
+        log against a draft or a revision instead.</li>
       <li><b>Update DOI</b> — the small button beside the <b>Identifier (DOI)</b> field generates a
         compliant <code>10.25039/CIE.DS.$$$$$$$$</code> suffix (a local placeholder until CIE CB
         assigns the real DOI).</li>

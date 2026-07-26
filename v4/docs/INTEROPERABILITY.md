@@ -713,9 +713,10 @@ were never at fault.
 `contentHash` and the database `baseHash`. It repairs derived fields only and refuses to
 write if a payload-content divergence would survive, so a stale hash is never replaced by a
 freshly computed hash over a payload its own history contradicts. The two bundled starter
-databases carried the same defect (36 of 36 and 9 of 9) and were repaired too. The hash chain
-is not reimplemented: the script lifts `canonical()`, `contentHash()`, `applyPatch()` and the
-rest out of `CIEmetaDB.html` at run time, for the reason set out in section 10.1.
+databases carried the same defect (36 of 36 and 9 of 9) and were repaired too. Nothing in the
+script is reimplemented: it lifts `canonical()`, `contentHash()`, `applyPatch()`, `kindOf()`,
+`repairDerivedFields()` and the rest out of `CIEmetaDB.html` at run time, for the reason set out
+in section 10.1.
 
 **Cause removed as well.** Repairing the data alone would have left the mechanism in place for
 the next pre-4.1 database anyone opens, so `migrateDb()` was corrected too. The repair is now
@@ -723,23 +724,31 @@ one function, `repairDerivedFields()`, which `migrateDb()` calls on every entry 
 which `db_integrity.js` lifts instead of restating — so the tool and the checker cannot
 disagree about what a consistent entry looks like. Three things changed:
 
-- **Order.** Status is normalised first, then the payload backfill, then the derived fields.
-  Previously `contentHash` was computed *before* the backfill mutated the payload, so even a
-  freshly computed hash was stale the moment it was written.
-- **`pendingRev()` rather than `rev`.** A draft payload is the revision waiting to be
+- **Order — three passes.** Structural defaults first (`rev`, `history`, `revisionOf`), then
+  `migrateStatuses()`, then the payload backfill and the derived fields over the resulting
+  list. Previously `contentHash` was computed *before* the backfill mutated the payload, so
+  even a freshly computed hash was stale the moment it was written. `migrateStatuses()` has to
+  sit in the middle because it can **split** a legacy record — unpublished edits stored on top
+  of a published revision — into a published parent plus a revision of it, and that parent is a
+  new entry no earlier pass has seen; repairing per entry before the split would miss it.
+- **`pendingRev()` rather than `rev`.** An unpublished payload is the revision waiting to be
   published, so it carries `rev + 1` — which is what `storeDraft()` and `publishEntry()`
-  record. The old backfill gave drafts `rev`, understating every unpublished edit by one.
+  record. The old backfill gave `rev`, understating every unpublished edit by one.
+  `pendingRev()` reads `kindOf()`, which depends on `rev` and `revisionOf` and not on the
+  stored status, so it is right for all three states once the first pass has run.
 - **The migration is no longer silent.** `loadDbFromText()` reports how many derived fields
   were repaired and leaves the database marked unsaved, so the repair can be written back
   instead of being redone on every open.
 
 This was verified against a database reduced to its genuine pre-4.1 state — no
-`metadataRevision` in any payload or patch, hashes recomputed over those payloads, and a
-pending draft added, since no shipped database contains one. In that state it is internally
-consistent; applying the old one-line backfill reproduces defect 7 exactly (`E3` and `E4`
-across the corpus); applying the corrected `migrateDb()` yields a database that passes
-`db_integrity.js --check`, gives the draft the revision it is pending against plus one where
-the old code gave it the published revision, and repairs nothing on a second migration.
+`metadataRevision` in any payload or patch, hashes recomputed over those payloads, plus a
+legacy record holding unpublished edits, since no shipped database contains one. In that state
+the hash chain is sound, and the only entry flagged is that legacy record, which is precisely
+what `migrateStatuses()` exists to resolve. Applying the old one-line backfill reproduces
+defect 7 exactly (`E3` and `E4` across the corpus). Applying the corrected `migrateDb()` yields
+a database that passes `db_integrity.js --check`, splits the legacy record into a published
+parent at `metadataRevision = rev` and a revision at `rev + 1` where the old code gave both
+`rev`, and repairs nothing on a second migration.
 
 Fixing any of 1, 2 or 5 changes metadata content and therefore increments
 `metadataRevision` per CIE 3. Defects 3 and 4 were instead applied directly to the stored
