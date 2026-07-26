@@ -319,8 +319,9 @@ terminology committee — see recommendation G8.
 ## 5. Recommendation C — an explicit `symbol` field
 
 Today the symbol is embedded in `title`, and the transliteration is inconsistent. The
-repository contains `x_bar(lambda)`, `V'(lambda)`, `s_mel(lambda)`, `K_m,mes;m` — and, in
-`CIE_srf_PS_5nm`, `β15(λ)`, the only non-ASCII column title in the corpus.
+repository contains `x_bar(lambda)`, `V'(lambda)`, `s_mel(lambda)`, `K_m,mes;m`.
+`CIE_srf_PS_5nm` also carried `β15(λ)`, the only non-ASCII column title in the corpus; it
+is now transliterated as `beta15(lambda)` (defect 4, since fixed).
 
 `title` has to stay as it is: it is the label a user sees against a CSV column, and ASCII is
 the safe choice for that. But a consumer that wants to render a correct axis label should
@@ -627,6 +628,9 @@ Independent of the recommendations above. These are defects in the published dat
 measured against the 39 entries in `CIEmetaDBdataset.json`. The affected share of the corpus
 is small — 8 defective columns out of 402, plus the subject-casing issue.
 
+**Defects 3 and 4 have since been corrected** in the database; the remaining data defects are
+1, 2, 5, 6 and 7.
+
 Defects in the *schema file* — it was not valid JSON, it had no `$id`, its `wavelength_*`
 fields rejected the sentinel strings the documentation requires, and `funderIdentifierType`
 lacked ROR — have been corrected. See the version history in
@@ -637,24 +641,39 @@ lacked ROR — have been corrected. See the version history in
 |---|---|---|---|
 | 1 | `"quantity": "  "` (whitespace) on the `lambda` column | 2 columns | `CIE_illum_D55`, `CIE_illum_D75` |
 | 2 | `quantity` key absent | 6 columns | `CIE_1st_deriv_meta_ind` (`delta_x_bar(lambda)`, `delta_y_bar(lambda)`, `delta_z_bar(lambda)`), `CIE_illum_Dxx_comp` (`S_0(lambda)`, `S_1(lambda)`, `S_2(lambda)`) |
-| 3 | **`descrition` typo** instead of `description` | 15 columns in **1** dataset | `CIE_srf_CQS_5nm` |
-| 4 | `β15(λ)` — the only non-ASCII column title in the corpus, where every other dataset transliterates (`x_bar`, `lambda`) | 1 column | `CIE_srf_PS_5nm` |
+| 3 | **`descrition` typo** instead of `description` — **fixed** | 15 columns in **1** dataset | `CIE_srf_CQS_5nm` |
+| 4 | `β15(λ)` — the only non-ASCII column title in the corpus, where every other dataset transliterates (`x_bar`, `lambda`) — **fixed**, now `beta15(lambda)` | 1 column | `CIE_srf_PS_5nm` |
 | 5 | **Subject casing is inconsistent** — the same concept appears under two spellings | 6 subject entries | `Perception of colour` (10) vs `Perception of Colour` (2); `Colour of objects` (10) vs `Colour of Objects` (2); `Colour vision` (10) vs `Colour Vision` (2) |
 | 6 | v3 example declares `"schemaName": "CIEmetaDataProduct"` (vs `CIEmetaDigitalProduct` in its own schema) and reuses the **v4** `schemaURL` DOI | 1 file | `v3/examples/CIE_cc_1931_2deg.csv_metadata.json` |
+| 7 | **Stored `contentHash` does not match the payload**, and replaying `history[].patch` does not reproduce it | 38 of 39 entries | all except `CIE_std_illum_A_1nm` |
 
-Defect 3 is the one that silently loses information: a consumer reading `description` gets
-nothing for those 15 columns. Note that it is **far less widespread than the `../examples/`
-folder suggests** — the stale copies there carry the typo in 12 files, but in the live
-database only `CIE_srf_CQS_5nm` still has it. Most occurrences have already been corrected;
-this is the remainder.
+Defect 3 was the one that silently lost information: a consumer reading `description` got
+nothing for those 15 columns. It was **far less widespread than the `../examples/` folder
+suggests** — the stale copies there carry the typo in 12 files, but in the live database
+only `CIE_srf_CQS_5nm` still had it. That remainder is now corrected, and the key
+`descrition` occurs nowhere in the database.
 
 Defect 5 is a direct illustration of why recommendation F matters. Fourteen distinct subject
 strings are in use across 113 subject entries, all as bare strings with no
 `subjectScheme`, `schemeURI` or `valueURI` — nothing prevents the same concept being
 entered twice with different capitalisation, and nothing detects it afterwards.
 
-Fixing any of 1–5 changes metadata content and therefore increments `metadataRevision`
-per CIE 3.
+Defect 7 is not visible in any published metadata file — it affects the WebTool database
+envelope, not the payloads. Recomputing `contentHash(payload)` with the tool's own
+`canonical()` and SHA-256 reproduces the stored value for exactly one entry, and
+`reconstruct(history, rev)` fails to reproduce the payload for the same 38. The consequence
+is that `historyContainsHash()`, the ancestry test the merge path uses to decide
+fast-forward versus conflict, cannot recognise an ancestor for those entries, so every
+concurrent edit is reported as a conflict. The fix is to recompute both — the payloads
+themselves are sound, and all 39 validate against the schema.
+
+Fixing any of 1, 2 or 5 changes metadata content and therefore increments
+`metadataRevision` per CIE 3. Defects 3 and 4 were applied directly to the stored payloads
+without a revision bump: `rev`, `metadataRevision`, `contentHash` and `audit` are unchanged,
+and the `descrition` correction was also applied inside the rev-1 history patch of
+`CIE_srf_CQS_5nm` — so those two records now differ from what the history replays. This is
+recorded here rather than hidden; whether to reissue them as revision 3 is an editorial
+decision, and doing so would also clear defect 7 for those entries.
 
 ### 10.1 The schema was defined twice — **resolved**
 
@@ -797,9 +816,10 @@ concept with no identifier — better an honest gap than a fabricated URI.
 - *Schema file: **done.*** Valid JSON, `$id`, sentinel-tolerant `wavelength_*`, ROR.
   `schemaVersion` stays `4`, the schema DOI is unchanged, and all 39 published records now
   validate against the file. See the version history in [README.md](README.md).
-- *Data (section 10, defects 1–5): outstanding.* Records touched increment
-  `metadataRevision` per CIE 3. Effort: small — 8 defective columns out of 402, plus the
-  subject-casing variants.
+- *Data (section 10): defects 3 and 4 **done**, 1, 2, 5, 6 and 7 outstanding.* Records
+  touched increment `metadataRevision` per CIE 3 — note that 3 and 4 were applied in place
+  without a bump, see section 10. Effort: small — 8 defective columns out of 402, plus the
+  subject-casing variants and a recomputation of the database hashes.
 
 **Phase 2 — semantic annotation.** Add `unitPID`, `quantityPID`, `symbol` as optional
 fields; publish the appendix table as a normative annex to README.md; extend the WebTool so
