@@ -4,7 +4,7 @@
   "dbId": "c4d247e0-ad8a-f983-eaf1-abd993d11eea",
   "title": "CIE Metadatabase — starter (example records)",
   "description": "Starter database assembled from the example CIEmetaDigitalProduct records shipped with the tool.",
-  "baseHash": "e5fea3d4f479e53ae8e04694198e00825bedafcb27f426feb5b866fcd6be8458",
+  "baseHash": "317cd619153dbecb0a5cdc43c1e709e334a0468288b47943595a70f2d79f0cf8",
   "generatedAt": "2024-01-01T00:00:00.000Z",
   "lastModifiedDate": "2024-01-01T00:00:00.000Z",
   "lastModifiedBy": "import",
@@ -53,7 +53,7 @@
     {
       "entryId": "364e757a-5e95-6077-1093-c4136c7c5220",
       "rev": 1,
-      "contentHash": "d72f9f6338d60338ade0b9d22d3db2020737cb6707901c48cd0c70c491eb8e6b",
+      "contentHash": "a845c5c8584e5737a750b06f24e9944ff8f697fcf44288ce971557b84831636d",
       "status": "published",
       "domains": [],
       "audit": {
@@ -403,6 +403,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -411,7 +416,7 @@
     {
       "entryId": "a7943cfa-7914-488c-5ab3-8fdcdbb0be9c",
       "rev": 1,
-      "contentHash": "93afeac26b6c667a12bdd2a25f48c3fb200fa866d961227b8c6430b8f3960c6f",
+      "contentHash": "191b94ad18f3e0aeb2cab88a393988663d632c17163f9b4a4e2040602374679a",
       "status": "published",
       "domains": [],
       "audit": {
@@ -709,6 +714,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -717,7 +727,7 @@
     {
       "entryId": "0fb60d99-b9b7-d074-26aa-fa2a9289893e",
       "rev": 1,
-      "contentHash": "79983b20cc448dc06839f1fe5161efc4d4066e4650f8b37b364bb1c05c4c320b",
+      "contentHash": "1faab587e2df5bf074d9c11d944253afa8f5c3d53544b211a77378fb81c4cfcc",
       "status": "published",
       "domains": [],
       "audit": {
@@ -1109,6 +1119,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -1117,7 +1132,7 @@
     {
       "entryId": "32070a48-e868-7e87-607a-acf0b257128a",
       "rev": 1,
-      "contentHash": "70446fc3720250b01a666bbc5e62ed19035d850df3a1957fcaf426d1312ab2bf",
+      "contentHash": "c0355f3dfeb620043e08e448fc7772bc53bd10459968dfa1030893083f1ed039",
       "status": "published",
       "domains": [],
       "audit": {
@@ -1479,6 +1494,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -1487,7 +1507,7 @@
     {
       "entryId": "92f373a6-2cb7-7daa-32d3-9104e8aff3f7",
       "rev": 1,
-      "contentHash": "2ab27fe846e62e8417f717cfd98d3e74959d3c7418a224f719c60621b77bfc2f",
+      "contentHash": "a15cc9cd4ebfc4cf29a5fcd370ff2287a70d5b9f147eb753ed2e0a2aa98d1ef5",
       "status": "published",
       "domains": [],
       "audit": {
@@ -1837,6 +1857,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -1845,7 +1870,7 @@
     {
       "entryId": "1ab79f52-af61-274b-9f27-580599290ea9",
       "rev": 1,
-      "contentHash": "257e6ac6ff1521a78350c5a209df1fc19a29b1a404c34a6748317f46820a4f4a",
+      "contentHash": "eaeaa49168aaf30fa39e09409bed58595bb3843ce7ad5386668a25c775bca177",
       "status": "published",
       "domains": [],
       "audit": {
@@ -2163,6 +2188,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -2171,7 +2201,7 @@
     {
       "entryId": "180aabb5-a8c4-fdfe-6881-2a81db85838f",
       "rev": 1,
-      "contentHash": "6a7c0bf4b09ce32f7c2e820829b67d7dc28416a75041a97667139aa6c54a86ed",
+      "contentHash": "ace7008ffe861e7c9c609336020ffdaaa825af0dea7d32f8274d481c25b910bb",
       "status": "published",
       "domains": [],
       "audit": {
@@ -2489,6 +2519,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -2497,7 +2532,7 @@
     {
       "entryId": "e156162e-541d-d7fc-a847-715b1125791f",
       "rev": 1,
-      "contentHash": "bc4e9d56099fa215a65489370d55e0321e1f9b6fcf9c58e32b5add71cc3959af",
+      "contentHash": "37c6f2da33a09453b4e11f477a99f026dec4a78506aafbf1274c0682cf7ffe0d",
       "status": "published",
       "domains": [],
       "audit": {
@@ -2847,6 +2882,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -2855,7 +2895,7 @@
     {
       "entryId": "343d3b7e-1978-48ab-cc57-4117f8c2b721",
       "rev": 1,
-      "contentHash": "636ae61477fbe7068c9e00829a2426538eeaff58c56a90f5dc84a0707cbc703a",
+      "contentHash": "fc6653574ea0d670524899180692dc54d4cc70836b79266f0f9ab1d1ecb927fc",
       "status": "published",
       "domains": [],
       "audit": {
@@ -3205,6 +3245,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -3213,7 +3258,7 @@
     {
       "entryId": "8f78fe32-6df4-55c8-3c47-b0cb79efba45",
       "rev": 1,
-      "contentHash": "b8fb69af097128895b569365c61dfbcf99e33d8d77d3cdb420abb8458f042299",
+      "contentHash": "b7f1e062350d65d99f0efc8be735eff76017e3b87bb7d96e261d7427ac5f940c",
       "status": "published",
       "domains": [],
       "audit": {
@@ -3537,6 +3582,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -3545,7 +3595,7 @@
     {
       "entryId": "b6e6d385-dd5b-3c62-5d06-690c1d5c878c",
       "rev": 1,
-      "contentHash": "7139d1e64fb4675806c6b44230c5fe40e8e129d8e24eef99e63b0477d1acf623",
+      "contentHash": "36f8547304c0d460ae1204cefbf42529e47e5db7323ba0f9bebbbf06a8e7ad48",
       "status": "published",
       "domains": [],
       "audit": {
@@ -3869,6 +3919,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -3877,7 +3932,7 @@
     {
       "entryId": "ab2cb607-9a77-3130-10fa-9ffb98e50a12",
       "rev": 1,
-      "contentHash": "bcbc3d48d222b934c8dcddb2c00989055a9699499774ad18f4fbabf8dfc9d993",
+      "contentHash": "ded8303d8f6976d76491ab4c4b1c28dff1d989585e5a4e9ad42d63b2085192de",
       "status": "published",
       "domains": [],
       "audit": {
@@ -4201,6 +4256,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -4209,7 +4269,7 @@
     {
       "entryId": "717014cc-44d7-ec75-e20f-a34a92678885",
       "rev": 1,
-      "contentHash": "aedcd38879a527a1480f89a3adcfef8d59640db5065f419b435edbfba88838b7",
+      "contentHash": "46604d7c7f94276bb8e907baebbfcab21179347abb0224c416e90e358ab00ae7",
       "status": "published",
       "domains": [],
       "audit": {
@@ -4541,6 +4601,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -4549,7 +4614,7 @@
     {
       "entryId": "709b3ff1-17b7-1b77-ecad-f6eaec1eda27",
       "rev": 1,
-      "contentHash": "9786a32c6433a8d7bae42abe19cf89ee65492b018b989a89664b08289201396c",
+      "contentHash": "6bd3083d924ca1958e9c8f6dbcb6824a6a3aefe922a8b7f3b711895a6c45edbb",
       "status": "published",
       "domains": [],
       "audit": {
@@ -5351,6 +5416,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -5359,7 +5429,7 @@
     {
       "entryId": "b92a2c2e-9530-29b9-d8ee-3c9dad19e34d",
       "rev": 1,
-      "contentHash": "39e2c4ace547fc458ff090d836742d0dda8e924fc47a7be794d15f81a980f9db",
+      "contentHash": "627b2d55333273f8f861acab4da1361eecf4b0a09ce6b0ff6e7c3f730e348a99",
       "status": "published",
       "domains": [],
       "audit": {
@@ -6161,6 +6231,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -6169,7 +6244,7 @@
     {
       "entryId": "3f944471-9c9f-c57d-6447-7b329a2cef44",
       "rev": 1,
-      "contentHash": "36eeb5291c2e31ceea58d284df5ecbf2b7da23a37d5eb4a8e7ef640d518f9411",
+      "contentHash": "7c55bec85f1cfd66fb1cf1e622c5f5e188b04ecdbd475e72d70268bb672c176d",
       "status": "published",
       "domains": [],
       "audit": {
@@ -6567,6 +6642,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -6575,7 +6655,7 @@
     {
       "entryId": "60a1e569-75d8-14f8-1306-e93c4cc28298",
       "rev": 1,
-      "contentHash": "3e839cd423da1e6d1cdb7ad70f6b55f5eb324b7665136d8c509d6afa0eb0eca0",
+      "contentHash": "008a6f8185cbabe013b4524734b22e2113e5a1e59c2dc960a25153aa87f83834",
       "status": "published",
       "domains": [],
       "audit": {
@@ -6887,6 +6967,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -6895,7 +6980,7 @@
     {
       "entryId": "bc9007dc-4277-ba90-f6be-67d870f6f2c5",
       "rev": 1,
-      "contentHash": "d127bf8c065fac792f6abf526b7f6ba639e251ae9712b5a881d1235959f4312a",
+      "contentHash": "32a07fa88750cac40a16fe27fec4675eb6fdfaa7ba72995a2099ef66c9e9587c",
       "status": "published",
       "domains": [],
       "audit": {
@@ -7207,6 +7292,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -7215,7 +7305,7 @@
     {
       "entryId": "50f782b0-441a-c027-85ad-fa5080f006ca",
       "rev": 1,
-      "contentHash": "a7a8421af1f08fae229fcdc18af0daec0aca87c2cf860db527b8671018e64a68",
+      "contentHash": "8a4149c24b5f0d33d717c602ecf9995b0e19b597177c7b5ea9e46d5728075bc5",
       "status": "published",
       "domains": [],
       "audit": {
@@ -7685,6 +7775,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -7693,7 +7788,7 @@
     {
       "entryId": "cd61dbfb-7fa6-5be0-d8a8-cbe549e0380b",
       "rev": 1,
-      "contentHash": "661a7eba05411eaa3bb2b69161afdd1337f9a91672e4f1ebbd8279fd25dda8b3",
+      "contentHash": "ed4dfa8e0934f7926a0323f154ca9013e3a64907d72f2038080ab68ac5c7bfd4",
       "status": "published",
       "domains": [],
       "audit": {
@@ -8163,6 +8258,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -8171,7 +8271,7 @@
     {
       "entryId": "3734b6b7-108c-26d4-dade-72f5c8e3ab60",
       "rev": 1,
-      "contentHash": "55535a7e7f87bc0ebdff08d4b7577d6dfabff531a3b8209578a054e16a83aea5",
+      "contentHash": "5fcc1f4a16e84e43d768c477651ffabfe3739bcaaade1fb0def72a5972ca2de1",
       "status": "published",
       "domains": [],
       "audit": {
@@ -8515,6 +8615,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -8523,7 +8628,7 @@
     {
       "entryId": "6719bfc8-302f-68bc-a6c3-7250127b9e9b",
       "rev": 1,
-      "contentHash": "0dbc80d180f10fef3f5866823fcf13296cbacfc1e7a300cb877730b69cdba423",
+      "contentHash": "d9737466ed4d982d7da0764c525e155a6f5a78175f5c2fdcbcd13ca69119e771",
       "status": "published",
       "domains": [],
       "audit": {
@@ -8867,6 +8972,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -8875,7 +8985,7 @@
     {
       "entryId": "0a598644-258f-5ff8-6cf4-265b7496885d",
       "rev": 1,
-      "contentHash": "d18656a838cf4fdf6b6686a5c07f97c4b26bbeef54c4d0782d7d0d33744e0d0f",
+      "contentHash": "f7951320c409b819a8b7a8375afb7b4dfa77dc8a662027692c3938b6bd71299a",
       "status": "published",
       "domains": [],
       "audit": {
@@ -9197,6 +9307,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -9205,7 +9320,7 @@
     {
       "entryId": "b9a762ba-b99a-6491-f6c3-f7fcbaf66fd5",
       "rev": 1,
-      "contentHash": "c71088c901772d50b11a30e79af441133febca96b051caef9db650c56bc5ed2d",
+      "contentHash": "78526fd55504b426b6f7b38b53877d20054af5bc10ec45722e3a3177b4487a87",
       "status": "published",
       "domains": [],
       "audit": {
@@ -9523,6 +9638,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -9531,7 +9651,7 @@
     {
       "entryId": "d941f6af-0ab0-4e55-7011-579f63a8ba1e",
       "rev": 1,
-      "contentHash": "14674732405008ceefe5af384b8cbc40e031123707d64e8d6ea82824f484b7dc",
+      "contentHash": "bd2c77e8adaaeb4023d7a14868b73e80c0af67360db3755acd0d5666532a0e1e",
       "status": "published",
       "domains": [],
       "audit": {
@@ -9849,6 +9969,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -9857,7 +9982,7 @@
     {
       "entryId": "dfb50b56-35d3-1c6d-ba9d-8c1a3fec117a",
       "rev": 1,
-      "contentHash": "cf6792a47fb8fbb9ab5e18d3062e8650eb189ceb85484c2582fd5fb66bccfe51",
+      "contentHash": "4060b4d6ac60e7565c6d6d5ab876f89cdbe216aef23d3589ab98c13ffaf0ec5c",
       "status": "published",
       "domains": [],
       "audit": {
@@ -10213,6 +10338,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -10221,7 +10351,7 @@
     {
       "entryId": "c3528aa6-6adf-0dc1-1d69-aade135b4067",
       "rev": 1,
-      "contentHash": "4ff5d79a96f591679e7ca5d01e8eb03b1b35354d8ed242d90dcefc8744964506",
+      "contentHash": "2418a62bb430c2565e31afeb876d60c3878426e1272323d55d237cfd31c1218f",
       "status": "published",
       "domains": [],
       "audit": {
@@ -10543,6 +10673,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -10551,7 +10686,7 @@
     {
       "entryId": "2c9a9cc6-c423-0e71-8c06-eff05c352017",
       "rev": 1,
-      "contentHash": "4100e303a2061d135d2d340a1945d2380afa04732dd760cc1f4b5c73cb5ffc34",
+      "contentHash": "8bc4cc9b20fbe1c1ed04cf7f6672740a78a1a7dae6deb734537e5d74bee3aad9",
       "status": "published",
       "domains": [],
       "audit": {
@@ -10907,6 +11042,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -10915,7 +11055,7 @@
     {
       "entryId": "7338a2a7-5811-c60d-a8a0-ee2324650ce7",
       "rev": 1,
-      "contentHash": "329ff25c4a96de0520894e1b1383fb4b97da29bbb4a6b29a5223cc34aea655f9",
+      "contentHash": "d164b1f369af96070c00364b0b7589aa2900ce0f2fbb1b814c8683b69640603f",
       "status": "published",
       "domains": [],
       "audit": {
@@ -13031,6 +13171,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -13039,7 +13184,7 @@
     {
       "entryId": "25729bfa-0e36-62ae-d659-c2a012c5f2ad",
       "rev": 1,
-      "contentHash": "ec411e48dc63b63b0165f9190ec5fa798a1cf5d0e18b8f5b866d7f3b9ace8878",
+      "contentHash": "94304ab177e5fb77c0660b3d72ef9df913cd6f7fb996c02dc1e3d95d949f05ac",
       "status": "published",
       "domains": [],
       "audit": {
@@ -15155,6 +15300,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -15163,7 +15313,7 @@
     {
       "entryId": "ebad5b61-8d62-b68f-b922-74ba76bb9471",
       "rev": 1,
-      "contentHash": "8ce3b5e6dff7f7ee95bf6e2cbfa6e00028cd5d1048bbc5b2ff90737918991abc",
+      "contentHash": "db2d9a1ddb160d13e4c0173166af33bd28d3e6760f161d4ff63fdc20a35eda19",
       "status": "published",
       "domains": [],
       "audit": {
@@ -15725,6 +15875,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -15733,7 +15888,7 @@
     {
       "entryId": "8917fb38-4b8f-3f19-ec16-da97baa79d44",
       "rev": 1,
-      "contentHash": "2ceca6b1f714475801e0552b7b150a159f043ea09a828e0cfa42802b90ce3a2b",
+      "contentHash": "1593a8d7093b8fa1ccfb20c78ec81e6174235ebabf67e6aa62e962df2886d03b",
       "status": "published",
       "domains": [],
       "audit": {
@@ -16051,6 +16206,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -16059,7 +16219,7 @@
     {
       "entryId": "d81d42e6-958c-86cd-a437-143b0cedb4c3",
       "rev": 1,
-      "contentHash": "0b490f354b5979442df67278f48cb22a27d5c1164b4fbb540d361de29e5388db",
+      "contentHash": "589f40847b6b9350545c6207fe5e34473325aaa9d8c3828c302f846135c5d1d9",
       "status": "published",
       "domains": [],
       "audit": {
@@ -16371,6 +16531,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -16379,7 +16544,7 @@
     {
       "entryId": "e217608a-c48a-fcf6-b15f-bf402937611c",
       "rev": 1,
-      "contentHash": "9a2ddd7a0d5f8542839c60f3f0aa6c5faff2c6810f381f259dde351946c76084",
+      "contentHash": "04e4f7fdeacfe19e344f365bd157753aa5b0ca734014fb05e45c53e61f82bf7f",
       "status": "published",
       "domains": [],
       "audit": {
@@ -16697,6 +16862,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -16705,7 +16875,7 @@
     {
       "entryId": "b4d99822-72c8-fc27-376f-7097c5a4158c",
       "rev": 1,
-      "contentHash": "568a1f9de392f43d6c1332b6cbb7ab17c7728d9dea5032e35d3c18d1b703f199",
+      "contentHash": "88972c8a441e17c21b32460c90c295ee345653d985a1e52bd7ad25afb53c0b2e",
       "status": "published",
       "domains": [],
       "audit": {
@@ -17091,6 +17261,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -17099,7 +17274,7 @@
     {
       "entryId": "966cca1a-9718-8df2-c6ac-1184ec3df937",
       "rev": 1,
-      "contentHash": "5f00020448c37bd64285c005f0742f6ba9bb4c2e57a79987cb8279c041b91c12",
+      "contentHash": "36a8354150a3d6e30715336ae62dd5c7638a56170664dea93b5f0d851e09a290",
       "status": "published",
       "domains": [],
       "audit": {
@@ -17459,6 +17634,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }

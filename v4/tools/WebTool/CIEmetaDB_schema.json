@@ -3,6 +3,7 @@
 	"$id": "https://www.cie.co.at/schemas/CIEmetaDB_schema_01.json",
 	"title": "CIEmetaDB",
 	"description": "Data model for the CIE metadatabase: an aggregate store of CIEmetaDigitalProduct (DataCite-based) metadata entries with per-entry change history, audit trail, CIE-division domains and optimistic-concurrency anchors. The payload of each entry validates against CIEmetaDigitalProduct_schema_04.json.",
+	"$comment": "Corrections, dbSchemaVersion stays 1. This file is not embedded in CIEmetaDB.html and is not consulted at run time - the tool checks dbSchemaName and dbSchemaVersion only - so it had drifted from the data model it describes. None of the following can invalidate a database that was valid before: two fields were already being written and are now declared, and one constraint is widened.\n\n- landingPage declared on an entry. Written by the tool since the Crossref export was added, and part of the per-entry fingerprint behind baseHash, but undeclared here. It validated only because no object in this schema sets additionalProperties: false.\n- rev minimum lowered from 1 to 0 and history minItems from 1 to 0. A new entry that has not been published yet has rev 0 and no history - the ordinary result of 'New entry' - so saving a database containing one produced a file that failed this schema. The constraints described the published case as if it were the only one.\n- The nine cr* Crossref deposit fields declared under defaults. Same omission as landingPage: written by the tool, undeclared here.\n- baseHash description corrected. It said 'sha256 over the ordered list of entry contentHashes', which the code has not done since envelope fields became versioned outside the payload; the hash is over each entry's contentHash combined with its status, domains and landingPage.\n- rev description corrected. It said 'incremented on every committed change'; only publishing creates a revision, and saving a draft deliberately does not.\n- payload description corrected. It said metadataRevision mirrors rev, which holds for a published entry but not for a draft, where it is rev + 1 - the revision the draft will become.\n- history description extended to say what it does not contain: a draft's pending payload is recorded only when published, so for a draft the history replays to the last published revision rather than to payload.\n\nThe derived fields (contentHash, history[].baseHash, the patch chain and baseHash) are checked by db_integrity.js, which reports them per entry and can repair them.",
 	"type": "object",
 	"definitions": {
 		"isoDateTime": {
@@ -66,8 +67,8 @@
 				},
 				"rev": {
 					"type": "integer",
-					"minimum": 1,
-					"description": "Revision counter, incremented on every committed change. Length of history equals rev."
+					"minimum": 0,
+					"description": "Number of published revisions. Incremented only by publishing, never by saving a draft, so it always equals the length of history. 0 for an entry that has never been published, whose history is correspondingly empty."
 				},
 				"contentHash": {
 					"type": "string",
@@ -88,6 +89,10 @@
 					"description": "Zero or more domain codes referencing db.domains[].code.",
 					"uniqueItems": true
 				},
+				"landingPage": {
+					"type": "string",
+					"description": "URL of the DOI landing page for this dataset, deposited as the Crossref <resource> element. Empty string when not yet known. An envelope field like status and domains: it is versioned outside the payload, is editable on a published entry, and does not advance metadataRevision - but it does take part in the per-entry fingerprint behind db.baseHash."
+				},
 				"audit": {
 					"type": "object",
 					"properties": {
@@ -101,13 +106,13 @@
 				},
 				"payload": {
 					"type": "object",
-					"description": "The CIEmetaDigitalProduct metadata record. Validates against CIEmetaDigitalProduct_schema_04.json. Carries an optional integer 'metadataRevision' mirroring the entry 'rev' (revision of the metadata file; advances only on payload-content changes, never on envelope changes such as domains or landingPage)."
+					"description": "The CIEmetaDigitalProduct metadata record. Validates against CIEmetaDigitalProduct_schema_04.json. Carries an optional integer 'metadataRevision', the revision of the metadata file itself: it equals the entry 'rev' for a published entry and rev + 1 for a draft, which is the revision that draft will become when published. It advances only on payload-content changes, never on envelope changes such as status, domains or landingPage."
 				},
 				"history": {
 					"type": "array",
 					"items": { "$ref": "#/definitions/historyRecord" },
-					"minItems": 1,
-					"description": "Append-only, oldest to newest. history[i].rev == i+1."
+					"minItems": 0,
+					"description": "One record per published revision, append-only, oldest to newest, with history[i].rev == i+1. Empty for an entry that has never been published. A draft is not represented here: its pending payload is only recorded when it is published, so for a draft the history replays to the last published revision rather than to payload."
 				},
 				"validationLog": {
 					"type": "array",
@@ -164,7 +169,7 @@
 		},
 		"baseHash": {
 			"type": "string",
-			"description": "sha256 over the ordered list of entry contentHashes at export time. Concurrency anchor: an importing app compares this to detect divergence."
+			"description": "sha256 over the entries in order, each contributing its contentHash followed by '~' and the canonical JSON of its envelope fields {status, domains sorted, landingPage}, the parts joined by '|'. The envelope fields are included so that an envelope-only edit - reclassifying a division, filling in a landing page - still drifts this hash rather than passing unnoticed. Concurrency anchor: an importing app compares this to detect divergence."
 		},
 		"generatedAt": {
 			"$ref": "#/definitions/isoDateTime"
@@ -184,7 +189,7 @@
 		},
 		"defaults": {
 			"type": "object",
-			"description": "Editable default values (one per field) used to pre-fill auto-filled fields on new entries and available via 'Revert fields to defaults'. publicationYear is not stored here; new entries always use the current year.",
+			"description": "Editable default values (one per field) used to pre-fill auto-filled fields on new entries and available via 'Revert fields to defaults'. publicationYear is not stored here; new entries always use the current year. The cr* keys are not payload defaults at all: they are the depositor, registrant and institution details of the Crossref deposit header, used by 'Create Crossref-file (XML)' and stored here because they belong to the database rather than to any one entry.",
 			"properties": {
 				"publisher": { "type": "string" },
 				"language": { "type": "string", "description": "IETF BCP 47 / ISO 639-1 code." },
@@ -198,7 +203,16 @@
 				"rightsIdentifier": { "type": "string" },
 				"interpolationMethod": { "type": "string" },
 				"extrapolationMethod": { "type": "string" },
-				"dataQuality": { "type": "string" }
+				"dataQuality": { "type": "string" },
+				"crDepositorName": { "type": "string", "description": "Crossref deposit header: depositor name." },
+				"crDepositorEmail": { "type": "string", "description": "Crossref deposit header: depositor e-mail address for the submission log." },
+				"crRegistrant": { "type": "string", "description": "Crossref deposit header: organisation registering the DOIs." },
+				"crDatabaseTitle": { "type": "string", "description": "Crossref: title of the database the datasets belong to." },
+				"crPublisherName": { "type": "string", "description": "Crossref: publisher name of the database." },
+				"crInstitutionName": { "type": "string", "description": "Crossref: full name of the publishing institution." },
+				"crInstitutionAcronym": { "type": "string", "description": "Crossref: acronym of the publishing institution." },
+				"crInstitutionPlace": { "type": "string", "description": "Crossref: place of the publishing institution." },
+				"crInstitutionDepartment": { "type": "string", "description": "Crossref: department within the publishing institution." }
 			}
 		},
 		"entries": {
