@@ -23,6 +23,7 @@ including the link to the Crossref deposit validator.
 | `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text), plus three `*.csv` data files with their `*_metadata_v2.json` payloads for trying out metadata-file import and CSV validation. |
 | `sync_schema.py` | Keeps the schema embedded in `CIEmetaDB.html` identical to the schema file. See below. |
 | `db_integrity.js` | Checks and repairs the derived fields of a database — hashes and history. See below. |
+| `selftest.js` | Exercises the tool's own migration and revision-pair code. See below. |
 | `README.md` | This file. |
 
 The metadata payload of each entry conforms to
@@ -139,6 +140,40 @@ the hashing. Self-tests run before any repair and abort on failure; the sharpest
 recomputes the `contentHash` of `CIE_std_illum_A_1nm`, the one entry whose hash the
 tool itself wrote after 4.1, and requires the lifted code to reproduce it. If the
 functions are ever renamed the script stops with their names rather than guessing.
+
+### Self-test
+
+```
+node selftest.js       # exit 0 when everything passes
+```
+
+`db_integrity.js --check` guards the databases in this folder, but two behaviours it
+cannot reach are exactly the ones that go wrong silently:
+
+- **`migrateDb()` has to leave a database consistent.** When it did not, the symptom was
+  not an error but every entry being reported as a merge conflict, because a stale
+  `contentHash` defeats `historyContainsHash()`. The shipped databases are already
+  migrated, so nothing here would notice a regression.
+- **The revision pair has to leave the published parent untouched** and the history
+  chain contiguous. No shipped database contains a pair, so again there is nothing to
+  check against.
+
+`selftest.js` builds its fixtures instead — a database reduced to its genuine pre-4.1
+state, a legacy draft of the kind the two-state model stored, a revision pair — and
+drives the tool's **own** functions over them, lifted from `CIEmetaDB.html` the same way
+`db_integrity.js` lifts them, with `DB` supplied and the four UI calls `saveEnvelope()`
+makes stubbed out. 78 checks in four groups: the lifted primitives, `migrateDb`,
+`db_integrity`'s invariants (including that a legitimate revision pair passes and that
+`--fix` is not blocked by something it cannot repair), and the full pair lifecycle —
+start, edit, publish, discard, envelope save.
+
+It writes only to a temporary directory, which it removes again, and needs no network.
+
+It earned its place on the first run by finding a defect in `publishEntry()`:
+`history[].baseHash` is defined as the hash of the payload the patch applies to, but the
+code recorded `entry.contentHash`, which after a draft save already describes the payload
+being *published* — so a publish that followed a draft save pointed the patch at its own
+result, and a first publish wrote a hash where the schema requires `null`.
 
 ## Running
 
