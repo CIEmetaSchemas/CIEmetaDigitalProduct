@@ -166,6 +166,9 @@ disappears. The DOI is unique again.
   of published v1 → `…_metadata_v2_draft_20260725T143022.json`.
 - A published entry with a revision in progress **cannot be deleted**; discard or publish the
   revision first.
+- On a published entry the read-only payload fields are shown **greyed out**. Validation checks
+  can still be run, but **Log this validation to the entry** is disabled — it writes to the entry,
+  so log against a draft or a revision instead.
 
 The action bar also offers two revert actions:
 
