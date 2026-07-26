@@ -4,7 +4,7 @@
   "dbId": "c4d247e0-ad8a-f983-eaf1-abd993d11eea",
   "title": "CIE Metadatabase — starter (short)",
   "description": "Reduced starter database with a small subset of example records for quick testing.",
-  "baseHash": "a9fd9974e03e0753d8873ebb2c5a12b94ccf2c407e4c63e1cf9fc1804ecaf9fe",
+  "baseHash": "395d70cd74fbe612501819391af7bf531e21904febb93f473f88cdf2b0072112",
   "generatedAt": "2026-07-23T11:16:26.422Z",
   "lastModifiedDate": "2026-07-23T11:16:26.422Z",
   "lastModifiedBy": "peter.blattner@metas.ch",
@@ -63,7 +63,7 @@
       "entryId": "364e757a-5e95-6077-1093-c4136c7c5220",
       "rev": 1,
       "contentHash": "a845c5c8584e5737a750b06f24e9944ff8f697fcf44288ce971557b84831636d",
-      "status": "draft",
+      "status": "published",
       "domains": [],
       "audit": {
         "createdBy": "import",
