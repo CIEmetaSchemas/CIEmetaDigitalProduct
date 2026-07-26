@@ -75,12 +75,20 @@ otherwise pass paths.
 Getting this wrong is quiet rather than loud. A stale `contentHash` breaks
 `historyContainsHash()`, the ancestry test the merge path uses to tell a
 fast-forward from a real conflict — so instead of an error you get every entry
-reported as a conflict on every merge. That is what happened: `migrateDb()`
-backfills the schema-4.1 field `metadataRevision` into legacy payloads without
+reported as a conflict on every merge. That is what happened: `migrateDb()` used to
+backfill the schema-4.1 field `metadataRevision` into legacy payloads without
 recomputing `contentHash` or recording it in the history, which left 38 of 39
 entries in `CIEmetaDBdataset.json` (and every entry in both starter databases) with
-a hash describing the pre-backfill payload. See defect 7 in
+a hash describing the pre-backfill payload. Both the data and `migrateDb()` have
+been repaired; see defect 7 in
 [`../../docs/INTEROPERABILITY.md`](../../docs/INTEROPERABILITY.md).
+
+The repair itself lives in **one** function, `repairDerivedFields()` in
+`CIEmetaDB.html`. `migrateDb()` calls it on every entry it migrates — and reports
+how many fields it had to repair, leaving the database marked unsaved so the repair
+reaches the file instead of being redone on every open — and this script lifts the
+same function rather than restating it. The tool and the checker therefore cannot
+disagree about what a consistent entry looks like.
 
 Two limits are deliberate:
 
@@ -93,15 +101,14 @@ Two limits are deliberate:
   than replacing a stale hash with a fresh hash computed over a payload its own
   history contradicts. A visible defect is better than a hidden one.
 
-The hash chain is **not** reimplemented. `canonical()`, `contentHash()`,
-`applyPatch()`, `diffPatch()`, `reconstruct()` and `computeDbBaseHash()` are lifted
-verbatim out of `CIEmetaDB.html` at run time and evaluated in a sandbox, so there is
-exactly one implementation to keep correct — the same reasoning as the embedded
-schema above, applied to the hashing. Self-tests run before any repair and abort on
-failure; the sharpest one recomputes the `contentHash` of `CIE_std_illum_A_1nm`, the
-one entry whose hash the tool itself wrote after 4.1, and requires the lifted code to
-reproduce it. If the functions are ever renamed the script stops with their names
-rather than guessing.
+The hash chain is **not** reimplemented either. `canonical()`, `contentHash()`,
+`applyPatch()`, `diffPatch()`, `reconstruct()`, `repairDerivedFields()` and
+`computeDbBaseHash()` are lifted verbatim out of `CIEmetaDB.html` at run time and
+evaluated in a sandbox — the same reasoning as the embedded schema above, applied to
+the hashing. Self-tests run before any repair and abort on failure; the sharpest one
+recomputes the `contentHash` of `CIE_std_illum_A_1nm`, the one entry whose hash the
+tool itself wrote after 4.1, and requires the lifted code to reproduce it. If the
+functions are ever renamed the script stops with their names rather than guessing.
 
 ## Running
 

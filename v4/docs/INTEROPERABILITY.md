@@ -690,14 +690,14 @@ for the other 38. The consequence was that `historyContainsHash()`, the ancestry
 merge path uses to decide fast-forward versus conflict, could not recognise an ancestor for
 those entries, so every concurrent edit was reported as a conflict.
 
-**Cause — a single line.** `migrateDb()` in `CIEmetaDB.html` backfills the schema-4.1 field
+**Cause — a single line.** `migrateDb()` in `CIEmetaDB.html` backfilled the schema-4.1 field
 `metadataRevision` into legacy payloads:
 
 ```js
 if(e.payload && e.payload.metadataRevision==null) e.payload.metadataRevision=e.rev;
 ```
 
-It does not recompute `contentHash` and does not record the field in the history, so after
+It did not recompute `contentHash` and did not record the field in the history, so after
 the backfill the stored hash described the *pre-backfill* payload and the history replayed to
 it rather than to the payload. That is exactly what was measured: for 37 of the 39 entries the
 replay differed from the payload by `/metadataRevision` and nothing else, and for 36 of those
@@ -717,10 +717,28 @@ databases carried the same defect (36 of 36 and 9 of 9) and were repaired too. T
 is not reimplemented: the script lifts `canonical()`, `contentHash()`, `applyPatch()` and the
 rest out of `CIEmetaDB.html` at run time, for the reason set out in section 10.1.
 
-One consequence is worth stating plainly. `migrateDb()` is unchanged, so the defect is closed
-for the shipped databases — their payloads now carry `metadataRevision`, so the backfill no
-longer fires — but any pre-4.1 database opened in the tool will still be mis-migrated. That
-fix belongs in `migrateDb()` and is pending.
+**Cause removed as well.** Repairing the data alone would have left the mechanism in place for
+the next pre-4.1 database anyone opens, so `migrateDb()` was corrected too. The repair is now
+one function, `repairDerivedFields()`, which `migrateDb()` calls on every entry it migrates and
+which `db_integrity.js` lifts instead of restating — so the tool and the checker cannot
+disagree about what a consistent entry looks like. Three things changed:
+
+- **Order.** Status is normalised first, then the payload backfill, then the derived fields.
+  Previously `contentHash` was computed *before* the backfill mutated the payload, so even a
+  freshly computed hash was stale the moment it was written.
+- **`pendingRev()` rather than `rev`.** A draft payload is the revision waiting to be
+  published, so it carries `rev + 1` — which is what `storeDraft()` and `publishEntry()`
+  record. The old backfill gave drafts `rev`, understating every unpublished edit by one.
+- **The migration is no longer silent.** `loadDbFromText()` reports how many derived fields
+  were repaired and leaves the database marked unsaved, so the repair can be written back
+  instead of being redone on every open.
+
+This was verified against a database reduced to its genuine pre-4.1 state — no
+`metadataRevision` in any payload or patch, hashes recomputed over those payloads. In that
+state it is internally consistent; applying the old one-line backfill reproduces defect 7
+exactly (`E3` and `E4` across the corpus); applying the corrected `migrateDb()` yields a
+database that passes `db_integrity.js --check`, gives the one draft `metadataRevision` 2 where
+the old code gave 1, and repairs nothing on a second migration.
 
 Fixing any of 1, 2 or 5 changes metadata content and therefore increments
 `metadataRevision` per CIE 3. Defects 3 and 4 were instead applied directly to the stored
@@ -877,10 +895,10 @@ concept with no identifier — better an honest gap than a fabricated URI.
   touched increment `metadataRevision` per CIE 3 — note that 3 and 4 were applied in place
   without a bump, see section 10. Effort: small — 8 defective columns out of 402, plus the
   subject-casing variants.
-- *Database integrity (defect 7): **done** for the three shipped databases,* which now satisfy
-  the invariants `CIEmetaDB_schema.json` declares; `db_integrity.js --check` verifies it.
-  The `migrateDb()` backfill that caused it is **still to be fixed**, so a pre-4.1 database
-  opened in the tool would be mis-migrated again.
+- *Database integrity (defect 7): **done.*** The three shipped databases now satisfy the
+  invariants `CIEmetaDB_schema.json` declares, `db_integrity.js --check` verifies it, and the
+  `migrateDb()` backfill that caused it has been corrected so a pre-4.1 database migrates
+  consistently.
 - *Schema identifier (defect 8): outstanding and not repairable here.* Needs a
   version-distinguishing schema DOI from CIE; see section 10.
 

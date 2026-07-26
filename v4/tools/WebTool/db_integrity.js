@@ -53,6 +53,7 @@ const FUNCTIONS = [
   "esc6902",
   "diffPatch",
   "reconstruct",
+  "repairDerivedFields",
   "entryEnvFingerprint",
   "computeDbBaseHash",
 ];
@@ -274,50 +275,12 @@ function checkDb(api, db) {
    repair
    ==========================================================================*/
 
-/* Only derived fields are written. Payload content is never touched - an E2 violation is a
-   statement about payload content, so it is reported and left alone. */
-function repairEntry(api, entry) {
-  const done = [];
-  const history = entry.history || [];
-
-  /* 1. record metadataRevision in the history. publishEntry() sets it on the payload before
-        diffing, so a history written by the tool carries it; the ones backfilled by
-        migrateDb() do not. Appending matches where diffPatch would have put the op
-        (metadataRevision is the payload's last key), and canonical() sorts keys, so op
-        position influences no hash. */
-  history.forEach((h, i) => {
-    h.patch = h.patch || [];
-    if (h.patch.some((op) => op.path === "/metadataRevision")) return;
-    h.patch.push({ op: i === 0 ? "add" : "replace", path: "/metadataRevision", value: i + 1 });
-    done.push(`history[${i}]: recorded metadataRevision ${i + 1}`);
-  });
-
-  /* 2. baseHash of each patch is the hash of the revision it applies to. Must follow step 1,
-        which changed what those revisions replay to. */
-  if (history.length && history[0].baseHash !== null) {
-    history[0].baseHash = null;
-    done.push("history[0].baseHash: set to null");
-  }
-  for (let i = 1; i < history.length; i++) {
-    const want = api.contentHash(api.reconstruct(history, i));
-    if (history[i].baseHash !== want) {
-      history[i].baseHash = want;
-      done.push(`history[${i}].baseHash: recomputed`);
-    }
-  }
-
-  /* 3. the entry hash itself. */
-  const want = api.contentHash(entry.payload);
-  if (entry.contentHash !== want) {
-    entry.contentHash = want;
-    done.push("contentHash: recomputed");
-  }
-
-  return done;
-}
-
+/* The repair itself is repairDerivedFields(), lifted from CIEmetaDB.html along with the hash
+   chain: migrateDb() calls the same function, so the tool and this script cannot disagree
+   about what a consistent entry looks like. It touches derived fields only - an E2 violation
+   is a statement about payload content, so it is reported and left alone. */
 function repairDb(api, db) {
-  const repaired = (db.entries || []).map((e) => ({ entry: e, done: repairEntry(api, e) }));
+  const repaired = (db.entries || []).map((e) => ({ entry: e, done: api.repairDerivedFields(e) }));
   const wantBase = api.computeDbBaseHash(db);
   const baseChanged = db.baseHash !== wantBase;
   if (baseChanged) db.baseHash = wantBase;
