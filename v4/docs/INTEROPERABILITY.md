@@ -656,18 +656,37 @@ entered twice with different capitalisation, and nothing detects it afterwards.
 Fixing any of 1–5 changes metadata content and therefore increments `metadataRevision`
 per CIE 3.
 
-### 10.1 Maintenance note — the schema is defined twice
+### 10.1 The schema was defined twice — **resolved**
 
-Not a defect in the data, but the condition that let one of the schema-file defects go
-unnoticed, and it still holds. The WebTool never loads
-`CIEmetaDigitalProduct_schema_04.json`; it re-implements it in JavaScript (`ENUMS` around
-line 276 and `buildCieSchema()` around line 580 of `CIEmetaDB.html`). **Any schema change
-therefore has to be made in two places.** When the two drifted, the tool went on accepting
-records that the published schema rejected, and nothing reported it.
+Not a defect in the data, but the condition that produced two of them. The WebTool used to
+restate the schema by hand in JavaScript (`ENUMS` and `buildCieSchema()` in
+`CIEmetaDB.html`), because it cannot fetch the schema file: it runs from `file://`, where
+`fetch` is blocked by CORS. Any schema change therefore had to be made in two places, and
+the two drifted apart **twice**:
 
-The tool cannot simply fetch the schema file: it is designed to run from `file://`, where
-`fetch` is blocked. Inlining the schema at build time, or a check that fails when the two
-definitions diverge, would remove the class of defect rather than one instance of it.
+- `wavelength_first/last/step` — the tool accepted the sentinel strings the published
+  schema rejected, so the tool validated a record the schema did not.
+- `titleType` — the tool offered `""` ("(none)"), which is not in the schema's enum. Any
+  curator selecting it produced a record the published schema rejects. Latent, never
+  triggered in a published record, but reachable from the UI.
+
+Neither was caught by review, because catching them meant comparing two differently-written
+schemas by eye.
+
+**Fix applied.** The schema file is now embedded verbatim in `CIEmetaDB.html` as a
+`<script type="application/json" id="cieSchemaSource">` block. The tool parses that block
+for both structural validation and its enum catalogues; `buildCieSchema()` is deleted and
+`ENUMS` is derived from the parsed schema. The schema is written down once, and the tool
+remains a self-contained offline file.
+
+`v4/tools/WebTool/sync_schema.py` maintains the invariant — `--check` fails when the
+embedded copy and the file diverge, and is intended to run in CI on changes to either. The
+comparison is character-for-character rather than semantic, so it cannot miss a divergence
+the way reading two schemas side by side can.
+
+Two catalogues stay hand-maintained in the tool, `validationType` and `hashMethod`: the
+schema leaves those fields as free strings, so there is nothing to derive them from. If
+they should be constrained, that is a schema change, not a tool change.
 
 A related loose end: `":null"` appears in both sentinel lists and in README.md, but it is
 not part of the `":unap"` / `":unas"` / `":unal"` family used elsewhere, and no data file
