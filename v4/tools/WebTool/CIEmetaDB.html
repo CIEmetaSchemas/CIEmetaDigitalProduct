@@ -1758,7 +1758,12 @@ function publishEntry(entry, newPayload, comment){
   const newRev=(entry.rev||0)+1;
   stored.metadataRevision=newRev;                    // metadata-file revision follows the published rev
   const patch=diffPatch(lastPublished, stored, "");
-  entry.history.push({rev:newRev, by:user, date:now, comment:comment||"", baseHash:entry.contentHash, patch:patch});
+  // baseHash is the hash of the payload this patch applies to - the previously published
+  // revision - and null when there is none. NOT entry.contentHash: once storeDraft has saved a
+  // draft, that already describes the payload being published, so recording it here would
+  // claim the patch applies to its own result.
+  const baseHash = entry.history.length ? contentHash(lastPublished) : null;
+  entry.history.push({rev:newRev, by:user, date:now, comment:comment||"", baseHash:baseHash, patch:patch});
   entry.rev=newRev;
   entry.status="published";
   entry.payload=stored;
