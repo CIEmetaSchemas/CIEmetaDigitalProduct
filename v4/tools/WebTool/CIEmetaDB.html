@@ -1495,6 +1495,36 @@ function reconstruct(history, rev){
   for(let i=0;i<rev && i<history.length;i++) doc=applyPatch(doc, history[i].patch);
   return doc;
 }
+/* bring an entry's derived fields back in line with its payload and history, and return a
+   description of every change (empty when nothing was out of line).
+
+   CIEmetaDB_schema.json defines these as derived: every patch replays onto {} to reproduce
+   its revision, baseHash is the hash of the payload the patch applies to, and contentHash is
+   the hash of the payload. publishEntry maintains all three for revisions it writes; entries
+   imported before a payload field existed carry no record of it, which is how the whole
+   metadataRevision generation ended up with hashes describing a payload that no longer
+   existed and histories that replayed to it instead of to the payload.
+
+   Only derived fields are touched: an existing metadataRevision op is left alone rather than
+   corrected, so a genuine history is never rewritten on the strength of a guess.
+   db_integrity.js lifts this function rather than restating it. */
+function repairDerivedFields(entry){
+  const done=[], history=entry.history||[];
+  history.forEach((h,i)=>{
+    h.patch=h.patch||[];
+    if(h.patch.some(op=>op.path==="/metadataRevision")) return;
+    h.patch.push({op:i===0?"add":"replace", path:"/metadataRevision", value:i+1});
+    done.push("history["+i+"]: recorded metadataRevision "+(i+1));
+  });
+  if(history.length && history[0].baseHash!==null){ history[0].baseHash=null; done.push("history[0].baseHash: set to null"); }
+  for(let i=1;i<history.length;i++){
+    const wantBase=contentHash(reconstruct(history,i));
+    if(history[i].baseHash!==wantBase){ history[i].baseHash=wantBase; done.push("history["+i+"].baseHash: recomputed"); }
+  }
+  const wantHash=contentHash(entry.payload);
+  if(entry.contentHash!==wantHash){ entry.contentHash=wantHash; done.push("contentHash: recomputed"); }
+  return done;
+}
 
 /* ============================================================================
    Minimal draft-07 validator for the embedded CIE schema
@@ -2962,9 +2992,17 @@ function loadDbFromText(text){
   let obj; try{ obj=JSON.parse(text); }catch(e){ toast("Not valid JSON: "+e.message,"err"); return null; }
   // is this an aggregate DB or a single DataCite metadata file?
   if(obj && obj.dbSchemaName===APP.DB_SCHEMA_NAME){
-    DB=migrateDb(obj); markSaved(computeDbBaseHash(DB)); selectedId=null; editModel=null; editDirty=false;
+    const fileBaseHash=obj.baseHash; // as stored in the file, before migration touches anything
+    DB=migrateDb(obj);
+    // anchor concurrency on the file's own hash when the migration had to repair something, so
+    // the database reads as unsaved and the repair can be written back instead of being redone
+    // on every open
+    markSaved(migrationRepairs ? fileBaseHash : computeDbBaseHash(DB));
+    selectedId=null; editModel=null; editDirty=false;
     suppressDbTouch=true; persist(); suppressDbTouch=false; // preserve the file's own lastModified* on open
-    refreshDomainFilter(); renderList(); renderDetail(); toast("Database loaded — "+DB.entries.length+" entries","ok");
+    refreshDomainFilter(); renderList(); renderDetail();
+    toast("Database loaded — "+DB.entries.length+" entries"+
+      (migrationRepairs ? " — "+migrationRepairs+" derived field"+(migrationRepairs===1?"":"s")+" repaired, save to keep" : ""),"ok");
     return "db";
   }else if(obj && obj.schemaName===APP.CIE_SCHEMA_NAME){
     if(!DB) DB=newDB();
@@ -2975,6 +3013,10 @@ function loadDbFromText(text){
     return null;
   }
 }
+/* how many derived fields the last migrateDb() call had to repair; read by loadDbFromText to
+   say so and to leave the database marked unsaved, because a repair that never reaches the
+   file is a repair that has to happen again on every open */
+let migrationRepairs=0;
 function migrateDb(obj){
   obj.domains=obj.domains||clone(DEFAULT_DOMAINS);
   if(obj.title==null) obj.title="";
@@ -2982,13 +3024,28 @@ function migrateDb(obj){
   if(obj.lastModifiedDate==null) obj.lastModifiedDate=obj.generatedAt||nowISO();
   if(obj.lastModifiedBy==null) obj.lastModifiedBy="";
   obj.defaults=Object.assign(clone(DEFAULT_VALUES), obj.defaults||{}); // seed/fill missing default keys
+  migrationRepairs=0;
   obj.entries=(obj.entries||[]).map(e=>{
-    e.domains=e.domains||[]; if(e.landingPage==null) e.landingPage=""; e.history=e.history||[{rev:e.rev||1,by:"import",date:e.audit?e.audit.modifiedDate:nowISO(),comment:"Imported",baseHash:null,patch:diffPatch({},e.payload,"")}];
-    if(e.contentHash==null) e.contentHash=contentHash(e.payload);
-    if(e.rev==null) e.rev=e.history.length;
-    if(e.payload && e.payload.metadataRevision==null) e.payload.metadataRevision=e.rev; // backfill metadata-file revision
+    e.domains=e.domains||[]; if(e.landingPage==null) e.landingPage="";
+    // status first: whether the payload is a published revision or a pending draft edit
+    // decides which metadata-file revision it carries
     if(e.status==="review") e.status="draft"; // legacy three-state status collapses to draft/published
     if(e.status!=="draft" && e.status!=="published") e.status="published";
+    // a synthesised history holds one record standing for revision e.rev, so it must diff a
+    // payload whose metadataRevision is that revision - not the pending one a draft carries
+    if(!e.history){
+      const asRev=Object.assign({}, e.payload, {metadataRevision:e.rev||1});
+      e.history=[{rev:e.rev||1,by:"import",date:e.audit?e.audit.modifiedDate:nowISO(),comment:"Imported",baseHash:null,patch:diffPatch({},asRev,"")}];
+    }
+    if(e.rev==null) e.rev=e.history.length;
+    // backfill the metadata-file revision. pendingRev, not rev: a draft payload is the next
+    // revision waiting to be published, which is what storeDraft/publishEntry record.
+    if(e.payload && e.payload.metadataRevision==null) e.payload.metadataRevision=pendingRev(e);
+    // derived fields last of all, so they describe the payload as migrated rather than as
+    // read, and so the history replays to it. Without this the backfill above silently
+    // invalidated contentHash and every hash in the history - see defect 7 in
+    // ../../docs/INTEROPERABILITY.md.
+    migrationRepairs+=repairDerivedFields(e).length;
     return e;
   });
   return obj;

@@ -20,11 +20,12 @@ entries have `status: "published"`, each carries a distinct DOI under the `10.25
 prefix, and each `payload` is a CIEmetaDigitalProduct v4 record. Between them the 39 records
 describe **402 data columns**. Of the 39 entries, 22 are at revision 2 and 17 at revision 1.
 
-The database is the authoritative corpus. Note that the `../examples/` folder is a **stale
-subset** — 36 records rather than 39 (`CIE_srf_CQS_5nm`, `CIE_srf_FCI_5nm` and
-`CIE_srf_PS_5nm` are missing) and several of its copies predate corrections that have since
-been made in the database. Analyses run against `../examples/` therefore overstate some
-defect counts; see section 10.
+The database is the authoritative corpus, and now the only one. `../examples/` previously
+held a **stale subset** — 36 records rather than 39 (`CIE_srf_CQS_5nm`, `CIE_srf_FCI_5nm` and
+`CIE_srf_PS_5nm` were missing), several of them predating corrections already made in the
+database, so analyses run against that folder overstated some defect counts. Those copies
+have since been removed; the folder is empty and no second copy of the corpus is maintained
+in this repository.
 
 ---
 
@@ -319,8 +320,9 @@ terminology committee — see recommendation G8.
 ## 5. Recommendation C — an explicit `symbol` field
 
 Today the symbol is embedded in `title`, and the transliteration is inconsistent. The
-repository contains `x_bar(lambda)`, `V'(lambda)`, `s_mel(lambda)`, `K_m,mes;m` — and, in
-`CIE_srf_PS_5nm`, `β15(λ)`, the only non-ASCII column title in the corpus.
+repository contains `x_bar(lambda)`, `V'(lambda)`, `s_mel(lambda)`, `K_m,mes;m`.
+`CIE_srf_PS_5nm` also carried `β15(λ)`, the only non-ASCII column title in the corpus; it
+is now transliterated as `beta15(lambda)` (defect 4, since fixed).
 
 `title` has to stay as it is: it is the label a user sees against a CSV column, and ASCII is
 the safe choice for that. But a consumer that wants to render a correct axis label should
@@ -627,34 +629,127 @@ Independent of the recommendations above. These are defects in the published dat
 measured against the 39 entries in `CIEmetaDBdataset.json`. The affected share of the corpus
 is small — 8 defective columns out of 402, plus the subject-casing issue.
 
-Defects in the *schema file* — it was not valid JSON, it had no `$id`, its `wavelength_*`
+**Defects 3, 4, 6 and 7 have since been corrected**; the remaining ones are 1, 2, 5 and 8.
+
+Defects in the *v4 schema file* — it was not valid JSON, it had no `$id`, its `wavelength_*`
 fields rejected the sentinel strings the documentation requires, and `funderIdentifierType`
 lacked ROR — have been corrected. See the version history in
 [README.md](README.md) and the `$comment` in
 [`../schema/CIEmetaDigitalProduct_schema_04.json`](../schema/CIEmetaDigitalProduct_schema_04.json).
+The **v3 schema file carried the same JSON-validity defect** — its descriptive header was 25
+`//` line comments inside the root object — and has been corrected the same way, so the v3
+example can now be checked against its own schema by a strict parser. `schemaVersion` stays
+`3` and no published metadata file is affected.
 
 | # | Defect | Extent | Datasets |
 |---|---|---|---|
 | 1 | `"quantity": "  "` (whitespace) on the `lambda` column | 2 columns | `CIE_illum_D55`, `CIE_illum_D75` |
 | 2 | `quantity` key absent | 6 columns | `CIE_1st_deriv_meta_ind` (`delta_x_bar(lambda)`, `delta_y_bar(lambda)`, `delta_z_bar(lambda)`), `CIE_illum_Dxx_comp` (`S_0(lambda)`, `S_1(lambda)`, `S_2(lambda)`) |
-| 3 | **`descrition` typo** instead of `description` | 15 columns in **1** dataset | `CIE_srf_CQS_5nm` |
-| 4 | `β15(λ)` — the only non-ASCII column title in the corpus, where every other dataset transliterates (`x_bar`, `lambda`) | 1 column | `CIE_srf_PS_5nm` |
+| 3 | **`descrition` typo** instead of `description` — **fixed** | 15 columns in **1** dataset | `CIE_srf_CQS_5nm` |
+| 4 | `β15(λ)` — the only non-ASCII column title in the corpus, where every other dataset transliterates (`x_bar`, `lambda`) — **fixed**, now `beta15(lambda)` | 1 column | `CIE_srf_PS_5nm` |
 | 5 | **Subject casing is inconsistent** — the same concept appears under two spellings | 6 subject entries | `Perception of colour` (10) vs `Perception of Colour` (2); `Colour of objects` (10) vs `Colour of Objects` (2); `Colour vision` (10) vs `Colour Vision` (2) |
-| 6 | v3 example declares `"schemaName": "CIEmetaDataProduct"` (vs `CIEmetaDigitalProduct` in its own schema) and reuses the **v4** `schemaURL` DOI | 1 file | `v3/examples/CIE_cc_1931_2deg.csv_metadata.json` |
+| 6 | v3 example declared `"schemaName": "CIEmetaDataProduct"`, which its own schema rejects (`const: "CIEmetaDigitalProduct"`) — **fixed** | 1 file | `v3/examples/CIE_cc_1931_2deg.csv_metadata.json` |
+| 7 | **Stored `contentHash` does not match the payload**, and replaying `history[].patch` does not reproduce it — **fixed** | 38 of 39 entries, plus 36 of 36 and 9 of 9 in the two bundled starter databases | all except `CIE_std_illum_A_1nm` |
+| 8 | **One schema DOI for two schema versions** — `10.25039/CIE.SC.4taqevcd` is the mandated `schemaURL` of *both* v3 and v4 and the `$id` of v4, so `schemaURL` does not identify which schema a record was written against | both schema files, every published record | v3 and v4 schemas |
 
-Defect 3 is the one that silently loses information: a consumer reading `description` gets
-nothing for those 15 columns. Note that it is **far less widespread than the `../examples/`
-folder suggests** — the stale copies there carry the typo in 12 files, but in the live
-database only `CIE_srf_CQS_5nm` still has it. Most occurrences have already been corrected;
-this is the remainder.
+Defect 3 was the one that silently lost information: a consumer reading `description` got
+nothing for those 15 columns. It was **far less widespread than it first appeared** — the
+stale copies in `../examples/` carried the typo in 12 files, but in the live database only
+`CIE_srf_CQS_5nm` still had it. That remainder is now corrected, and the key `descrition`
+occurs nowhere in the database. The stale copies have since been deleted, so the only
+surviving trace of the typo is in the git history.
 
 Defect 5 is a direct illustration of why recommendation F matters. Fourteen distinct subject
 strings are in use across 113 subject entries, all as bare strings with no
 `subjectScheme`, `schemeURI` or `valueURI` — nothing prevents the same concept being
 entered twice with different capitalisation, and nothing detects it afterwards.
 
-Fixing any of 1–5 changes metadata content and therefore increments `metadataRevision`
-per CIE 3.
+Defect 6 was a plain typo — `CIEmetaDataProduct` for `CIEmetaDigitalProduct` — and it was
+the only point on which the v3 example failed its own schema; it now validates with no
+errors. It had gone unnoticed because the v3 schema file could not be parsed (see above), so
+the example had never actually been run against it.
+
+Defect 8 came to light while fixing 6, and it is the one item in this register that cannot be
+repaired in this repository. Both schema versions declare
+`"schemaURL": {"const": "https://doi.org/10.25039/CIE.SC.4taqevcd"}`, and v4 additionally
+declares that DOI as its `$id`. A consumer holding a metadata file therefore learns the
+schema version only from `schemaVersion`, never from the identifier the record is required to
+carry — and resolving `schemaURL` returns whichever version is currently behind the DOI. For
+the same reason the v3 schema was **not** given an `$id` when its JSON validity was repaired:
+the only available identifier is already claimed by v4, and inventing a URI would be worse
+than leaving the gap (the same reasoning as in section 11.3). Repairing this needs CIE to
+mint a version-distinguishing identifier — a versioned DOI, or one DOI per schema version
+with the current one kept as a "latest" alias. It is the same persistence argument made for
+the e-ILV in recommendation G2, applied to CIE's own schema.
+
+Defect 7 was not visible in any published metadata file — it affected the WebTool database
+envelope, not the payloads, and all 39 payloads validated throughout. Recomputing
+`contentHash(payload)` with the tool's own `canonical()` and SHA-256 reproduced the stored
+value for exactly one entry, and `reconstruct(history, rev)` failed to reproduce the payload
+for the other 38. The consequence was that `historyContainsHash()`, the ancestry test the
+merge path uses to decide fast-forward versus conflict, could not recognise an ancestor for
+those entries, so every concurrent edit was reported as a conflict.
+
+**Cause — a single line.** `migrateDb()` in `CIEmetaDB.html` backfilled the schema-4.1 field
+`metadataRevision` into legacy payloads:
+
+```js
+if(e.payload && e.payload.metadataRevision==null) e.payload.metadataRevision=e.rev;
+```
+
+It did not recompute `contentHash` and did not record the field in the history, so after
+the backfill the stored hash described the *pre-backfill* payload and the history replayed to
+it rather than to the payload. That is exactly what was measured: for 37 of the 39 entries the
+replay differed from the payload by `/metadataRevision` and nothing else, and for 36 of those
+the stored hash was the hash of the replay. The one consistent entry,
+`CIE_std_illum_A_1nm`, is the only one re-published after 4.1, so the tool itself wrote its
+rev-2 patch — `{"op":"replace","path":"/metadataRevision","value":2}` — which is the shape the
+repair reproduces. `createEntry()` and `publishEntry()` both set the field before diffing and
+were never at fault.
+
+**Fix applied.** `v4/tools/WebTool/db_integrity.js` checks the invariants
+`CIEmetaDB_schema.json` declares and repairs the derived fields: it records
+`metadataRevision` in each history patch, recomputes every `history[].baseHash`, every
+`contentHash` and the database `baseHash`. It repairs derived fields only and refuses to
+write if a payload-content divergence would survive, so a stale hash is never replaced by a
+freshly computed hash over a payload its own history contradicts. The two bundled starter
+databases carried the same defect (36 of 36 and 9 of 9) and were repaired too. The hash chain
+is not reimplemented: the script lifts `canonical()`, `contentHash()`, `applyPatch()` and the
+rest out of `CIEmetaDB.html` at run time, for the reason set out in section 10.1.
+
+**Cause removed as well.** Repairing the data alone would have left the mechanism in place for
+the next pre-4.1 database anyone opens, so `migrateDb()` was corrected too. The repair is now
+one function, `repairDerivedFields()`, which `migrateDb()` calls on every entry it migrates and
+which `db_integrity.js` lifts instead of restating — so the tool and the checker cannot
+disagree about what a consistent entry looks like. Three things changed:
+
+- **Order.** Status is normalised first, then the payload backfill, then the derived fields.
+  Previously `contentHash` was computed *before* the backfill mutated the payload, so even a
+  freshly computed hash was stale the moment it was written.
+- **`pendingRev()` rather than `rev`.** A draft payload is the revision waiting to be
+  published, so it carries `rev + 1` — which is what `storeDraft()` and `publishEntry()`
+  record. The old backfill gave drafts `rev`, understating every unpublished edit by one.
+- **The migration is no longer silent.** `loadDbFromText()` reports how many derived fields
+  were repaired and leaves the database marked unsaved, so the repair can be written back
+  instead of being redone on every open.
+
+This was verified against a database reduced to its genuine pre-4.1 state — no
+`metadataRevision` in any payload or patch, hashes recomputed over those payloads, and a
+pending draft added, since no shipped database contains one. In that state it is internally
+consistent; applying the old one-line backfill reproduces defect 7 exactly (`E3` and `E4`
+across the corpus); applying the corrected `migrateDb()` yields a database that passes
+`db_integrity.js --check`, gives the draft the revision it is pending against plus one where
+the old code gave it the published revision, and repairs nothing on a second migration.
+
+Fixing any of 1, 2 or 5 changes metadata content and therefore increments
+`metadataRevision` per CIE 3. Defects 3 and 4 were instead applied directly to the stored
+payloads without a revision bump: `rev`, `metadataRevision` and `audit` are unchanged. To let
+the history replay to the payload again, the corrections were also written into the rev-1
+patches of `CIE_srf_CQS_5nm` and `CIE_srf_PS_5nm`. **Those two rev-1 patches therefore no
+longer reproduce the file that was imported on 2026-07-21.** This is recorded rather than
+hidden; the alternative was to reissue both as revision 3, which would have changed a
+published `metadataRevision` and required re-publishing two metadata files for a typo and a
+transliteration.
 
 ### 10.1 The schema was defined twice — **resolved**
 
@@ -797,9 +892,16 @@ concept with no identifier — better an honest gap than a fabricated URI.
 - *Schema file: **done.*** Valid JSON, `$id`, sentinel-tolerant `wavelength_*`, ROR.
   `schemaVersion` stays `4`, the schema DOI is unchanged, and all 39 published records now
   validate against the file. See the version history in [README.md](README.md).
-- *Data (section 10, defects 1–5): outstanding.* Records touched increment
-  `metadataRevision` per CIE 3. Effort: small — 8 defective columns out of 402, plus the
+- *Data (section 10): defects 3, 4, 6 and 7 **done**, 1, 2 and 5 outstanding.* Records
+  touched increment `metadataRevision` per CIE 3 — note that 3 and 4 were applied in place
+  without a bump, see section 10. Effort: small — 8 defective columns out of 402, plus the
   subject-casing variants.
+- *Database integrity (defect 7): **done.*** The three shipped databases now satisfy the
+  invariants `CIEmetaDB_schema.json` declares, `db_integrity.js --check` verifies it, and the
+  `migrateDb()` backfill that caused it has been corrected so a pre-4.1 database migrates
+  consistently.
+- *Schema identifier (defect 8): outstanding and not repairable here.* Needs a
+  version-distinguishing schema DOI from CIE; see section 10.
 
 **Phase 2 — semantic annotation.** Add `unitPID`, `quantityPID`, `symbol` as optional
 fields; publish the appendix table as a normative annex to README.md; extend the WebTool so

@@ -18,9 +18,11 @@ including the link to the Crossref deposit validator.
 |------|---------|
 | `CIEmetaDB.html` | The application. Open it in a browser. Self-contained (logo, styles, code, hashers, validator all embedded). |
 | `CIEmetaDB_schema.json` | JSON Schema (draft-07) for the metadatabase envelope — the **data model**. |
-| `CIEmetaDB_starter.json` | Starter database built from the 36 records in `../../examples/`. |
-| `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text). |
+| `CIEmetaDB_starter.json` | Starter database, built from the 36 example metadata files that used to live in `../../examples/` (that folder has since been emptied). |
+| `CIEmetaDB_starter_short.json` | Nine-record subset of the starter database for quick testing, including two entries at revision 2 so the history views have something to show. |
+| `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text), plus three `*.csv` data files with their `*_metadata_v2.json` payloads for trying out metadata-file import and CSV validation. |
 | `sync_schema.py` | Keeps the schema embedded in `CIEmetaDB.html` identical to the schema file. See below. |
+| `db_integrity.js` | Checks and repairs the derived fields of a database — hashes and history. See below. |
 | `README.md` | This file. |
 
 The metadata payload of each entry conforms to
@@ -54,6 +56,78 @@ JavaScript inside `CIEmetaDB.html`. The two definitions drifted apart twice — 
 tool accepted `wavelength_*` sentinel strings the published schema rejected, and
 offered a `titleType` value (`""`) the schema did not allow — and neither was
 caught by review.
+
+### Database integrity
+
+`CIEmetaDB_schema.json` is **documentation, not a runtime check.** The tool never
+loads it — on opening a database it verifies `dbSchemaName` and `dbSchemaVersion` and
+nothing else — so if you want a database checked against it, do so deliberately with
+any draft-07 validator. Because nothing consulted it, the schema itself drifted from
+the model it describes; the corrections are listed in its `$comment`.
+
+Several fields of a database are **derived** from payload content, and that schema
+says so: `contentHash` is the SHA-256 of the canonical payload, `history[].patch`
+replays onto `{}` to reproduce any revision, `history[].baseHash` is the hash of the
+payload before that patch, and the database `baseHash` fingerprints all entries.
+Nothing enforced any of it, and it drifted too:
+
+```
+node db_integrity.js --check    # report violations; exit 1 if any
+node db_integrity.js --fix      # repair the derived fields in place
+```
+
+With no file arguments both modes act on the three databases in this folder;
+otherwise pass paths.
+
+Getting this wrong is quiet rather than loud. A stale `contentHash` breaks
+`historyContainsHash()`, the ancestry test the merge path uses to tell a
+fast-forward from a real conflict — so instead of an error you get every entry
+reported as a conflict on every merge. That is what happened: `migrateDb()` used to
+backfill the schema-4.1 field `metadataRevision` into legacy payloads without
+recomputing `contentHash` or recording it in the history, which left 38 of 39
+entries in `CIEmetaDBdataset.json` (and every entry in both starter databases) with
+a hash describing the pre-backfill payload. Both the data and `migrateDb()` have
+been repaired; see defect 7 in
+[`../../docs/INTEROPERABILITY.md`](../../docs/INTEROPERABILITY.md).
+
+The repair itself lives in **one** function, `repairDerivedFields()` in
+`CIEmetaDB.html`. `migrateDb()` calls it on every entry it migrates — and reports
+how many fields it had to repair, leaving the database marked unsaved so the repair
+reaches the file instead of being redone on every open — and this script lifts the
+same function rather than restating it. The tool and the checker therefore cannot
+disagree about what a consistent entry looks like.
+
+What it checks, per entry: `history` length and numbering (**E1**), the
+`metadataRevision` the status implies (**E2**), that replaying the history reproduces
+the payload (**E3**), `contentHash` (**E4**), the `history[].baseHash` chain (**E5**),
+and that a draft actually differs from the revision it is pending against (**E6**);
+plus the database `baseHash` (**D1**).
+
+Three limits are deliberate:
+
+- **It repairs derived fields only** — E1, E3, E4, E5, D1. Payload content is never
+  rewritten.
+- **It refuses to write if a repairable violation would survive the repair**, rather
+  than replacing a stale hash with a fresh hash computed over a payload its own
+  history contradicts. A visible defect is better than a hidden one. Violations it is
+  *not* answerable for do not block the write — refusing to fix 38 stale hashes
+  because one entry has an unrelated content problem helps nobody — but they are
+  printed, so a repair never quietly hides one.
+- **Only E2 is a warning.** A `metadataRevision` that disagrees with the entry's
+  revision is a value the tool rewrites on the next edit anyway, and a gate that can
+  never go green is a gate everyone learns to ignore. Everything else fails `--check`,
+  including E6, which `--fix` cannot resolve: whether an empty draft should be
+  published or given a real pending change is a decision for a curator.
+
+The hash chain is **not** reimplemented either. `canonical()`, `contentHash()`,
+`applyPatch()`, `diffPatch()`, `reconstruct()`, `repairDerivedFields()`,
+`contentDiff()` and `computeDbBaseHash()` are lifted verbatim out of
+`CIEmetaDB.html` at run time and
+evaluated in a sandbox — the same reasoning as the embedded schema above, applied to
+the hashing. Self-tests run before any repair and abort on failure; the sharpest one
+recomputes the `contentHash` of `CIE_std_illum_A_1nm`, the one entry whose hash the
+tool itself wrote after 4.1, and requires the lifted code to reproduce it. If the
+functions are ever renamed the script stops with their names rather than guessing.
 
 ## Running
 
@@ -390,8 +464,8 @@ more per entry. Entries can be filtered by domain in the list.
 
 - **Save DB** / **Save DB As…** — the whole metadatabase (with history and audit).
 - **Export metadata-files…** (toolbar) or **Export to metadata-file (JSON)** (per entry) — emits
-  standard `*.csv_metadata.json` files matching the format in `../../examples/`
-  (envelope, history and audit stripped), ready for publication.
+  standard `*.csv_metadata.json` files as published on the CIE website — the payload alone,
+  with the database envelope, history and audit stripped — ready for publication.
 - **Export to Crossref-file (XML)** (per entry) — see below.
 
 ### Export to Crossref-file (XML) (DOI registration)

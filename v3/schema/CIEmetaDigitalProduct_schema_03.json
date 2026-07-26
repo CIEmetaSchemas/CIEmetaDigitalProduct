@@ -1,30 +1,8 @@
 {
-//
-//  CIEmetaDigitalProduct Schema
-//  ---------------------
-//
-// based on
-// https://github.com/datacite/schema/blob/76de5e551d19e3e9b829af2f38ccc13e8c7677fe/source/json/kernel-4.3/datacite_4.3_schema.json
-// to become datacite version 4.4:
-// -field classificationCode added in the subjects field
-// -address of metaschema has been changed
-// -additional resourceTypeGeneral items
-// -relatedItem added
-// -only one identifier is allowed (as in the official schema), additional are introduced by "alternateIdentifier"
-//  -schemaType replaced by schemaName
-//
-//  CIE additions:
-//  --------------
-//  checksums (recommended)
-//  datatableInfo (validation,dataQuality,extrapolationMethod, interpolationMethod)
-//  schemaName (required)
-//	schemaVersion (required)
-//	schemaURL:(required)//
-//   
-//  to validate your JSON file use any online tool, i.e.: https://www.jsonschemavalidator.net/
-//
-//
-"$schema": "http://json-schema.org/draft-07/schema#",
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "CIEmetaDigitalProduct",
+	"description": "Superseded metadata schema (version 3) for digital products published by the International Commission on Illumination (CIE), in particular data tables distributed as CSV alongside CIE publications. Based on the DataCite metadata kernel with CIE-specific additions. Retained for reference only; new and revised metadata files use version 4 (v4/schema/CIEmetaDigitalProduct_schema_04.json). The accompanying description of the metadata model is published at https://github.com/CIEmetaSchemas/CIEmetaDigitalProduct (v3/docs/README.md). To validate a metadata file against this schema, any JSON Schema draft-07 validator can be used, for example https://www.jsonschemavalidator.net/ .",
+	"$comment": "Based on the DataCite kernel-4.3 JSON schema:\nhttps://github.com/datacite/schema/blob/76de5e551d19e3e9b829af2f38ccc13e8c7677fe/source/json/kernel-4.3/datacite_4.3_schema.json\n\nChanges towards DataCite version 4.4:\n- field classificationCode added in the subjects field\n- address of metaschema has been changed\n- additional resourceTypeGeneral items\n- relatedItem added\n- only one identifier is allowed (as in the official schema), additional ones are introduced by \"alternateIdentifier\"\n- schemaType replaced by schemaName\n\nCIE additions:\n- checksums (recommended)\n- datatableInfo (validation, dataQuality, extrapolationMethod, interpolationMethod)\n- schemaName (required)\n- schemaVersion (required)\n- schemaURL (required)\n\nVersion history:\n3.x : schema file correction (editorial only; schemaVersion stays 3 and no published metadata file is affected). The file is now valid JSON. The descriptive header was previously written as // line comments inside the root object, which made the file unparsable by a strict JSON parser and therefore unusable with the validators recommended above. That text is now carried in description and in this $comment. The same correction was applied to version 4 of this schema.\n\nNo $id is declared. The only schema DOI CIE has minted, https://doi.org/10.25039/CIE.SC.4taqevcd, is required as the schemaURL const by both this schema and version 4, and version 4 declares it as its $id. Claiming it here as well would give two different schema documents the same canonical URI. Setting $id here requires CIE to mint a version-distinguishing identifier first; see the defect register in v4/docs/INTEROPERABILITY.md.",
 	"definitions": {
 		"nameType": {
 			"type": "string",
