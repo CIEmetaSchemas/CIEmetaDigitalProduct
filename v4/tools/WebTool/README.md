@@ -18,7 +18,7 @@ including the link to the Crossref deposit validator.
 |------|---------|
 | `CIEmetaDB.html` | The application. Open it in a browser. Self-contained (logo, styles, code, hashers, validator all embedded). |
 | `CIEmetaDB_schema.json` | JSON Schema (draft-07) for the metadatabase envelope — the **data model**. |
-| `CIEmetaDB_starter.json` | Starter database built from the 36 records in `../../examples/`. |
+| `CIEmetaDB_starter.json` | Starter database, built from the 36 example metadata files that used to live in `../../examples/` (that folder has since been emptied). |
 | `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text). |
 | `sync_schema.py` | Keeps the schema embedded in `CIEmetaDB.html` identical to the schema file. See below. |
 | `README.md` | This file. |
@@ -390,8 +390,8 @@ more per entry. Entries can be filtered by domain in the list.
 
 - **Save DB** / **Save DB As…** — the whole metadatabase (with history and audit).
 - **Export metadata-files…** (toolbar) or **Export to metadata-file (JSON)** (per entry) — emits
-  standard `*.csv_metadata.json` files matching the format in `../../examples/`
-  (envelope, history and audit stripped), ready for publication.
+  standard `*.csv_metadata.json` files as published on the CIE website — the payload alone,
+  with the database envelope, history and audit stripped — ready for publication.
 - **Export to Crossref-file (XML)** (per entry) — see below.
 
 ### Export to Crossref-file (XML) (DOI registration)

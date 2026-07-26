@@ -20,11 +20,12 @@ entries have `status: "published"`, each carries a distinct DOI under the `10.25
 prefix, and each `payload` is a CIEmetaDigitalProduct v4 record. Between them the 39 records
 describe **402 data columns**. Of the 39 entries, 22 are at revision 2 and 17 at revision 1.
 
-The database is the authoritative corpus. Note that the `../examples/` folder is a **stale
-subset** — 36 records rather than 39 (`CIE_srf_CQS_5nm`, `CIE_srf_FCI_5nm` and
-`CIE_srf_PS_5nm` are missing) and several of its copies predate corrections that have since
-been made in the database. Analyses run against `../examples/` therefore overstate some
-defect counts; see section 10.
+The database is the authoritative corpus, and now the only one. `../examples/` previously
+held a **stale subset** — 36 records rather than 39 (`CIE_srf_CQS_5nm`, `CIE_srf_FCI_5nm` and
+`CIE_srf_PS_5nm` were missing), several of them predating corrections already made in the
+database, so analyses run against that folder overstated some defect counts. Those copies
+have since been removed; the folder is empty and no second copy of the corpus is maintained
+in this repository.
 
 ---
 
@@ -652,10 +653,11 @@ example can now be checked against its own schema by a strict parser. `schemaVer
 | 8 | **One schema DOI for two schema versions** — `10.25039/CIE.SC.4taqevcd` is the mandated `schemaURL` of *both* v3 and v4 and the `$id` of v4, so `schemaURL` does not identify which schema a record was written against | both schema files, every published record | v3 and v4 schemas |
 
 Defect 3 was the one that silently lost information: a consumer reading `description` got
-nothing for those 15 columns. It was **far less widespread than the `../examples/` folder
-suggests** — the stale copies there carry the typo in 12 files, but in the live database
-only `CIE_srf_CQS_5nm` still had it. That remainder is now corrected, and the key
-`descrition` occurs nowhere in the database.
+nothing for those 15 columns. It was **far less widespread than it first appeared** — the
+stale copies in `../examples/` carried the typo in 12 files, but in the live database only
+`CIE_srf_CQS_5nm` still had it. That remainder is now corrected, and the key `descrition`
+occurs nowhere in the database. The stale copies have since been deleted, so the only
+surviving trace of the typo is in the git history.
 
 Defect 5 is a direct illustration of why recommendation F matters. Fourteen distinct subject
 strings are in use across 113 subject entries, all as bare strings with no
