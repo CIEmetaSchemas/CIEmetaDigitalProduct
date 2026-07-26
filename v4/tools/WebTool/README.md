@@ -59,11 +59,17 @@ caught by review.
 
 ### Database integrity
 
-Several fields of a database are **derived** from payload content, and
-`CIEmetaDB_schema.json` says so: `contentHash` is the SHA-256 of the canonical
-payload, `history[].patch` replays onto `{}` to reproduce any revision,
-`history[].baseHash` is the hash of the payload before that patch, and the database
-`baseHash` fingerprints all entries. Nothing enforced any of it, and it drifted:
+`CIEmetaDB_schema.json` is **documentation, not a runtime check.** The tool never
+loads it — on opening a database it verifies `dbSchemaName` and `dbSchemaVersion` and
+nothing else — so if you want a database checked against it, do so deliberately with
+any draft-07 validator. Because nothing consulted it, the schema itself drifted from
+the model it describes; the corrections are listed in its `$comment`.
+
+Several fields of a database are **derived** from payload content, and that schema
+says so: `contentHash` is the SHA-256 of the canonical payload, `history[].patch`
+replays onto `{}` to reproduce any revision, `history[].baseHash` is the hash of the
+payload before that patch, and the database `baseHash` fingerprints all entries.
+Nothing enforced any of it, and it drifted too:
 
 ```
 node db_integrity.js --check    # report violations; exit 1 if any
