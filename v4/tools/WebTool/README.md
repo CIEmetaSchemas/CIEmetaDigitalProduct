@@ -7,7 +7,7 @@ metadata records, with full git-like change history and safe concurrent-edit mer
 Modelled on the termdat curation workflow. Runs entirely in the browser from a
 local file — **no server, no network access, no external/CDN dependencies.**
 
-**Interface version 1.8.0** (shown in the header).
+**Interface version 1.10.0** (shown in the header).
 
 A **? Help** button in the toolbar opens an in-app summary of the features below,
 including the link to the Crossref deposit validator.
@@ -18,12 +18,162 @@ including the link to the Crossref deposit validator.
 |------|---------|
 | `CIEmetaDB.html` | The application. Open it in a browser. Self-contained (logo, styles, code, hashers, validator all embedded). |
 | `CIEmetaDB_schema.json` | JSON Schema (draft-07) for the metadatabase envelope — the **data model**. |
-| `CIEmetaDB_starter.json` | Starter database built from the 36 records in `../../examples/`. |
-| `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text). |
+| `CIEmetaDB_starter.json` | Starter database, built from the 36 example metadata files that used to live in `../../examples/` (that folder has since been emptied). |
+| `CIEmetaDB_starter_short.json` | Nine-record subset of the starter database for quick testing, including two entries at revision 2 so the history views have something to show. |
+| `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text), plus three `*.csv` data files with their `*_metadata_v2.json` payloads for trying out metadata-file import and CSV validation. |
+| `sync_schema.py` | Keeps the schema embedded in `CIEmetaDB.html` identical to the schema file. See below. |
+| `db_integrity.js` | Checks and repairs the derived fields of a database — hashes and history. See below. |
+| `selftest.js` | Exercises the tool's own migration and revision-pair code. See below. |
 | `README.md` | This file. |
 
 The metadata payload of each entry conforms to
 `../../schema/CIEmetaDigitalProduct_schema_04.json`.
+
+### The embedded schema
+
+`CIEmetaDB.html` contains a copy of `CIEmetaDigitalProduct_schema_04.json` in a
+`<script type="application/json" id="cieSchemaSource">` block near the top of the
+file. The application parses that block for both structural validation and the
+enum catalogues behind the form dropdowns, so **the schema is written down once**.
+
+It has to be embedded rather than loaded: the tool is designed to run from
+`file://`, where `fetch()` is blocked by CORS. Embedding keeps the tool a
+self-contained offline file while still having a single definition.
+
+**Never edit the embedded copy.** Edit `../../schema/CIEmetaDigitalProduct_schema_04.json`,
+then run:
+
+```
+python sync_schema.py            # re-embed the schema file into the HTML
+python sync_schema.py --check    # verify they match; exit 1 if they do not
+```
+
+Run `--check` in CI on any change to either file. The comparison is
+character-for-character (line endings excluded, since the two files differ there),
+so it cannot miss a divergence.
+
+This replaces an earlier arrangement in which the schema was restated by hand in
+JavaScript inside `CIEmetaDB.html`. The two definitions drifted apart twice — the
+tool accepted `wavelength_*` sentinel strings the published schema rejected, and
+offered a `titleType` value (`""`) the schema did not allow — and neither was
+caught by review.
+
+### Database integrity
+
+`CIEmetaDB_schema.json` is **documentation, not a runtime check.** The tool never
+loads it — on opening a database it verifies `dbSchemaName` and `dbSchemaVersion` and
+nothing else — so if you want a database checked against it, do so deliberately with
+any draft-07 validator. Because nothing consulted it, the schema itself drifted from
+the model it describes; the corrections are listed in its `$comment`.
+
+Several fields of a database are **derived** from payload content, and that schema
+says so: `contentHash` is the SHA-256 of the canonical payload, `history[].patch`
+replays onto `{}` to reproduce any revision, `history[].baseHash` is the hash of the
+payload before that patch, and the database `baseHash` fingerprints all entries.
+Nothing enforced any of it, and it drifted too:
+
+```
+node db_integrity.js --check    # report violations; exit 1 if any
+node db_integrity.js --fix      # repair the derived fields in place
+```
+
+With no file arguments both modes act on the three databases in this folder;
+otherwise pass paths.
+
+Getting this wrong is quiet rather than loud. A stale `contentHash` breaks
+`historyContainsHash()`, the ancestry test the merge path uses to tell a
+fast-forward from a real conflict — so instead of an error you get every entry
+reported as a conflict on every merge. That is what happened: `migrateDb()` used to
+backfill the schema-4.1 field `metadataRevision` into legacy payloads without
+recomputing `contentHash` or recording it in the history, which left 38 of 39
+entries in `CIEmetaDBdataset.json` (and every entry in both starter databases) with
+a hash describing the pre-backfill payload. Both the data and `migrateDb()` have
+been repaired; see defect 7 in
+[`../../docs/INTEROPERABILITY.md`](../../docs/INTEROPERABILITY.md).
+
+The repair itself lives in **one** function, `repairDerivedFields()` in
+`CIEmetaDB.html`. `migrateDb()` calls it on every entry it migrates — and reports
+how many fields it had to repair, leaving the database marked unsaved so the repair
+reaches the file instead of being redone on every open — and this script lifts the
+same function rather than restating it. The tool and the checker therefore cannot
+disagree about what a consistent entry looks like.
+
+What it checks, per entry: `history` length and numbering (**E1**), the
+`metadataRevision` the entry's kind implies (**E2**), that replaying the history
+reproduces the payload (**E3**), `contentHash` (**E4**), the `history[].baseHash` chain
+(**E5**), and that the stored `status` matches what `kindOf()` derives (**E6**). Across
+the database: that each `revisionOf` resolves to exactly one published parent (**E7**),
+and the database `baseHash` (**D1**).
+
+E6 and E7 police the [three-state model](#draft-under-revision--published-workflow):
+`status` is derived, not chosen — `draft` when `rev` is 0, `review` when `revisionOf` is
+set, `published` otherwise — so a stored status that disagrees with `kindOf()` is stale,
+and because `status` feeds the fingerprint behind `baseHash` it also puts that out of
+step. E2 and E3 are keyed off `kindOf()` too rather than the stored status, so a status
+that has gone stale reports once as E6 instead of cascading into unrelated failures.
+Note that an *empty* revision — one whose payload still equals its parent's — is
+perfectly legitimate: you start a revision before editing it, and it stays `review`
+until published or discarded.
+
+Three limits are deliberate:
+
+- **It repairs derived fields only** — E1, E3, E4, E5, D1. Payload content is never
+  rewritten, and neither is a `status` or a `revisionOf`.
+- **It refuses to write if a repairable violation would survive the repair**, rather
+  than replacing a stale hash with a fresh hash computed over a payload its own
+  history contradicts. A visible defect is better than a hidden one. Violations it is
+  *not* answerable for do not block the write — refusing to fix 38 stale hashes
+  because one entry has an unrelated content problem helps nobody — but they are
+  printed, so a repair never quietly hides one.
+- **Only E2 is a warning.** A `metadataRevision` that disagrees with the entry's
+  revision is a value the tool rewrites on the next edit anyway, and a gate that can
+  never go green is a gate everyone learns to ignore. Everything else fails `--check`,
+  including E6 and E7, which `--fix` cannot resolve: which record is published and
+  which revision belongs to which parent are editorial decisions.
+
+Nothing here is reimplemented either. `canonical()`, `contentHash()`, `applyPatch()`,
+`diffPatch()`, `reconstruct()`, `repairDerivedFields()`, `contentDiff()`, `kindOf()`
+and `computeDbBaseHash()` are lifted verbatim out of
+`CIEmetaDB.html` at run time and
+evaluated in a sandbox — the same reasoning as the embedded schema above, applied to
+the hashing. Self-tests run before any repair and abort on failure; the sharpest one
+recomputes the `contentHash` of `CIE_std_illum_A_1nm`, the one entry whose hash the
+tool itself wrote after 4.1, and requires the lifted code to reproduce it. If the
+functions are ever renamed the script stops with their names rather than guessing.
+
+### Self-test
+
+```
+node selftest.js       # exit 0 when everything passes
+```
+
+`db_integrity.js --check` guards the databases in this folder, but two behaviours it
+cannot reach are exactly the ones that go wrong silently:
+
+- **`migrateDb()` has to leave a database consistent.** When it did not, the symptom was
+  not an error but every entry being reported as a merge conflict, because a stale
+  `contentHash` defeats `historyContainsHash()`. The shipped databases are already
+  migrated, so nothing here would notice a regression.
+- **The revision pair has to leave the published parent untouched** and the history
+  chain contiguous. No shipped database contains a pair, so again there is nothing to
+  check against.
+
+`selftest.js` builds its fixtures instead — a database reduced to its genuine pre-4.1
+state, a legacy draft of the kind the two-state model stored, a revision pair — and
+drives the tool's **own** functions over them, lifted from `CIEmetaDB.html` the same way
+`db_integrity.js` lifts them, with `DB` supplied and the four UI calls `saveEnvelope()`
+makes stubbed out. 78 checks in four groups: the lifted primitives, `migrateDb`,
+`db_integrity`'s invariants (including that a legitimate revision pair passes and that
+`--fix` is not blocked by something it cannot repair), and the full pair lifecycle —
+start, edit, publish, discard, envelope save.
+
+It writes only to a temporary directory, which it removes again, and needs no network.
+
+It earned its place on the first run by finding a defect in `publishEntry()`:
+`history[].baseHash` is defined as the hash of the payload the patch applies to, but the
+code recorded `entry.contentHash`, which after a draft save already describes the payload
+being *published* — so a publish that followed a draft save pointed the patch at its own
+result, and a first publish wrote a hash where the schema requires `null`.
 
 ## Running
 
@@ -78,29 +228,75 @@ and email, registrant, database title, publisher name and the institution fields
 (name, acronym, place, department). These are organisation-wide values used by
 **Export to Crossref-file (XML)** (see below); set them once and they apply to every deposit.
 
-## Draft & publish workflow
+## Draft, under revision & published workflow
 
-Each entry is either a **draft** or **published**, and the status is **automatic and
-read-only** — you never set it by hand:
+Each entry has one of **three** statuses, and the status is **automatic and read-only** — you
+never set it by hand:
 
-- Creating or duplicating an entry, or editing any **payload** field, sets the entry to
-  **draft**.
-- **Save draft** stores your edits **without creating a revision** — the revision number is
-  unchanged, no history entry is added, and you are not asked for a comment. Envelope fields
-  (domains, DOI landing page) also save this way and never change status or revision.
-- **Publish entry** is the *only* action that mints a revision. It asks for a short **revision
-  text**, records **one** history entry holding the change since the previous published
-  revision, bumps the revision number and sets status to **published**. History therefore shows
-  revision-to-revision changes only, never intermediate draft saves.
-- Exporting a **draft** appends `_draft` after the (pending) revision number in the file name —
-  e.g. a new draft → `…_metadata_draft.json`, a draft on top of published v1 →
-  `…_metadata_v2_draft.json`.
+| Status | Meaning |
+|---|---|
+| **draft** | a new record (New entry / Duplicate) that has never been published |
+| **under revision** | a revision of a published record, being prepared alongside it |
+| **published** | the current published record |
+
+### Revising a published entry
+
+The **payload** of a published entry is **read-only**. To change it, press **Start revision**:
+this creates a second entry with status **under revision**, and you edit that one.
+
+**Envelope fields are the exception.** **Domains** and the **DOI landing page** are not part of
+the versioned payload — they never mint a revision and never change status — so they stay
+editable on a published entry. Change them in place and press **Save domains & landing page**;
+the revision number and status are untouched. No revision is needed for them.
+
+The published version **stays in the list, unchanged, for the whole time** — you can open,
+compare and export it while the revision is in progress. Each half shows a banner linking to the
+other.
+
+The two halves deliberately **share one DOI** while the revision is open, and that is **not**
+reported as a duplicate. The DOI cannot be edited on a revision, because changing it would break
+the pair. Two *unrelated* entries sharing a DOI are still flagged as before.
+
+**Publishing the revision collapses the pair**: the revision becomes the published entry at the
+next revision number, inheriting the complete revision chain, and the previous published row
+disappears. The DOI is unique again.
+
+```
+[published rev 2]                          Start revision
+        |
+        v
+[published rev 2]  +  [under revision]     both available, same DOI
+        |                    |
+        |                    | Publish
+        v                    v
+              [published rev 3]            history: rev 1, 2, 3
+```
+
+### Saving and publishing
+
+- **Save draft** / **Save revision** stores your edits **without creating a revision** — the
+  revision number is unchanged, no history entry is added, and you are not asked for a comment.
+  Envelope fields (domains, DOI landing page) also save this way and never change status or revision.
+- **Publish** is the *only* action that mints a revision. It asks for a short **revision text**,
+  records **one** history entry holding the change since the previous published revision, bumps
+  the revision number and sets status to **published**. History therefore shows
+  revision-to-revision changes only, never intermediate saves.
+- Exporting anything **not yet published** appends `_draft_TIMESTAMP` after the (pending) revision
+  number in the file name — e.g. a new draft → `…_metadata_draft_20260725T143022.json`, a revision
+  of published v1 → `…_metadata_v2_draft_20260725T143022.json`.
+- A published entry with a revision in progress **cannot be deleted**; discard or publish the
+  revision first.
+- On a published entry the read-only payload fields are shown **greyed out**. Validation checks
+  can still be run, but **Log this validation to the entry** is disabled — it writes to the entry,
+  so log against a draft or a revision instead.
 
 The action bar also offers two revert actions:
 
 - **Undo changes** — discards unsaved editor edits and returns to the last *saved* version.
-- **Revert to last published** — discards unpublished draft edits and restores the entry to its
-  last published revision (applied immediately, after a confirmation, since draft edits are not
+- **Discard revision** — deletes a revision entirely and returns you to the published entry,
+  which is unaffected (applied immediately, after a confirmation).
+- **Revert to last published** — for a never-published draft, restores the entry to its last
+  published revision (applied immediately, after a confirmation, since unpublished edits are not
   versioned and are lost).
 
 ## Data model (metadatabase envelope)
@@ -120,7 +316,8 @@ entry
 ├─ entryId        internal stable id (independent of the DOI; used for merge matching)
 ├─ rev            last published revision number (0 = never published); only Publish changes it
 ├─ contentHash    sha256 of the canonical payload (concurrency/merge anchor)
-├─ status         draft | published  (automatic; draft while edited, published on Publish)
+├─ status         draft | review | published   (automatic; 'review' displays as "under revision")
+├─ revisionOf     on a 'review' entry only: entryId of the published entry it revises
 ├─ landingPage    URL the DOI resolves to (Crossref <resource>); envelope-level, per entry
 ├─ domains        [ CIE-division codes ]
 ├─ audit          createdBy/Date, modifiedBy/Date, modifiedComment
@@ -360,8 +557,8 @@ more per entry. Entries can be filtered by domain in the list.
 
 - **Save DB** / **Save DB As…** — the whole metadatabase (with history and audit).
 - **Export metadata-files…** (toolbar) or **Export to metadata-file (JSON)** (per entry) — emits
-  standard `*.csv_metadata.json` files matching the format in `../../examples/`
-  (envelope, history and audit stripped), ready for publication.
+  standard `*.csv_metadata.json` files as published on the CIE website — the payload alone,
+  with the database envelope, history and audit stripped — ready for publication.
 - **Export to Crossref-file (XML)** (per entry) — see below.
 
 ### Export to Crossref-file (XML) (DOI registration)

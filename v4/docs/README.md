@@ -365,6 +365,15 @@ Note the distinction from the DataCite `Version` field (property 15 above): `Ver
 
 ## Version history
 
+Version 4.1 - schema file corrections:
+
+Editorial corrections to `CIEmetaDigitalProduct_schema_04.json` only. The metadata model itself is unchanged: `schemaName`/`schemaVersion` stay `CIEmetaDigitalProduct`/`4`, the schema DOI is unchanged, and none of the corrections can invalidate an existing metadata file - each only widens what is accepted.
+- The schema file is now **valid JSON**. Its descriptive header was previously written as `//` line comments inside the root object, which made the file unparsable by a strict JSON parser - and therefore unusable with the online validators recommended at the top of this document. That text is now carried in the `title`, `description` and `$comment` keywords; no information was removed.
+- `$id` added (`https://doi.org/10.25039/CIE.SC.4taqevcd`, the same persistent identifier that every metadata file carries as `schemaURL`), so the schema can be referenced by URI.
+- `wavelength_first`, `wavelength_last` and `wavelength_step` now reference a new `definitions.wavelengthField`, which accepts **either** a number **or** one of the sentinel strings `":unap"`, `":null"`, `":unal"`, `":unas"`. They were previously declared as plain numbers, which contradicted CIE 2.4.5 - 2.4.7 above and rejected the published metadata of non-spectral data tables such as `CIE_max_sle_mesopic`.
+- `"ROR"` added to `funderIdentifierType` (property 19), which previously offered the superseded GRID but not ROR.
+- `validationType` (CIE 2.5) is now an enum in the schema, carrying exactly the six values already listed in the table above: `"sumOfColumns"`, `"sampleRow"`, `"numberOfRows"`, `"numberOfColumns"`, `":unap"`, `"other"`. It was the only one of the four value tables in this document not encoded in the schema - `interpolationMethod`, `extrapolationMethod` and `dataQuality` always were. Note that unlike the corrections above, this one **narrows** what the schema accepts; every value used in every published CIE metadata file is already within the list, so no existing file is affected. `hashMethod` (CIE 1) is deliberately left unconstrained, because md5 and sha256 are given there as examples rather than as a closed list.
+
 Version 4.1:
 - Optional field `metadataRevision` added (see CIE 3 above). It is the revision of the JSON metadata file itself:
   - integer, starting at 1, incremented by 1 on every change of the metadata content (e.g. a corrected checksum, an added/edited column header, a fixed title or description);
