@@ -1681,9 +1681,10 @@ function parentOf(e){
   if(!DB||!e||!e.revisionOf) return null;
   return DB.entries.find(x=>x.entryId===e.revisionOf) || null;
 }
-/* an entry is read-only when it is the published half of an open pair: edits belong in
-   the revision, and allowing both to change would let the two diverge */
-function isLocked(e){ return kindOf(e)==="published" && !!openRevisionOf(e); }
+/* Published entries are read-only. Changing a published record means starting a revision:
+   that is what keeps the published version available while the new one is prepared, and what
+   stops the two halves of a pair diverging. Drafts and revisions are freely editable. */
+function isLocked(e){ return kindOf(e)==="published"; }
 
 /* the version a draft or revision will become when published — used for filename/display
    only. Published entries simply show their own rev. */
@@ -2192,7 +2193,7 @@ function renderDetail(){
       <span id="saveState"></span>
     </div>
     <div class="detail-actions">
-      ${locked?`<button id="btnStartRevision" title="Create a revision of this published entry. The published version stays available alongside it.">Start revision</button>`
+      ${locked?`<button id="btnStartRevision" title="${openRevisionOf(e)?"A revision of this entry is already in progress — go to it":"Create a revision of this published entry. The published version stays available alongside it."}">${openRevisionOf(e)?"Go to revision<br>in progress":"Start revision"}</button>`
               :`<button id="btnSaveEntry">${isRevision(e)?"Save revision":"Save draft"}</button>
       <button id="btnPublish" title="${isRevision(e)?"Publish this revision as rev "+((e.rev||0)+1)+", replacing the published entry":"Create a new revision and mark the entry published"}">Publish ${isRevision(e)?"revision":"entry"}</button>
       <button class="ghost" id="btnRevert" title="Discard unsaved editor changes and return to the last saved version">Undo changes</button>
@@ -2206,17 +2207,21 @@ function renderDetail(){
     </div>`;
   pane.appendChild(head);
 
-  /* banner tying the two halves of a revision pair together, with a jump to the other one */
+  /* explain the read-only / paired state, with a jump to the other half where there is one */
   const other = locked ? openRevisionOf(e) : (isRevision(e) ? parentOf(e) : null);
-  if(other){
+  if(locked || isRevision(e)){
     const b=document.createElement("div"); b.className="pair-banner";
-    b.innerHTML = locked
-      ? `<b>Read-only.</b> A revision of this entry is in progress; this published rev ${e.rev} stays available for reference. Edit the revision instead. `
-      : `This is a <b>revision</b> of published rev ${e.rev}, which remains available unchanged until you publish. Both share the same DOI. `;
-    const jump=document.createElement("button"); jump.className="ghost small";
-    jump.textContent = locked ? "Go to the revision" : "Go to the published entry";
-    jump.onclick=()=>selectEntry(other.entryId);
-    b.appendChild(jump);
+    b.innerHTML = !locked
+      ? `This is a <b>revision</b> of published rev ${e.rev}, which stays available unchanged until you publish. Both share the same DOI. `
+      : other
+        ? `<b>Read-only.</b> A revision of this entry is in progress; this published rev ${e.rev} stays available for reference. Make your changes in the revision. `
+        : `<b>Read-only — published.</b> To change this record press <b>Start revision</b>: the revision is edited separately and this published rev ${e.rev} stays available alongside it. `;
+    if(other){
+      const jump=document.createElement("button"); jump.className="ghost small";
+      jump.textContent = locked ? "Go to the revision" : "Go to the published entry";
+      jump.onclick=()=>selectEntry(other.entryId);
+      b.appendChild(jump);
+    }
     pane.appendChild(b);
   }
 
@@ -2250,9 +2255,11 @@ function renderDetail(){
   else if(activeTab==="validate") renderValidate(page,e);
   else if(activeTab==="history") renderHistory(page,e);
 
-  /* the published half of an open pair is read-only: disable every control in the page so the
-     two halves cannot diverge. Buttons in the action bar above are unaffected. */
-  if(locked) page.querySelectorAll("input,select,textarea,button").forEach(n=>{ n.disabled=true; });
+  /* A published entry is read-only: disable the editing surfaces (Form fields, JSON editor).
+     Validation and History stay interactive — they are useful on a published record and do not
+     change the payload. The action bar above is unaffected, so Duplicate/Export/Delete still work. */
+  if(locked && (activeTab==="form"||activeTab==="json"))
+    page.querySelectorAll("input,select,textarea,button").forEach(n=>{ n.disabled=true; });
   /* a revision must keep its parent's DOI: changing it would break the pair and silently
      mint a second dataset */
   if(isRevision(e) && activeTab==="form"){
