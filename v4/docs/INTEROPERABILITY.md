@@ -734,11 +734,12 @@ disagree about what a consistent entry looks like. Three things changed:
   instead of being redone on every open.
 
 This was verified against a database reduced to its genuine pre-4.1 state — no
-`metadataRevision` in any payload or patch, hashes recomputed over those payloads. In that
-state it is internally consistent; applying the old one-line backfill reproduces defect 7
-exactly (`E3` and `E4` across the corpus); applying the corrected `migrateDb()` yields a
-database that passes `db_integrity.js --check`, gives the one draft `metadataRevision` 2 where
-the old code gave 1, and repairs nothing on a second migration.
+`metadataRevision` in any payload or patch, hashes recomputed over those payloads, and a
+pending draft added, since no shipped database contains one. In that state it is internally
+consistent; applying the old one-line backfill reproduces defect 7 exactly (`E3` and `E4`
+across the corpus); applying the corrected `migrateDb()` yields a database that passes
+`db_integrity.js --check`, gives the draft the revision it is pending against plus one where
+the old code gave it the published revision, and repairs nothing on a second migration.
 
 Fixing any of 1, 2 or 5 changes metadata content and therefore increments
 `metadataRevision` per CIE 3. Defects 3 and 4 were instead applied directly to the stored

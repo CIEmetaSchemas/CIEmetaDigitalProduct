@@ -54,6 +54,7 @@ const FUNCTIONS = [
   "diffPatch",
   "reconstruct",
   "repairDerivedFields",
+  "contentDiff",
   "entryEnvFingerprint",
   "computeDbBaseHash",
 ];
@@ -250,6 +251,19 @@ function checkEntry(api, entry) {
     }
   }
 
+  /* A draft is a pending edit, so it has to differ from the revision it is pending against.
+     storeDraft() enforces this from the other side: when an edit brings the payload back to
+     the last published revision it sets the status back to published rather than keeping an
+     empty draft. A stored draft that matches its own rev is therefore a state the tool cannot
+     produce, and one it will silently discard on the next edit. Skipped at rev 0, where there
+     is no published revision to differ from. */
+  if (replayable && !published && entry.rev > 0) {
+    const lastPublished = api.reconstruct(history, entry.rev);
+    if (api.contentDiff(lastPublished, entry.payload).length === 0) {
+      add("E6", `status is ${entry.status} but the payload is identical to revision ${entry.rev}`);
+    }
+  }
+
   return violations;
 }
 
@@ -297,16 +311,24 @@ const CODES = {
   E3: "history does not replay to payload",
   E4: "contentHash stale",
   E5: "history baseHash inconsistent",
+  E6: "draft identical to its published revision",
   D1: "database baseHash stale",
 };
 
-/* Which codes --fix is answerable for, and therefore which ones --check treats as failures.
-   E2 is a payload value, not a derived field: the tool sets it on the next edit
-   (storeDraft/publishEntry), and rewriting it here would be a content change made by a
-   hash-repair script. So E2 is reported as a warning - it neither blocks a write nor fails
-   --check, because a gate that can never go green is a gate everyone learns to ignore. */
+/* Two different questions, deliberately kept apart.
+
+   REPAIRABLE - what --fix is answerable for. Anything outside this set survives a repair by
+   definition, so it must not block the write: refusing to fix 38 stale hashes because one
+   entry has an unrelated content problem helps nobody.
+
+   WARNINGS - what --check tolerates. E2 alone: a metadataRevision that disagrees with the
+   entry's revision is a payload value the tool rewrites on the next edit anyway, and a gate
+   that can never go green is a gate everyone learns to ignore. Everything else fails --check,
+   including codes --fix cannot repair - E6 is a genuinely invalid state that wants a human
+   decision, not silence. */
 const REPAIRABLE = new Set(["E1", "E3", "E4", "E5", "D1"]);
-const isFailure = (v) => REPAIRABLE.has(v.code);
+const WARNINGS = new Set(["E2"]);
+const isFailure = (v) => !WARNINGS.has(v.code);
 
 function summarise(report) {
   const counts = {};
@@ -334,7 +356,7 @@ function printReport(file, report, api) {
   const counts = summarise(report);
   for (const code of Object.keys(CODES)) {
     if (!counts[code]) continue;
-    const label = `${code} ${CODES[code]}${REPAIRABLE.has(code) ? "" : " (warning)"}`;
+    const label = `${code} ${CODES[code]}${WARNINGS.has(code) ? " (warning)" : ""}`;
     console.log(`  ${label.padEnd(56, ".")} ${counts[code]}`);
   }
   for (const { entry, violations } of bad) {

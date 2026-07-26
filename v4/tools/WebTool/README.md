@@ -19,6 +19,7 @@ including the link to the Crossref deposit validator.
 | `CIEmetaDB.html` | The application. Open it in a browser. Self-contained (logo, styles, code, hashers, validator all embedded). |
 | `CIEmetaDB_schema.json` | JSON Schema (draft-07) for the metadatabase envelope — the **data model**. |
 | `CIEmetaDB_starter.json` | Starter database, built from the 36 example metadata files that used to live in `../../examples/` (that folder has since been emptied). |
+| `CIEmetaDB_starter_short.json` | Nine-record subset of the starter database for quick testing, including two entries at revision 2 so the history views have something to show. |
 | `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text), plus three `*.csv` data files with their `*_metadata_v2.json` payloads for trying out metadata-file import and CSV validation. |
 | `sync_schema.py` | Keeps the schema embedded in `CIEmetaDB.html` identical to the schema file. See below. |
 | `db_integrity.js` | Checks and repairs the derived fields of a database — hashes and history. See below. |
@@ -90,20 +91,32 @@ reaches the file instead of being redone on every open — and this script lifts
 same function rather than restating it. The tool and the checker therefore cannot
 disagree about what a consistent entry looks like.
 
-Two limits are deliberate:
+What it checks, per entry: `history` length and numbering (**E1**), the
+`metadataRevision` the status implies (**E2**), that replaying the history reproduces
+the payload (**E3**), `contentHash` (**E4**), the `history[].baseHash` chain (**E5**),
+and that a draft actually differs from the revision it is pending against (**E6**);
+plus the database `baseHash` (**D1**).
 
-- **It repairs derived fields only.** Payload content is never rewritten. Where a
-  payload value is wrong — a `metadataRevision` that does not match the entry's
-  revision, say — it is reported as a *warning* and left for the tool to correct on
-  the next edit. Warnings do not fail `--check`; a gate that can never go green is a
-  gate everyone learns to ignore.
-- **It refuses to write if a content divergence would survive the repair**, rather
+Three limits are deliberate:
+
+- **It repairs derived fields only** — E1, E3, E4, E5, D1. Payload content is never
+  rewritten.
+- **It refuses to write if a repairable violation would survive the repair**, rather
   than replacing a stale hash with a fresh hash computed over a payload its own
-  history contradicts. A visible defect is better than a hidden one.
+  history contradicts. A visible defect is better than a hidden one. Violations it is
+  *not* answerable for do not block the write — refusing to fix 38 stale hashes
+  because one entry has an unrelated content problem helps nobody — but they are
+  printed, so a repair never quietly hides one.
+- **Only E2 is a warning.** A `metadataRevision` that disagrees with the entry's
+  revision is a value the tool rewrites on the next edit anyway, and a gate that can
+  never go green is a gate everyone learns to ignore. Everything else fails `--check`,
+  including E6, which `--fix` cannot resolve: whether an empty draft should be
+  published or given a real pending change is a decision for a curator.
 
 The hash chain is **not** reimplemented either. `canonical()`, `contentHash()`,
-`applyPatch()`, `diffPatch()`, `reconstruct()`, `repairDerivedFields()` and
-`computeDbBaseHash()` are lifted verbatim out of `CIEmetaDB.html` at run time and
+`applyPatch()`, `diffPatch()`, `reconstruct()`, `repairDerivedFields()`,
+`contentDiff()` and `computeDbBaseHash()` are lifted verbatim out of
+`CIEmetaDB.html` at run time and
 evaluated in a sandbox — the same reasoning as the embedded schema above, applied to
 the hashing. Self-tests run before any repair and abort on failure; the sharpest one
 recomputes the `contentHash` of `CIE_std_illum_A_1nm`, the one entry whose hash the
