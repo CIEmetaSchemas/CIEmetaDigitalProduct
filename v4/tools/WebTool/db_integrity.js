@@ -1,0 +1,480 @@
+#!/usr/bin/env node
+/* Check and repair the derived fields of a CIEmetaDB metadatabase file.
+ *
+ * CIEmetaDB_schema.json defines several fields as derived from payload content:
+ * contentHash is the sha256 of the canonical payload, history[].patch replays onto {} to
+ * reproduce any revision, history[].baseHash is the hash of the payload before that patch,
+ * and the database baseHash is a fingerprint over all entries. Nothing enforced them, and
+ * they drifted: migrateDb() backfills the schema-4.1 field metadataRevision into legacy
+ * payloads without recomputing contentHash and without recording it in the history, so the
+ * stored hash describes the pre-backfill payload and the history no longer replays to it.
+ * That silently disables historyContainsHash(), the ancestry test the merge path uses to
+ * tell a fast-forward from a real conflict.
+ *
+ *     node db_integrity.js --check    report violations; exit 1 if any
+ *     node db_integrity.js --fix      repair the derived fields in place
+ *
+ * With no file arguments both modes act on the three databases stored beside this script.
+ *
+ * The hash chain is NOT reimplemented here. canonical(), contentHash(), applyPatch() and
+ * friends are lifted verbatim out of CIEmetaDB.html at run time, so there is exactly one
+ * implementation to keep correct - the same single-source-of-truth reasoning as
+ * sync_schema.py. Self-tests below prove the lifted code reproduces hashes the tool wrote.
+ */
+
+"use strict";
+
+const fs = require("fs");
+const path = require("path");
+const vm = require("vm");
+const crypto = require("crypto");
+
+const HERE = __dirname;
+const HTML = path.join(HERE, "CIEmetaDB.html");
+const DEFAULT_DBS = [
+  "CIEmetaDBdataset.json",
+  "CIEmetaDB_starter.json",
+  "CIEmetaDB_starter_short.json",
+].map((f) => path.join(HERE, f));
+
+/* ============================================================================
+   lift the primitives out of CIEmetaDB.html
+   ==========================================================================*/
+
+const CONSTS = ["SHA_K", "_enc"];
+const FUNCTIONS = [
+  "sha256Bytes",
+  "sha256Str",
+  "canonical",
+  "contentHash",
+  "clone",
+  "ptrTokens",
+  "applyPatch",
+  "esc6902",
+  "diffPatch",
+  "reconstruct",
+  "entryEnvFingerprint",
+  "computeDbBaseHash",
+];
+
+/* A declaration runs from its own line to the next line that starts one, all of these being
+   written at column 0 in CIEmetaDB.html. Brace matching is deliberately avoided: esc6902
+   contains the regex literal /\//g, and its "//" makes a naive scanner treat the rest of the
+   line as a comment, run past the closing brace and swallow the remainder of the file. */
+const STARTS_DECL = /^(function |const |let |var |\/\*|\/\/)/;
+
+function liftDeclaration(lines, firstLine) {
+  const start = lines.findIndex((l) => l.startsWith(firstLine));
+  if (start < 0) return null;
+  let end = start + 1;
+  while (end < lines.length && !STARTS_DECL.test(lines[end])) end++;
+  return lines.slice(start, end).join("\n");
+}
+
+function liftPrimitives() {
+  if (!fs.existsSync(HTML)) fail(`${HTML} not found`);
+  const lines = fs.readFileSync(HTML, "utf8").split("\n");
+  const missing = [];
+  let source = "";
+  for (const name of CONSTS) {
+    const text = liftDeclaration(lines, `const ${name}`);
+    text === null ? missing.push(`const ${name}`) : (source += text + "\n");
+  }
+  for (const name of FUNCTIONS) {
+    const text = liftDeclaration(lines, `function ${name}(`);
+    text === null ? missing.push(`function ${name}()`) : (source += text + "\n");
+  }
+  if (missing.length) {
+    fail(
+      `could not find these declarations in ${path.basename(HTML)}:\n` +
+        missing.map((m) => `        ${m}`).join("\n") +
+        `\n      They were renamed or reformatted. This script lifts them verbatim rather\n` +
+        `      than restating them, so it has to be pointed at their new names.`
+    );
+  }
+  const sandbox = {
+    TextEncoder,
+    JSON,
+    Object,
+    Array,
+    String,
+    Number,
+    Math,
+    Uint8Array,
+    Uint32Array,
+    console,
+  };
+  return vm.runInNewContext(`${source}\n({${FUNCTIONS.join(",")}})`, sandbox);
+}
+
+/* ============================================================================
+   self-tests: the lifted code must reproduce hashes the tool itself wrote
+   ==========================================================================*/
+
+/* CIE_std_illum_A_1nm is the one entry in CIEmetaDBdataset.json that was published after
+   metadataRevision was introduced, so the tool wrote its contentHash over the payload as it
+   stands. Reproducing that hash proves the lift is faithful. */
+const WITNESS_FILE = path.join(HERE, "CIEmetaDBdataset.json");
+const WITNESS_ENTRY = "CIE_std_illum_A_1nm.csv";
+
+function selfTest(api) {
+  const results = [];
+  const check = (name, ok, detail) => results.push({ name, ok, detail: detail || "" });
+
+  if (fs.existsSync(WITNESS_FILE)) {
+    const db = readDb(WITNESS_FILE);
+    const witness = db.entries.find((e) => entryName(e) === WITNESS_ENTRY);
+    if (!witness) {
+      check("T1 witness entry present", false, `${WITNESS_ENTRY} not in ${path.basename(WITNESS_FILE)}`);
+    } else {
+      check(
+        "T1 lifted contentHash reproduces the hash the tool stored",
+        api.contentHash(witness.payload) === witness.contentHash,
+        WITNESS_ENTRY
+      );
+      const canon = api.canonical(witness.payload);
+      check(
+        "T2 lifted sha256 agrees with node crypto",
+        crypto.createHash("sha256").update(canon, "utf8").digest("hex") === api.sha256Str(canon)
+      );
+    }
+  } else {
+    check("T1/T2 witness file present", false, `${WITNESS_FILE} not found`);
+  }
+
+  const added = api.diffPatch({}, { metadataRevision: 1 }, "");
+  const replaced = api.diffPatch({ metadataRevision: 1 }, { metadataRevision: 2 }, "");
+  check(
+    "T3 diffPatch emits the op shapes the repair appends",
+    added.length === 1 &&
+      added[0].op === "add" &&
+      added[0].path === "/metadataRevision" &&
+      replaced.length === 1 &&
+      replaced[0].op === "replace" &&
+      replaced[0].path === "/metadataRevision"
+  );
+
+  const failed = results.filter((r) => !r.ok);
+  if (failed.length) {
+    fail(
+      "self-tests failed - the code lifted from CIEmetaDB.html does not behave as expected:\n" +
+        failed.map((r) => `        ${r.name}${r.detail ? " (" + r.detail + ")" : ""}`).join("\n")
+    );
+  }
+  return results;
+}
+
+/* ============================================================================
+   database i/o
+   ==========================================================================*/
+
+/* The tool writes databases with JSON.stringify(db,null,2) and no trailing newline
+   (writeText in CIEmetaDB.html). Reading and rewriting an untouched file must therefore be
+   byte-neutral; serialise() is checked against that on every run (T4). */
+function serialise(db) {
+  return JSON.stringify(db, null, 2);
+}
+
+function readDb(file) {
+  const text = fs.readFileSync(file, "utf8");
+  let db;
+  try {
+    db = JSON.parse(text);
+  } catch (e) {
+    fail(`${path.basename(file)} is not valid JSON: ${e.message}`);
+  }
+  if (db.dbSchemaName !== "CIEmetaDB") {
+    fail(`${path.basename(file)} is not a CIEmetaDB database (dbSchemaName: ${db.dbSchemaName})`);
+  }
+  db.__text = text;
+  return db;
+}
+
+function entryName(e) {
+  const alt = ((e.payload && e.payload.alternateIdentifiers) || []).find((a) =>
+    /^CIE_/.test(a.alternateIdentifier || "")
+  );
+  if (alt) return alt.alternateIdentifier;
+  const doi = e.payload && e.payload.identifier && e.payload.identifier.identifier;
+  return doi || e.entryId;
+}
+
+/* ============================================================================
+   invariants
+   ==========================================================================*/
+
+/* A draft's payload is deliberately ahead of its history: it holds the pending next
+   revision, which by design has not been recorded as a patch yet. E3 therefore applies to
+   published entries only, and E2 expects rev+1 rather than rev. */
+function checkEntry(api, entry) {
+  const violations = [];
+  const add = (code, detail) => violations.push({ code, detail });
+  const published = entry.status === "published";
+  const history = entry.history || [];
+
+  if (history.length !== entry.rev) {
+    add("E1", `history.length ${history.length} != rev ${entry.rev}`);
+  }
+  history.forEach((h, i) => {
+    if (h.rev !== i + 1) add("E1", `history[${i}].rev is ${h.rev}, expected ${i + 1}`);
+  });
+
+  const wantMdRev = published ? entry.rev : entry.rev + 1;
+  const gotMdRev = entry.payload ? entry.payload.metadataRevision : undefined;
+  if (gotMdRev !== wantMdRev) {
+    add("E2", `payload.metadataRevision ${gotMdRev} != ${wantMdRev} (status ${entry.status}, rev ${entry.rev})`);
+  }
+
+  /* E1 failures make replay meaningless, so only walk the history when it is well-formed. */
+  const replayable = history.length === entry.rev && history.every((h, i) => h.rev === i + 1);
+
+  if (replayable && published) {
+    const replay = api.reconstruct(history, entry.rev);
+    if (api.canonical(replay) !== api.canonical(entry.payload)) {
+      add("E3", `replaying history does not reproduce payload: ${describeDivergence(api, replay, entry.payload)}`);
+    }
+  }
+
+  if (api.contentHash(entry.payload) !== entry.contentHash) {
+    add("E4", "contentHash does not match payload");
+  }
+
+  if (replayable) {
+    if (history.length && history[0].baseHash !== null) {
+      add("E5", `history[0].baseHash is ${JSON.stringify(history[0].baseHash)}, expected null`);
+    }
+    for (let i = 1; i < history.length; i++) {
+      const want = api.contentHash(api.reconstruct(history, i));
+      if (history[i].baseHash !== want) add("E5", `history[${i}].baseHash does not match revision ${i}`);
+    }
+  }
+
+  return violations;
+}
+
+/* Name the differing top-level keys so a real content divergence is distinguishable from
+   the metadataRevision gap at a glance. */
+function describeDivergence(api, replay, payload) {
+  const keys = new Set([...Object.keys(replay || {}), ...Object.keys(payload || {})]);
+  const differing = [...keys].filter(
+    (k) => api.canonical((replay || {})[k]) !== api.canonical((payload || {})[k])
+  );
+  return differing.length ? differing.map((k) => "/" + k).join(", ") : "(no top-level key differs)";
+}
+
+function checkDb(api, db) {
+  const entries = (db.entries || []).map((e) => ({ entry: e, violations: checkEntry(api, e) }));
+  const dbViolations = [];
+  const wantBase = api.computeDbBaseHash(db);
+  if (db.baseHash !== wantBase) dbViolations.push({ code: "D1", detail: "baseHash does not match the entries" });
+  return { entries, dbViolations };
+}
+
+/* ============================================================================
+   repair
+   ==========================================================================*/
+
+/* Only derived fields are written. Payload content is never touched - an E2 violation is a
+   statement about payload content, so it is reported and left alone. */
+function repairEntry(api, entry) {
+  const done = [];
+  const history = entry.history || [];
+
+  /* 1. record metadataRevision in the history. publishEntry() sets it on the payload before
+        diffing, so a history written by the tool carries it; the ones backfilled by
+        migrateDb() do not. Appending matches where diffPatch would have put the op
+        (metadataRevision is the payload's last key), and canonical() sorts keys, so op
+        position influences no hash. */
+  history.forEach((h, i) => {
+    h.patch = h.patch || [];
+    if (h.patch.some((op) => op.path === "/metadataRevision")) return;
+    h.patch.push({ op: i === 0 ? "add" : "replace", path: "/metadataRevision", value: i + 1 });
+    done.push(`history[${i}]: recorded metadataRevision ${i + 1}`);
+  });
+
+  /* 2. baseHash of each patch is the hash of the revision it applies to. Must follow step 1,
+        which changed what those revisions replay to. */
+  if (history.length && history[0].baseHash !== null) {
+    history[0].baseHash = null;
+    done.push("history[0].baseHash: set to null");
+  }
+  for (let i = 1; i < history.length; i++) {
+    const want = api.contentHash(api.reconstruct(history, i));
+    if (history[i].baseHash !== want) {
+      history[i].baseHash = want;
+      done.push(`history[${i}].baseHash: recomputed`);
+    }
+  }
+
+  /* 3. the entry hash itself. */
+  const want = api.contentHash(entry.payload);
+  if (entry.contentHash !== want) {
+    entry.contentHash = want;
+    done.push("contentHash: recomputed");
+  }
+
+  return done;
+}
+
+function repairDb(api, db) {
+  const repaired = (db.entries || []).map((e) => ({ entry: e, done: repairEntry(api, e) }));
+  const wantBase = api.computeDbBaseHash(db);
+  const baseChanged = db.baseHash !== wantBase;
+  if (baseChanged) db.baseHash = wantBase;
+  return { repaired, baseChanged };
+}
+
+/* ============================================================================
+   reporting
+   ==========================================================================*/
+
+const CODES = {
+  E1: "history length / rev numbering",
+  E2: "payload.metadataRevision",
+  E3: "history does not replay to payload",
+  E4: "contentHash stale",
+  E5: "history baseHash inconsistent",
+  D1: "database baseHash stale",
+};
+
+/* Which codes --fix is answerable for, and therefore which ones --check treats as failures.
+   E2 is a payload value, not a derived field: the tool sets it on the next edit
+   (storeDraft/publishEntry), and rewriting it here would be a content change made by a
+   hash-repair script. So E2 is reported as a warning - it neither blocks a write nor fails
+   --check, because a gate that can never go green is a gate everyone learns to ignore. */
+const REPAIRABLE = new Set(["E1", "E3", "E4", "E5", "D1"]);
+const isFailure = (v) => REPAIRABLE.has(v.code);
+
+function summarise(report) {
+  const counts = {};
+  for (const { violations } of report.entries) {
+    for (const v of new Set(violations.map((v) => v.code))) counts[v] = (counts[v] || 0) + 1;
+  }
+  for (const v of report.dbViolations) counts[v.code] = (counts[v.code] || 0) + 1;
+  return counts;
+}
+
+/* Returns true when nothing that --fix is answerable for is outstanding. */
+function printReport(file, report, api) {
+  const bad = report.entries.filter((e) => e.violations.length);
+  const failures =
+    report.entries.reduce((n, e) => n + e.violations.filter(isFailure).length, 0) +
+    report.dbViolations.filter(isFailure).length;
+  const warnings =
+    report.entries.reduce((n, e) => n + e.violations.filter((v) => !isFailure(v)).length, 0) +
+    report.dbViolations.filter((v) => !isFailure(v)).length;
+
+  const verdict = failures ? "FAIL" : warnings ? `OK, ${warnings} warning${warnings === 1 ? "" : "s"}` : "OK";
+  console.log(`${path.basename(file)}  ${verdict}  (${report.entries.length} entries)`);
+  if (!failures && !warnings) return true;
+
+  const counts = summarise(report);
+  for (const code of Object.keys(CODES)) {
+    if (!counts[code]) continue;
+    const label = `${code} ${CODES[code]}${REPAIRABLE.has(code) ? "" : " (warning)"}`;
+    console.log(`  ${label.padEnd(56, ".")} ${counts[code]}`);
+  }
+  for (const { entry, violations } of bad) {
+    console.log(`  ${entryName(entry)} (rev ${entry.rev}, ${entry.status})`);
+    for (const v of violations) console.log(`      ${v.code} ${v.detail}`);
+  }
+  for (const v of report.dbViolations) console.log(`      ${v.code} ${v.detail}`);
+  return failures === 0;
+}
+
+/* ============================================================================
+   main
+   ==========================================================================*/
+
+function fail(message) {
+  console.error(`error: ${message}`);
+  process.exit(2);
+}
+
+function main(argv) {
+  const args = argv.slice(2);
+  const doFix = args.includes("--fix");
+  const doCheck = args.includes("--check");
+  const files = args.filter((a) => !a.startsWith("--"));
+
+  if (doFix === doCheck) {
+    console.error("usage: node db_integrity.js (--check | --fix) [file.json ...]");
+    return 2;
+  }
+
+  const api = liftPrimitives();
+  selfTest(api);
+
+  const targets = files.length ? files.map((f) => path.resolve(f)) : DEFAULT_DBS;
+  for (const file of targets) {
+    if (!fs.existsSync(file)) fail(`${file} not found`);
+  }
+
+  let failures = 0;
+
+  for (const file of targets) {
+    const db = readDb(file);
+    const original = db.__text;
+    delete db.__text;
+
+    /* T4: rewriting an untouched database has to be byte-neutral, otherwise every repair
+       would bury its real changes under a reformat. */
+    if (serialise(db) !== original) {
+      fail(
+        `${path.basename(file)} is not stored the way the tool writes it ` +
+          `(JSON.stringify(db,null,2), no trailing newline). Refusing to rewrite it, because ` +
+          `doing so would reformat the whole file.`
+      );
+    }
+
+    if (doCheck) {
+      if (!printReport(file, checkDb(api, db), api)) failures++;
+      continue;
+    }
+
+    const { repaired, baseChanged } = repairDb(api, db);
+    const touched = repaired.filter((r) => r.done.length);
+
+    /* Repairing only derived fields cannot resolve a content divergence. If one survives,
+       say so and write nothing - a stale hash is a visible defect, a hash freshly computed
+       over a payload its own history contradicts is a hidden one. */
+    const after = checkDb(api, db);
+    const blocking = after.entries
+      .map((e) => ({ entry: e.entry, violations: e.violations.filter((v) => REPAIRABLE.has(v.code)) }))
+      .filter((e) => e.violations.length);
+    if (blocking.length || after.dbViolations.length) {
+      console.error(`${path.basename(file)}  NOT WRITTEN - violations remain after repair:`);
+      printReport(file, { entries: blocking, dbViolations: after.dbViolations }, api);
+      console.error(
+        `      These are payload-content problems, which this script does not touch. ` +
+          `Resolve them in the tool (or by an explicit, documented edit) and run again.`
+      );
+      failures++;
+      continue;
+    }
+
+    /* Left standing on purpose - reported so the write is not silently hiding them. */
+    const noted = after.entries.filter((e) => e.violations.length);
+    for (const { entry, violations } of noted) {
+      for (const v of violations) {
+        console.log(`${path.basename(file)}  note: ${entryName(entry)} ${v.code} ${v.detail} (not repaired)`);
+      }
+    }
+
+    if (!touched.length && !baseChanged) {
+      console.log(`${path.basename(file)}  already consistent, unchanged`);
+      continue;
+    }
+
+    fs.writeFileSync(file, serialise(db), "utf8");
+    const ops = touched.reduce((n, r) => n + r.done.length, 0);
+    console.log(
+      `${path.basename(file)}  repaired ${touched.length} of ${repaired.length} entries ` +
+        `(${ops} field${ops === 1 ? "" : "s"}${baseChanged ? ", plus the database baseHash" : ""})`
+    );
+  }
+
+  return failures ? 1 : 0;
+}
+
+process.exit(main(process.argv));

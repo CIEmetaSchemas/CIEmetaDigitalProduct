@@ -21,6 +21,7 @@ including the link to the Crossref deposit validator.
 | `CIEmetaDB_starter.json` | Starter database, built from the 36 example metadata files that used to live in `../../examples/` (that folder has since been emptied). |
 | `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text), plus three `*.csv` data files with their `*_metadata_v2.json` payloads for trying out metadata-file import and CSV validation. |
 | `sync_schema.py` | Keeps the schema embedded in `CIEmetaDB.html` identical to the schema file. See below. |
+| `db_integrity.js` | Checks and repairs the derived fields of a database — hashes and history. See below. |
 | `README.md` | This file. |
 
 The metadata payload of each entry conforms to
@@ -54,6 +55,53 @@ JavaScript inside `CIEmetaDB.html`. The two definitions drifted apart twice — 
 tool accepted `wavelength_*` sentinel strings the published schema rejected, and
 offered a `titleType` value (`""`) the schema did not allow — and neither was
 caught by review.
+
+### Database integrity
+
+Several fields of a database are **derived** from payload content, and
+`CIEmetaDB_schema.json` says so: `contentHash` is the SHA-256 of the canonical
+payload, `history[].patch` replays onto `{}` to reproduce any revision,
+`history[].baseHash` is the hash of the payload before that patch, and the database
+`baseHash` fingerprints all entries. Nothing enforced any of it, and it drifted:
+
+```
+node db_integrity.js --check    # report violations; exit 1 if any
+node db_integrity.js --fix      # repair the derived fields in place
+```
+
+With no file arguments both modes act on the three databases in this folder;
+otherwise pass paths.
+
+Getting this wrong is quiet rather than loud. A stale `contentHash` breaks
+`historyContainsHash()`, the ancestry test the merge path uses to tell a
+fast-forward from a real conflict — so instead of an error you get every entry
+reported as a conflict on every merge. That is what happened: `migrateDb()`
+backfills the schema-4.1 field `metadataRevision` into legacy payloads without
+recomputing `contentHash` or recording it in the history, which left 38 of 39
+entries in `CIEmetaDBdataset.json` (and every entry in both starter databases) with
+a hash describing the pre-backfill payload. See defect 7 in
+[`../../docs/INTEROPERABILITY.md`](../../docs/INTEROPERABILITY.md).
+
+Two limits are deliberate:
+
+- **It repairs derived fields only.** Payload content is never rewritten. Where a
+  payload value is wrong — a `metadataRevision` that does not match the entry's
+  revision, say — it is reported as a *warning* and left for the tool to correct on
+  the next edit. Warnings do not fail `--check`; a gate that can never go green is a
+  gate everyone learns to ignore.
+- **It refuses to write if a content divergence would survive the repair**, rather
+  than replacing a stale hash with a fresh hash computed over a payload its own
+  history contradicts. A visible defect is better than a hidden one.
+
+The hash chain is **not** reimplemented. `canonical()`, `contentHash()`,
+`applyPatch()`, `diffPatch()`, `reconstruct()` and `computeDbBaseHash()` are lifted
+verbatim out of `CIEmetaDB.html` at run time and evaluated in a sandbox, so there is
+exactly one implementation to keep correct — the same reasoning as the embedded
+schema above, applied to the hashing. Self-tests run before any repair and abort on
+failure; the sharpest one recomputes the `contentHash` of `CIE_std_illum_A_1nm`, the
+one entry whose hash the tool itself wrote after 4.1, and requires the lifted code to
+reproduce it. If the functions are ever renamed the script stops with their names
+rather than guessing.
 
 ## Running
 
