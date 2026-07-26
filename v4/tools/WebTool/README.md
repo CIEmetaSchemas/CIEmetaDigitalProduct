@@ -121,8 +121,13 @@ never set it by hand:
 
 ### Revising a published entry
 
-A published entry is **read-only**. To change it, press **Start revision**: this creates a
-second entry with status **under revision**, and you edit that one.
+The **payload** of a published entry is **read-only**. To change it, press **Start revision**:
+this creates a second entry with status **under revision**, and you edit that one.
+
+**Envelope fields are the exception.** **Domains** and the **DOI landing page** are not part of
+the versioned payload — they never mint a revision and never change status — so they stay
+editable on a published entry. Change them in place and press **Save domains & landing page**;
+the revision number and status are untouched. No revision is needed for them.
 
 The published version **stays in the list, unchanged, for the whole time** — you can open,
 compare and export it while the revision is in progress. Each half shows a banner linking to the

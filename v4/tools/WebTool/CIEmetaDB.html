@@ -2193,7 +2193,9 @@ function renderDetail(){
       <span id="saveState"></span>
     </div>
     <div class="detail-actions">
-      ${locked?`<button id="btnStartRevision" title="${openRevisionOf(e)?"A revision of this entry is already in progress — go to it":"Create a revision of this published entry. The published version stays available alongside it."}">${openRevisionOf(e)?"Go to revision<br>in progress":"Start revision"}</button>`
+      ${locked?`<button id="btnStartRevision" title="${openRevisionOf(e)?"A revision of this entry is already in progress — go to it":"Create a revision of this published entry. The published version stays available alongside it."}">${openRevisionOf(e)?"Go to revision<br>in progress":"Start revision"}</button>
+      <button class="ghost" id="btnSaveEnvelope" title="Save domains and the DOI landing page. These are envelope fields, outside the versioned payload: saving them does not mint a revision or change the status.">Save domains &amp;<br>landing page</button>
+      <button class="ghost" id="btnRevert" title="Discard unsaved edits to domains / landing page">Undo changes</button>`
               :`<button id="btnSaveEntry">${isRevision(e)?"Save revision":"Save draft"}</button>
       <button id="btnPublish" title="${isRevision(e)?"Publish this revision as rev "+((e.rev||0)+1)+", replacing the published entry":"Create a new revision and mark the entry published"}">Publish ${isRevision(e)?"revision":"entry"}</button>
       <button class="ghost" id="btnRevert" title="Discard unsaved editor changes and return to the last saved version">Undo changes</button>
@@ -2236,6 +2238,8 @@ function renderDetail(){
 
   if(locked){
     el("btnStartRevision").onclick=()=>startRevisionAction(e);
+    el("btnSaveEnvelope").onclick=()=>saveEnvelope(e);
+    el("btnRevert").onclick=()=>{ resetEditMeta(e); editDirty=false; renderDetail(); toast("Changes undone"); };
   }else{
     el("btnSaveEntry").onclick=saveEntry;
     el("btnPublish").onclick=publishEntryAction;
@@ -2255,11 +2259,15 @@ function renderDetail(){
   else if(activeTab==="validate") renderValidate(page,e);
   else if(activeTab==="history") renderHistory(page,e);
 
-  /* A published entry is read-only: disable the editing surfaces (Form fields, JSON editor).
-     Validation and History stay interactive — they are useful on a published record and do not
-     change the payload. The action bar above is unaffected, so Duplicate/Export/Delete still work. */
+  /* A published entry is read-only for its PAYLOAD: disable the Form fields and the JSON editor.
+     Envelope fields (domains, DOI landing page) are not part of the versioned payload — they never
+     mint a revision or change status — so they stay editable and are excluded here via .envelope.
+     Validation and History stay interactive too; they do not change the payload. The action bar is
+     unaffected, so Duplicate/Export/Delete still work. */
   if(locked && (activeTab==="form"||activeTab==="json"))
-    page.querySelectorAll("input,select,textarea,button").forEach(n=>{ n.disabled=true; });
+    page.querySelectorAll("input,select,textarea,button").forEach(n=>{
+      if(!n.closest(".envelope")) n.disabled=true;
+    });
   /* a revision must keep its parent's DOI: changing it would break the pair and silently
      mint a second dataset */
   if(isRevision(e) && activeTab==="form"){
@@ -2353,14 +2361,16 @@ function columnHeadersToTsv(arr){
 function renderForm(page,e){
   const p=editModel;
   // sidebar meta fieldset
-  const fsMeta=document.createElement("fieldset");
+  // class "envelope": these fields live OUTSIDE the versioned payload, so they stay editable even
+  // on a published (read-only) entry and are excluded from the read-only sweep in renderDetail.
+  const fsMeta=document.createElement("fieldset"); fsMeta.className="envelope";
   fsMeta.innerHTML='<legend>Database entry</legend>';
   const gm=document.createElement("div"); gm.className="grid";
   // status is read-only: set automatically (draft while edited, published via Publish entry).
-  // domains/landingPage edit the envelope buffer (editMeta); committed via Save draft.
+  // domains/landingPage edit the envelope buffer (editMeta); committed via Save.
   const statusView=document.createElement("div"); statusView.style.padding="4px 0";
   statusView.innerHTML=`<span class="badge ${esc(kindOf(e))}">${esc(statusLabel(e))}</span>`;
-  statusView.title="Set automatically — 'draft' while an entry has unpublished edits, 'published' after you press Publish entry.";
+  statusView.title="Set automatically — 'draft' for a new record, 'under revision' while a published record is being revised, 'published' after you press Publish.";
   gm.appendChild(field("Status", statusView));
   const domWrap=document.createElement("div");
   DB.domains.forEach(d=>{
@@ -2843,6 +2853,18 @@ function preSaveChecks(e){
     if(!confirm("Another entry already uses this DOI:\n"+curDoi+"\n\nDOIs must be unique. Continue anyway (the database will flag it as a duplicate to fix)?")) return false;
   }
   return true;
+}
+/* Save envelope-only changes (domains, DOI landing page) on a read-only published entry.
+   These live outside the versioned payload, so they never mint a revision and never change the
+   status — which is why they remain editable without starting a revision. */
+function saveEnvelope(e){
+  if(!e) return;
+  if(!metaChanged(e)){ toast("No changes to domains or landing page"); editDirty=false; renderDetail(); return; }
+  e.domains=clone(editMeta.domains); e.landingPage=editMeta.landingPage||"";
+  e.audit.modifiedBy=currentUser(); e.audit.modifiedDate=nowISO();
+  resetEditMeta(e); editDirty=false;
+  persist(); renderList(); renderDetail();
+  toast("Saved domains / landing page — status and revision unchanged","ok");
 }
 /* Save draft edits. Payload changes are stored WITHOUT creating a revision (the entry flips to
    draft); envelope changes (domains / landing page) are stored as before. Publishing is the only
@@ -3847,10 +3869,14 @@ function openHelpDialog(){
         <b>draft</b> — a new record (New entry or Duplicate) that has never been published;
         <b>under revision</b> — a revision of a published record, being prepared alongside it;
         <b>published</b> — the current published record.</li>
-      <li><b>Revising a published entry.</b> A published entry is read-only. Press
+      <li><b>Revising a published entry.</b> The <i>payload</i> of a published entry is read-only. Press
         <b>Start revision</b> to create a copy with status <b>under revision</b>; edit that. The
         published version <i>stays in the list unchanged</i> for the whole time, so you can consult or
         export it while the revision is in progress. Both halves show a banner linking to the other.</li>
+      <li><b>Envelope fields stay editable</b> on a published entry: <b>Domains</b> and the
+        <b>DOI landing page</b> are not part of the versioned payload, so no revision is needed to
+        change them. Edit them in place and press <b>Save domains &amp; landing page</b> — the
+        revision number and the status are untouched.</li>
       <li>The pair deliberately <b>shares one DOI</b> while the revision is open, and that is
         <i>not</i> reported as a duplicate. The DOI cannot be edited on a revision — changing it would
         break the pair. Two <i>unrelated</i> entries sharing a DOI are still flagged as before.</li>
