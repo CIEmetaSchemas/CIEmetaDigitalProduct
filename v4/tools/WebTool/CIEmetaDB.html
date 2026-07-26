@@ -581,7 +581,8 @@ const CIE_SCHEMA = buildCieSchema();
 function buildCieSchema(){
   const D=ENUMS;
   const strEnum=arr=>({type:"string",enum:arr});
-  // wavelength fields are numeric, but the CIE README allows sentinel strings for non-spectral tables
+  // mirrors definitions.wavelengthField in CIEmetaDigitalProduct_schema_04.json: a number,
+  // or one of the sentinel strings the CIE README allows for non-spectral tables
   const wlField={anyOf:[{type:"number"},{type:"string",enum:[":unap",":null",":unal",":unas"]}]};
   const nameIds={type:"array",items:{type:"object",properties:{nameIdentifier:{type:"string"},nameIdentifierScheme:{type:"string"},schemeURI:{type:"string"}},required:["nameIdentifier","nameIdentifierScheme"]}};
   const affils={type:"array",items:{type:"object",properties:{affiliation:{type:"string"}},required:["affiliation"]}};

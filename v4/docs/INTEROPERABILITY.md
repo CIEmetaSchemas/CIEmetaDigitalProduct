@@ -24,7 +24,7 @@ The database is the authoritative corpus. Note that the `../examples/` folder is
 subset** — 36 records rather than 39 (`CIE_srf_CQS_5nm`, `CIE_srf_FCI_5nm` and
 `CIE_srf_PS_5nm` are missing) and several of its copies predate corrections that have since
 been made in the database. Analyses run against `../examples/` therefore overstate some
-defect counts; see section 10.2.
+defect counts; see section 10.
 
 ---
 
@@ -63,8 +63,7 @@ invalidating it, and every existing record remains valid unchanged. `schemaName`
 
 This was checked, not assumed: the published `CIE_cc_1931_2deg` payload with `unitPID`,
 `quantityPID` and `symbol` added to every column validates against
-`CIEmetaDigitalProduct_schema_04.json` under a draft-07 validator — once the `//` comments
-are removed so that the schema file can be parsed at all (defect 1, section 10.1).
+`CIEmetaDigitalProduct_schema_04.json` under a draft-07 validator.
 
 Section 10 lists defects that already exist in v4 and should be repaired regardless of
 whether any recommendation here is adopted.
@@ -89,9 +88,9 @@ Column semantics live at
             "unit":             { "type": "string" },
             "quantity":         { "type": "string" },
             "description":      { "type": "string" },
-            "wavelength_first": { "type": "number" },
-            "wavelength_last":  { "type": "number" },
-            "wavelength_step":  { "type": "number" }
+            "wavelength_first": { "$ref": "#/definitions/wavelengthField" },
+            "wavelength_last":  { "$ref": "#/definitions/wavelengthField" },
+            "wavelength_step":  { "$ref": "#/definitions/wavelengthField" }
         }
     },
     "uniqueItems": true
@@ -133,11 +132,11 @@ them; there are no empty, absent or sentinel unit values anywhere in the corpus:
 | `"action spectra"` | 5 |
 | `"spectral luminous efficiency"` | 4 |
 | `"luminous efficiency"` | 2 |
-| `"  "` (whitespace — defect 5) | 2 |
+| `"  "` (whitespace — defect 1) | 2 |
 | `"adaptation coefficient"` | 1 |
 | `"maximum luminous efficacy"` | 1 |
 
-A further 6 columns omit the `quantity` key entirely (defect 6). The unit column is
+A further 6 columns omit the `quantity` key entirely (defect 2). The unit column is
 therefore in better shape than the quantity column: `unit` is complete and consistent,
 `quantity` has 8 defective columns out of 402.
 
@@ -461,9 +460,9 @@ ROR identifier, verified:
 ```
 
 Where an individual is credited, `nameIdentifierScheme: "ORCID"` with the full
-`https://orcid.org/…` form. `funderIdentifierType` currently enumerates
-`["ISNI", "GRID", "Crossref Funder ID", "Other"]`; **ROR should be added** — GRID has been
-superseded by ROR since 2021.
+`https://orcid.org/…` form. `funderIdentifierType` previously enumerated
+`["ISNI", "GRID", "Crossref Funder ID", "Other"]`, offering the superseded GRID but not ROR;
+**`"ROR"` has since been added** to the schema — see the version history in [README.md](README.md).
 
 **Subjects.** `subjects[]` supports `subjectScheme`, `schemeURI`, `valueURI` and
 `classificationCode`. Across the 39 records there are **113 subject entries drawing on 14
@@ -482,7 +481,7 @@ anywhere:
 
 The list reads as entries from a classification rather than free keywords, and the
 right-hand column shows the cost of not saying so: three of the fourteen are
-capitalisation variants of another three (defect 9). Fourteen values is small enough to
+capitalisation variants of another three (defect 5). Fourteen values is small enough to
 enumerate. Declaring the scheme costs one field per subject and makes the values
 resolvable; if the strings are ad-hoc, CIE should adopt a scheme — the e-ILV itself would
 be a natural source once recommendation G is in place.
@@ -624,62 +623,55 @@ that the SI Reference Point has made BIPM the cited source for units.
 
 ## 10. Defect register
 
-Independent of the recommendations above. These are defects in v4 as published.
+Independent of the recommendations above. These are defects in the published data,
+measured against the 39 entries in `CIEmetaDBdataset.json`. The affected share of the corpus
+is small — 8 defective columns out of 402, plus the subject-casing issue.
 
-### 10.1 To fix in the schema file
-
-| # | Defect | Detail | Fix |
-|---|---|---|---|
-| 1 | **The schema file is not valid JSON** | Lines 2–34 of `CIEmetaDigitalProduct_schema_04.json` are `//` line comments inside the object. Any strict parser rejects the file. | Move the changelog into `$comment` strings or a sibling `.md`. |
-| 2 | **`wavelength_*` type contradicts the documentation and the data** | The schema declares `{"type": "number"}`. README.md CIE 2.4.5–2.4.7 requires `":unap"` / `":null"` for non-spectral tables, and `CIE_max_sle_mesopic` uses them. **The published schema currently rejects a published CIE record.** | `"anyOf": [{"type":"number"}, {"type":"string","enum":[":unap",":null",":unal",":unas"]}]` |
-| 3 | **No `$id`** | The schema cannot be referenced by URI from another schema or a validator. | Add `"$id"`, pointing at the schema DOI or a stable cie.co.at URL. |
-| 4 | **`funderIdentifierType` lacks ROR** | Enumerates the superseded GRID but not ROR. | Add `"ROR"`. |
-
-Defect 2 is masked in practice: the WebTool does not load the schema file at all. It
-re-implements it in JavaScript (`buildCieSchema()`, `CIEmetaDB.html` around line 579) and
-its private copy already permits the sentinels:
-
-```js
-// wavelength fields are numeric, but the CIE README allows sentinel strings for non-spectral tables
-const wlField = { anyOf:[ {type:"number"},
-                          {type:"string", enum:[":unap",":null",":unal",":unas"]} ] };
-```
-
-So the tool validates records that the published schema rejects. The two must be
-reconciled — and note that **any schema change has to be made in two places**, the JSON
-file and `CIEmetaDB.html` (`ENUMS` around line 276 and `buildCieSchema()`). That
-duplication is itself a maintenance risk worth addressing separately.
-
-Also note `:null` appears in the tool's enum and in README.md but is not part of the
-`:unap`/`:unas`/`:unal` sentinel family used elsewhere, and no data file uses it.
-
-### 10.2 To fix in the data
-
-Measured against the 39 published entries in `CIEmetaDBdataset.json`. The affected share of
-the corpus is small — 8 defective columns out of 402, plus the subject-casing issue.
+Defects in the *schema file* — it was not valid JSON, it had no `$id`, its `wavelength_*`
+fields rejected the sentinel strings the documentation requires, and `funderIdentifierType`
+lacked ROR — have been corrected. See the version history in
+[README.md](README.md) and the `$comment` in
+[`../schema/CIEmetaDigitalProduct_schema_04.json`](../schema/CIEmetaDigitalProduct_schema_04.json).
 
 | # | Defect | Extent | Datasets |
 |---|---|---|---|
-| 5 | `"quantity": "  "` (whitespace) on the `lambda` column | 2 columns | `CIE_illum_D55`, `CIE_illum_D75` |
-| 6 | `quantity` key absent | 6 columns | `CIE_1st_deriv_meta_ind` (`delta_x_bar(lambda)`, `delta_y_bar(lambda)`, `delta_z_bar(lambda)`), `CIE_illum_Dxx_comp` (`S_0(lambda)`, `S_1(lambda)`, `S_2(lambda)`) |
-| 7 | **`descrition` typo** instead of `description` | 15 columns in **1** dataset | `CIE_srf_CQS_5nm` |
-| 8 | `β15(λ)` — the only non-ASCII column title in the corpus, where every other dataset transliterates (`x_bar`, `lambda`) | 1 column | `CIE_srf_PS_5nm` |
-| 9 | **Subject casing is inconsistent** — the same concept appears under two spellings | 6 subject entries | `Perception of colour` (10) vs `Perception of Colour` (2); `Colour of objects` (10) vs `Colour of Objects` (2); `Colour vision` (10) vs `Colour Vision` (2) |
-| 10 | v3 example declares `"schemaName": "CIEmetaDataProduct"` (vs `CIEmetaDigitalProduct` in its own schema) and reuses the **v4** `schemaURL` DOI | 1 file | `v3/examples/CIE_cc_1931_2deg.csv_metadata.json` |
+| 1 | `"quantity": "  "` (whitespace) on the `lambda` column | 2 columns | `CIE_illum_D55`, `CIE_illum_D75` |
+| 2 | `quantity` key absent | 6 columns | `CIE_1st_deriv_meta_ind` (`delta_x_bar(lambda)`, `delta_y_bar(lambda)`, `delta_z_bar(lambda)`), `CIE_illum_Dxx_comp` (`S_0(lambda)`, `S_1(lambda)`, `S_2(lambda)`) |
+| 3 | **`descrition` typo** instead of `description` | 15 columns in **1** dataset | `CIE_srf_CQS_5nm` |
+| 4 | `β15(λ)` — the only non-ASCII column title in the corpus, where every other dataset transliterates (`x_bar`, `lambda`) | 1 column | `CIE_srf_PS_5nm` |
+| 5 | **Subject casing is inconsistent** — the same concept appears under two spellings | 6 subject entries | `Perception of colour` (10) vs `Perception of Colour` (2); `Colour of objects` (10) vs `Colour of Objects` (2); `Colour vision` (10) vs `Colour Vision` (2) |
+| 6 | v3 example declares `"schemaName": "CIEmetaDataProduct"` (vs `CIEmetaDigitalProduct` in its own schema) and reuses the **v4** `schemaURL` DOI | 1 file | `v3/examples/CIE_cc_1931_2deg.csv_metadata.json` |
 
-Defect 7 is the one that silently loses information: a consumer reading `description` gets
+Defect 3 is the one that silently loses information: a consumer reading `description` gets
 nothing for those 15 columns. Note that it is **far less widespread than the `../examples/`
 folder suggests** — the stale copies there carry the typo in 12 files, but in the live
 database only `CIE_srf_CQS_5nm` still has it. Most occurrences have already been corrected;
 this is the remainder.
 
-Defect 9 is a direct illustration of why recommendation F matters. Fourteen distinct subject
+Defect 5 is a direct illustration of why recommendation F matters. Fourteen distinct subject
 strings are in use across 113 subject entries, all as bare strings with no
 `subjectScheme`, `schemeURI` or `valueURI` — nothing prevents the same concept being
 entered twice with different capitalisation, and nothing detects it afterwards.
 
-Fixing any of 5–9 changes metadata content and therefore increments `metadataRevision`
+Fixing any of 1–5 changes metadata content and therefore increments `metadataRevision`
 per CIE 3.
+
+### 10.1 Maintenance note — the schema is defined twice
+
+Not a defect in the data, but the condition that let one of the schema-file defects go
+unnoticed, and it still holds. The WebTool never loads
+`CIEmetaDigitalProduct_schema_04.json`; it re-implements it in JavaScript (`ENUMS` around
+line 276 and `buildCieSchema()` around line 580 of `CIEmetaDB.html`). **Any schema change
+therefore has to be made in two places.** When the two drifted, the tool went on accepting
+records that the published schema rejected, and nothing reported it.
+
+The tool cannot simply fetch the schema file: it is designed to run from `file://`, where
+`fetch` is blocked. Inlining the schema at build time, or a check that fails when the two
+definitions diverge, would remove the class of defect rather than one instance of it.
+
+A related loose end: `":null"` appears in both sentinel lists and in README.md, but it is
+not part of the `":unap"` / `":unas"` / `":unal"` family used elsewhere, and no data file
+uses it.
 
 ---
 
@@ -732,8 +724,8 @@ coordinate against wavelength?".
 
 ### 11.3 `CIE_max_sle_mesopic` — the hard case
 
-The only non-spectral table, the only real physical unit, and the source of the sentinel
-problem in defect 2.
+The only non-spectral table, the only real physical unit, and the record whose sentinel
+values the schema file used to reject.
 
 ```json
 "columnHeaders": [
@@ -766,16 +758,21 @@ concept with no identifier — better an honest gap than a fabricated URI.
 
 ## 12. Roadmap
 
-**Phase 1 — schema hygiene.** Defects 1–4 and 5–9. No new fields, no change to the model.
-Every existing record stays valid; records touched under 10.2 increment `metadataRevision`.
-Effort: small. This phase is worth doing on its own merits.
+**Phase 1 — schema hygiene.** No new fields, no change to the model.
+
+- *Schema file: **done.*** Valid JSON, `$id`, sentinel-tolerant `wavelength_*`, ROR.
+  `schemaVersion` stays `4`, the schema DOI is unchanged, and all 39 published records now
+  validate against the file. See the version history in [README.md](README.md).
+- *Data (section 10, defects 1–5): outstanding.* Records touched increment
+  `metadataRevision` per CIE 3. Effort: small — 8 defective columns out of 402, plus the
+  subject-casing variants.
 
 **Phase 2 — semantic annotation.** Add `unitPID`, `quantityPID`, `symbol` as optional
 fields; publish the appendix table as a normative annex to README.md; extend the WebTool so
 the Quantity and Unit inputs become dropdowns backed by that table, with the PID filled in
 automatically. Currently both are plain text inputs (`CIEmetaDB.html` around lines
 1443–1444) and the conventions are enforced by nothing — which is how the whitespace and
-missing-key defects arose. Remember the two-places rule for schema changes (10.1).
+missing-key defects arose. Remember the two-places rule for schema changes (section 10.1).
 `schemaVersion` stays `4`; document the change as 4.2. Effort: small for the data, moderate
 for the tool.
 
