@@ -13085,7 +13085,7 @@
               "wavelength_step": 5
             },
             {
-              "descrition": "5R 4/14",
+              "description": "5R 4/14",
               "quantity": "spectral radiance factor",
               "title": "VS1",
               "unit": "dimensionless",
@@ -13094,7 +13094,7 @@
               "wavelength_step": 5
             },
             {
-              "descrition": "10R  6/12",
+              "description": "10R  6/12",
               "quantity": "spectral radiance factor",
               "title": "VS2",
               "unit": "dimensionless",
@@ -13103,7 +13103,7 @@
               "wavelength_step": 5
             },
             {
-              "descrition": "7.5YR 7/12",
+              "description": "7.5YR 7/12",
               "quantity": "spectral radiance factor",
               "title": "VS3",
               "unit": "dimensionless",
@@ -13112,7 +13112,7 @@
               "wavelength_step": 5
             },
             {
-              "descrition": "5Y 8/12",
+              "description": "5Y 8/12",
               "quantity": "spectral radiance factor",
               "title": "VS4",
               "unit": "dimensionless",
@@ -13121,7 +13121,7 @@
               "wavelength_step": 5
             },
             {
-              "descrition": "2.5GY 8/10",
+              "description": "2.5GY 8/10",
               "quantity": "spectral radiance factor",
               "title": "VS5",
               "unit": "dimensionless",
@@ -13130,7 +13130,7 @@
               "wavelength_step": 5
             },
             {
-              "descrition": "7.5GY 7/10",
+              "description": "7.5GY 7/10",
               "quantity": "spectral radiance factor",
               "title": "VS6",
               "unit": "dimensionless",
@@ -13139,7 +13139,7 @@
               "wavelength_step": 5
             },
             {
-              "descrition": "2.5G 6/12",
+              "description": "2.5G 6/12",
               "quantity": "spectral radiance factor",
               "title": "VS7",
               "unit": "dimensionless",
@@ -13148,7 +13148,7 @@
               "wavelength_step": 5
             },
             {
-              "descrition": "2.5BG 6/10",
+              "description": "2.5BG 6/10",
               "quantity": "spectral radiance factor",
               "title": "VS8",
               "unit": "dimensionless",
@@ -13157,7 +13157,7 @@
               "wavelength_step": 5
             },
             {
-              "descrition": "10BG 6/8",
+              "description": "10BG 6/8",
               "quantity": "spectral radiance factor",
               "title": "VS9",
               "unit": "dimensionless",
@@ -13166,7 +13166,7 @@
               "wavelength_step": 5
             },
             {
-              "descrition": "7.5B 5/10",
+              "description": "7.5B 5/10",
               "quantity": "spectral radiance factor",
               "title": "VS10",
               "unit": "dimensionless",
@@ -13175,7 +13175,7 @@
               "wavelength_step": 5
             },
             {
-              "descrition": "2.5PB 4/10",
+              "description": "2.5PB 4/10",
               "quantity": "spectral radiance factor",
               "title": "VS11",
               "unit": "dimensionless",
@@ -13184,7 +13184,7 @@
               "wavelength_step": 5
             },
             {
-              "descrition": "7.5PB 4/12",
+              "description": "7.5PB 4/12",
               "quantity": "spectral radiance factor",
               "title": "VS12",
               "unit": "dimensionless",
@@ -13193,7 +13193,7 @@
               "wavelength_step": 5
             },
             {
-              "descrition": "5P 5/10",
+              "description": "5P 5/10",
               "quantity": "spectral radiance factor",
               "title": "VS13",
               "unit": "dimensionless",
@@ -13202,7 +13202,7 @@
               "wavelength_step": 5
             },
             {
-              "descrition": "2.5RP 6/12",
+              "description": "2.5RP 6/12",
               "quantity": "spectral radiance factor",
               "title": "VS14",
               "unit": "dimensionless",
@@ -13211,7 +13211,7 @@
               "wavelength_step": 5
             },
             {
-              "descrition": "7.5RP 5/12",
+              "description": "7.5RP 5/12",
               "quantity": "spectral radiance factor",
               "title": "VS15",
               "unit": "dimensionless",
@@ -13340,7 +13340,7 @@
                     "wavelength_step": 5
                   },
                   {
-                    "descrition": "5R 4/14",
+                    "description": "5R 4/14",
                     "quantity": "spectral radiance factor",
                     "title": "VS1",
                     "unit": "dimensionless",
@@ -13349,7 +13349,7 @@
                     "wavelength_step": 5
                   },
                   {
-                    "descrition": "10R  6/12",
+                    "description": "10R  6/12",
                     "quantity": "spectral radiance factor",
                     "title": "VS2",
                     "unit": "dimensionless",
@@ -13358,7 +13358,7 @@
                     "wavelength_step": 5
                   },
                   {
-                    "descrition": "7.5YR 7/12",
+                    "description": "7.5YR 7/12",
                     "quantity": "spectral radiance factor",
                     "title": "VS3",
                     "unit": "dimensionless",
@@ -13367,7 +13367,7 @@
                     "wavelength_step": 5
                   },
                   {
-                    "descrition": "5Y 8/12",
+                    "description": "5Y 8/12",
                     "quantity": "spectral radiance factor",
                     "title": "VS4",
                     "unit": "dimensionless",
@@ -13376,7 +13376,7 @@
                     "wavelength_step": 5
                   },
                   {
-                    "descrition": "2.5GY 8/10",
+                    "description": "2.5GY 8/10",
                     "quantity": "spectral radiance factor",
                     "title": "VS5",
                     "unit": "dimensionless",
@@ -13385,7 +13385,7 @@
                     "wavelength_step": 5
                   },
                   {
-                    "descrition": "7.5GY 7/10",
+                    "description": "7.5GY 7/10",
                     "quantity": "spectral radiance factor",
                     "title": "VS6",
                     "unit": "dimensionless",
@@ -13394,7 +13394,7 @@
                     "wavelength_step": 5
                   },
                   {
-                    "descrition": "2.5G 6/12",
+                    "description": "2.5G 6/12",
                     "quantity": "spectral radiance factor",
                     "title": "VS7",
                     "unit": "dimensionless",
@@ -13403,7 +13403,7 @@
                     "wavelength_step": 5
                   },
                   {
-                    "descrition": "2.5BG 6/10",
+                    "description": "2.5BG 6/10",
                     "quantity": "spectral radiance factor",
                     "title": "VS8",
                     "unit": "dimensionless",
@@ -13412,7 +13412,7 @@
                     "wavelength_step": 5
                   },
                   {
-                    "descrition": "10BG 6/8",
+                    "description": "10BG 6/8",
                     "quantity": "spectral radiance factor",
                     "title": "VS9",
                     "unit": "dimensionless",
@@ -13421,7 +13421,7 @@
                     "wavelength_step": 5
                   },
                   {
-                    "descrition": "7.5B 5/10",
+                    "description": "7.5B 5/10",
                     "quantity": "spectral radiance factor",
                     "title": "VS10",
                     "unit": "dimensionless",
@@ -13430,7 +13430,7 @@
                     "wavelength_step": 5
                   },
                   {
-                    "descrition": "2.5PB 4/10",
+                    "description": "2.5PB 4/10",
                     "quantity": "spectral radiance factor",
                     "title": "VS11",
                     "unit": "dimensionless",
@@ -13439,7 +13439,7 @@
                     "wavelength_step": 5
                   },
                   {
-                    "descrition": "7.5PB 4/12",
+                    "description": "7.5PB 4/12",
                     "quantity": "spectral radiance factor",
                     "title": "VS12",
                     "unit": "dimensionless",
@@ -13448,7 +13448,7 @@
                     "wavelength_step": 5
                   },
                   {
-                    "descrition": "5P 5/10",
+                    "description": "5P 5/10",
                     "quantity": "spectral radiance factor",
                     "title": "VS13",
                     "unit": "dimensionless",
@@ -13457,7 +13457,7 @@
                     "wavelength_step": 5
                   },
                   {
-                    "descrition": "2.5RP 6/12",
+                    "description": "2.5RP 6/12",
                     "quantity": "spectral radiance factor",
                     "title": "VS14",
                     "unit": "dimensionless",
@@ -13466,7 +13466,7 @@
                     "wavelength_step": 5
                   },
                   {
-                    "descrition": "7.5RP 5/12",
+                    "description": "7.5RP 5/12",
                     "quantity": "spectral radiance factor",
                     "title": "VS15",
                     "unit": "dimensionless",
@@ -14238,7 +14238,7 @@
             },
             {
               "quantity": "spectral radiance factor",
-              "title": "β15(λ)",
+              "title": "beta15(lambda)",
               "unit": "dimensionless",
               "wavelength_first": 380,
               "wavelength_last": 780,
