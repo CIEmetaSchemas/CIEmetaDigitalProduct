@@ -684,9 +684,24 @@ embedded copy and the file diverge, and is intended to run in CI on changes to e
 comparison is character-for-character rather than semantic, so it cannot miss a divergence
 the way reading two schemas side by side can.
 
-Two catalogues stay hand-maintained in the tool, `validationType` and `hashMethod`: the
-schema leaves those fields as free strings, so there is nothing to derive them from. If
-they should be constrained, that is a schema change, not a tool change.
+Checking what could actually be derived exposed a related gap. README.md publishes four
+controlled value tables for `datatableInfo`, but only three of them —
+`interpolationMethod`, `extrapolationMethod`, `dataQuality` — had ever been encoded as
+schema enums. **`validationType` (CIE 2.5) had not**, so it was a free string in the schema
+while being a closed vocabulary in the documentation. It is now
+`definitions.validationType`, and the tool derives it like the rest. This narrows what the
+schema accepts, unlike the other corrections, but all three values in use across the
+published corpus (`sampleRow`, `sumOfColumns`, `numberOfColumns`) are within the six.
+
+One catalogue remains hand-maintained in the tool: `hashMethod`. That is deliberate.
+README.md CIE 1 introduces md5 and sha256 with "there are different standards, e.g. …" —
+an open set, not a vocabulary. Constraining it in the schema would wrongly reject sha512.
+The tool offers the two as UI suggestions and the field stays a free string.
+
+A loose end in the same block: **`validationAlgorithm` is in the schema but appears in none
+of the 192 validation entries** across the published corpus and the bundled databases, and
+it is absent from the CIE 2.5 value table. It should either be documented in README.md or
+removed from the schema.
 
 A related loose end: `":null"` appears in both sentinel lists and in README.md, but it is
 not part of the `":unap"` / `":unas"` / `":unal"` family used elsewhere, and no data file

@@ -3,7 +3,7 @@
 	"$id": "https://doi.org/10.25039/CIE.SC.4taqevcd",
 	"title": "CIEmetaDigitalProduct",
 	"description": "Metadata schema for digital products published by the International Commission on Illumination (CIE), in particular data tables distributed as CSV alongside CIE publications. Based on the DataCite metadata kernel with CIE-specific additions. The accompanying description of the metadata model, including the obligation (mandatory / recommended / optional) of each property, is published at https://github.com/CIEmetaSchemas/CIEmetaDigitalProduct (v4/docs/README.md). To validate a metadata file against this schema, any JSON Schema draft-07 validator can be used, for example https://www.jsonschemavalidator.net/ .",
-	"$comment": "Based on the DataCite kernel-4.3 JSON schema:\nhttps://github.com/datacite/schema/blob/76de5e551d19e3e9b829af2f38ccc13e8c7677fe/source/json/kernel-4.3/datacite_4.3_schema.json\n\nChanges towards DataCite version 4.4:\n- field classificationCode added in the subjects field\n- address of metaschema has been changed\n- additional resourceTypeGeneral items\n- relatedItem added\n- only one identifier is allowed (as in the official schema), additional ones are introduced by \"alternateIdentifier\"\n- schemaType replaced by schemaName\n- relatedItem.title replaced by relatedItem.titles (array of string) to be compatible with the strict DataCite 4.4 XML definition\n\nCIE additions:\n- checksums (recommended)\n- datatableInfo (validation, dataQuality, extrapolationMethod, interpolationMethod)\n- schemaName (required)\n- schemaVersion (required)\n- schemaURL (required)\n- metadataRevision (optional): revision of the JSON metadata file itself (not the resource; see DataCite \"version\"). Increments only on metadata-content changes.\n\nVersion history:\n4.0 : new fields added in the column headers: wavelength_first, wavelength_last, wavelength_step\n4.1 : optional field metadataRevision added (revision of the JSON metadata file; backward-compatible, schemaVersion stays 4)\n4.1 : schema file corrections (editorial only; schemaVersion stays 4 and the schema DOI is unchanged). None of these can invalidate an existing metadata file - they only widen what is accepted:\n      - the file is now valid JSON. The descriptive header was previously written as // line comments inside the root object, which made the file unparsable by a strict JSON parser (and therefore unusable with the validators recommended above). That text is now carried in description and in this $comment.\n      - $id added.\n      - wavelength_first / wavelength_last / wavelength_step now reference definitions.wavelengthField, which accepts a number or one of the sentinel strings documented in v4/docs/README.md (CIE 2.4.5 - 2.4.7). Previously declared as plain numbers, which contradicted both the documentation and published metadata files for non-spectral data tables.\n      - \"ROR\" added to funderIdentifierType (GRID has been superseded by ROR).",
+	"$comment": "Based on the DataCite kernel-4.3 JSON schema:\nhttps://github.com/datacite/schema/blob/76de5e551d19e3e9b829af2f38ccc13e8c7677fe/source/json/kernel-4.3/datacite_4.3_schema.json\n\nChanges towards DataCite version 4.4:\n- field classificationCode added in the subjects field\n- address of metaschema has been changed\n- additional resourceTypeGeneral items\n- relatedItem added\n- only one identifier is allowed (as in the official schema), additional ones are introduced by \"alternateIdentifier\"\n- schemaType replaced by schemaName\n- relatedItem.title replaced by relatedItem.titles (array of string) to be compatible with the strict DataCite 4.4 XML definition\n\nCIE additions:\n- checksums (recommended)\n- datatableInfo (validation, dataQuality, extrapolationMethod, interpolationMethod)\n- schemaName (required)\n- schemaVersion (required)\n- schemaURL (required)\n- metadataRevision (optional): revision of the JSON metadata file itself (not the resource; see DataCite \"version\"). Increments only on metadata-content changes.\n\nVersion history:\n4.0 : new fields added in the column headers: wavelength_first, wavelength_last, wavelength_step\n4.1 : optional field metadataRevision added (revision of the JSON metadata file; backward-compatible, schemaVersion stays 4)\n4.1 : schema file corrections (editorial only; schemaVersion stays 4 and the schema DOI is unchanged). None of these can invalidate an existing metadata file - they only widen what is accepted:\n      - the file is now valid JSON. The descriptive header was previously written as // line comments inside the root object, which made the file unparsable by a strict JSON parser (and therefore unusable with the validators recommended above). That text is now carried in description and in this $comment.\n      - $id added.\n      - wavelength_first / wavelength_last / wavelength_step now reference definitions.wavelengthField, which accepts a number or one of the sentinel strings documented in v4/docs/README.md (CIE 2.4.5 - 2.4.7). Previously declared as plain numbers, which contradicted both the documentation and published metadata files for non-spectral data tables.\n      - \"ROR\" added to funderIdentifierType (GRID has been superseded by ROR).\n4.1 : validationType constrained to the value table already published in v4/docs/README.md (CIE 2.5): sumOfColumns, sampleRow, numberOfRows, numberOfColumns, :unap, other. It was the only one of the four README value tables not encoded as an enum here; the other three (interpolationMethod, extrapolationMethod, dataQuality) always were. Unlike the corrections above this one NARROWS what is accepted, so it is noted separately - but every value in every published CIE metadata file is already within the list. hashMethod is deliberately NOT constrained: README (CIE 1) gives md5 and sha256 as examples of a deliberately open set.",
 	"definitions": {
 		"nameType": {
 			"type": "string",
@@ -314,6 +314,18 @@
 				"Crossref Funder ID",
 				"ROR",
 				"Other"
+			]
+		},
+		"validationType": {
+			"$comment": "The kind of check a validations[] entry records. Values as documented in v4/docs/README.md (CIE 2.5).",
+			"type": "string",
+			"enum": [
+				"sumOfColumns",
+				"sampleRow",
+				"numberOfRows",
+				"numberOfColumns",
+				":unap",
+				"other"
 			]
 		},
 		"wavelengthField": {
@@ -853,7 +865,7 @@
 						"type": "object",
 						"properties": {
 							"validationType": {
-								"type": "string"
+								"$ref": "#/definitions/validationType"
 							},
 							"validationAlgorithm": {
 								"type": "string"
