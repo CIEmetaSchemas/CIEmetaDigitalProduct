@@ -212,6 +212,963 @@
 <div id="toast" class="toast"></div>
 <input type="file" id="hiddenFile" style="display:none">
 
+<!-- ===========================================================================
+     CIEmetaDigitalProduct_schema_04.json, embedded VERBATIM.
+     This block is the single source of truth for structural validation and for
+     the enum catalogues in the script below. It is a character-for-character
+     copy of ../../schema/CIEmetaDigitalProduct_schema_04.json (line endings
+     normalised to LF, since that file is stored CRLF and this one LF).
+     DO NOT EDIT HERE. Edit the schema file, then run:  python sync_schema.py
+     ========================================================================= -->
+<script type="application/json" id="cieSchemaSource">
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://doi.org/10.25039/CIE.SC.4taqevcd",
+	"title": "CIEmetaDigitalProduct",
+	"description": "Metadata schema for digital products published by the International Commission on Illumination (CIE), in particular data tables distributed as CSV alongside CIE publications. Based on the DataCite metadata kernel with CIE-specific additions. The accompanying description of the metadata model, including the obligation (mandatory / recommended / optional) of each property, is published at https://github.com/CIEmetaSchemas/CIEmetaDigitalProduct (v4/docs/README.md). To validate a metadata file against this schema, any JSON Schema draft-07 validator can be used, for example https://www.jsonschemavalidator.net/ .",
+	"$comment": "Based on the DataCite kernel-4.3 JSON schema:\nhttps://github.com/datacite/schema/blob/76de5e551d19e3e9b829af2f38ccc13e8c7677fe/source/json/kernel-4.3/datacite_4.3_schema.json\n\nChanges towards DataCite version 4.4:\n- field classificationCode added in the subjects field\n- address of metaschema has been changed\n- additional resourceTypeGeneral items\n- relatedItem added\n- only one identifier is allowed (as in the official schema), additional ones are introduced by \"alternateIdentifier\"\n- schemaType replaced by schemaName\n- relatedItem.title replaced by relatedItem.titles (array of string) to be compatible with the strict DataCite 4.4 XML definition\n\nCIE additions:\n- checksums (recommended)\n- datatableInfo (validation, dataQuality, extrapolationMethod, interpolationMethod)\n- schemaName (required)\n- schemaVersion (required)\n- schemaURL (required)\n- metadataRevision (optional): revision of the JSON metadata file itself (not the resource; see DataCite \"version\"). Increments only on metadata-content changes.\n\nVersion history:\n4.0 : new fields added in the column headers: wavelength_first, wavelength_last, wavelength_step\n4.1 : optional field metadataRevision added (revision of the JSON metadata file; backward-compatible, schemaVersion stays 4)\n4.1 : schema file corrections (editorial only; schemaVersion stays 4 and the schema DOI is unchanged). None of these can invalidate an existing metadata file - they only widen what is accepted:\n      - the file is now valid JSON. The descriptive header was previously written as // line comments inside the root object, which made the file unparsable by a strict JSON parser (and therefore unusable with the validators recommended above). That text is now carried in description and in this $comment.\n      - $id added.\n      - wavelength_first / wavelength_last / wavelength_step now reference definitions.wavelengthField, which accepts a number or one of the sentinel strings documented in v4/docs/README.md (CIE 2.4.5 - 2.4.7). Previously declared as plain numbers, which contradicted both the documentation and published metadata files for non-spectral data tables.\n      - \"ROR\" added to funderIdentifierType (GRID has been superseded by ROR).\n4.1 : validationType constrained to the value table already published in v4/docs/README.md (CIE 2.5): sumOfColumns, sampleRow, numberOfRows, numberOfColumns, :unap, other. It was the only one of the four README value tables not encoded as an enum here; the other three (interpolationMethod, extrapolationMethod, dataQuality) always were. Unlike the corrections above this one NARROWS what is accepted, so it is noted separately - but every value in every published CIE metadata file is already within the list. hashMethod is deliberately NOT constrained: README (CIE 1) gives md5 and sha256 as examples of a deliberately open set.",
+	"definitions": {
+		"nameType": {
+			"type": "string",
+			"enum": [
+				"Organizational",
+				"Personal"
+			]
+		},
+		"nameIdentifiers": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"nameIdentifier": {
+						"type": "string"
+					},
+					"nameIdentifierScheme": {
+						"type": "string"
+					},
+					"schemeURI": {
+						"type": "string",
+						"format": "uri"
+					}
+				},
+				"required": [
+					"nameIdentifier",
+					"nameIdentifierScheme"
+				]
+			},
+			"uniqueItems": true
+		},
+		"affiliations": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"affiliation": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"affiliation"
+				]
+			},
+			"uniqueItems": true
+		},
+		"titleType": {
+			"type": "string",
+			"enum": [
+				"AlternativeTitle",
+				"Subtitle",
+				"TranslatedTitle",
+				"Other"
+			]
+		},
+		"contributorType": {
+			"type": "string",
+			"enum": [
+				"ContactPerson",
+				"DataCollector",
+				"DataCurator",
+				"DataManager",
+				"Distributor",
+				"Editor",
+				"HostingInstitution",
+				"Producer",
+				"ProjectLeader",
+				"ProjectManager",
+				"ProjectMember",
+				"RegistrationAgency",
+				"RegistrationAuthority",
+				"RelatedPerson",
+				"Researcher",
+				"ResearchGroup",
+				"RightsHolder",
+				"Sponsor",
+				"Supervisor",
+				"WorkPackageLeader",
+				"Other"
+			]
+		},
+		"date": {
+			"type": "string",
+			"anyOf": [
+				{
+					"format": "year"
+				},
+				{
+					"format": "yearmonth"
+				},
+				{
+					"format": "date"
+				},
+				{
+					"format": "datetime"
+				},
+				{
+					"format": "year-range"
+				},
+				{
+					"format": "yearmonth-range"
+				},
+				{
+					"format": "date-range"
+				},
+				{
+					"format": "datetime-range"
+				}
+			]
+		},
+		"dateType": {
+			"type": "string",
+			"enum": [
+				"Accepted",
+				"Available",
+				"Copyrighted",
+				"Collected",
+				"Created",
+				"Issued",
+				"Submitted",
+				"Updated",
+				"Valid",
+				"Withdrawn",
+				"Other"
+			]
+		},
+		"interpolationMethod": {
+			"type": "string",
+			"enum": [
+				"",
+				":unal",
+				":unap",
+				":unas",
+				"nearest",
+				"linear",
+				"cubic-spline",
+				"cubic-Hermite",
+				"Sprague",
+				"Lagrange",
+				"useRelatedDataset",
+				"useRelatedFormula",
+				"other"
+			]
+		},
+		"extrapolationMethod": {
+			"type": "string",
+			"enum": [
+				"",
+				":unal",
+				":unap",
+				":unas",
+				"nearest",
+				"zero",
+				"useRelatedDataset",
+				"useRelatedFormula",
+				"other"
+			]
+		},
+		"dataQuality": {
+			"type": "string",
+			"enum": [
+				"",
+				":unap",
+				":unas",
+				"nominal",
+				"fromFormula",
+				"approximated",
+				"other"
+			]
+		},
+		"resourceTypeGeneral": {
+			"type": "string",
+			"enum": [
+				"Audiovisual",
+				"Book",
+				"Bookchapter",
+				"Collection",
+				"ComputationalNotebook",
+				"ConferencePaper",
+				"ConferenceProceeding",
+				"DataPaper",
+				"Dataset",
+				"Dissertation",
+				"Event",
+				"Image",
+				"InteractiveResource",
+				"Journal",
+				"JournalArticle",
+				"Model",
+				"OutputManagementPlan",
+				"PeerReview",
+				"PhysicalObject",
+				"Preprint",
+				"Report",
+				"Service",
+				"Software",
+				"Sound",
+				"Standard",
+				"Text",
+				"Workflow",
+				"Other"
+			]
+		},
+		"relatedIdentifierType": {
+			"type": "string",
+			"enum": [
+				"ARK",
+				"arXiv",
+				"bibcode",
+				"DOI",
+				"EAN13",
+				"EISSN",
+				"Handle",
+				"IGSN",
+				"ISBN",
+				"ISSN",
+				"ISTC",
+				"LISSN",
+				"LSID",
+				"PMID",
+				"PURL",
+				"UPC",
+				"URL",
+				"URN",
+				"w3id"
+			]
+		},
+		"relationType": {
+			"type": "string",
+			"enum": [
+				"IsCitedBy",
+				"Cites",
+				"IsSupplementTo",
+				"IsSupplementedBy",
+				"IsContinuedBy",
+				"Continues",
+				"IsDescribedBy",
+				"Describes",
+				"HasMetadata",
+				"IsMetadataFor",
+				"HasVersion",
+				"IsVersionOf",
+				"IsNewVersionOf",
+				"IsPreviousVersionOf",
+				"IsPartOf",
+				"HasPart",
+				"IsPublishedIn",
+				"IsReferencedBy",
+				"References",
+				"IsDocumentedBy",
+				"Documents",
+				"IsCompiledBy",
+				"Compiles",
+				"IsVariantFormOf",
+				"IsOriginalFormOf",
+				"IsIdenticalTo",
+				"IsReviewedBy",
+				"Reviews",
+				"IsDerivedFrom",
+				"IsSourceOf",
+				"IsRequiredBy",
+				"Requires",
+				"IsObsoletedBy",
+				"Obsoletes"
+			]
+		},
+		"descriptionType": {
+			"type": "string",
+			"enum": [
+				"Abstract",
+				"Methods",
+				"SeriesInformation",
+				"TableOfContents",
+				"TechnicalInfo",
+				"Other"
+			]
+		},
+		"geoLocationPoint": {
+			"type": "object",
+			"properties": {
+				"pointLongitude": {
+					"$ref": "#/definitions/longitude"
+				},
+				"pointLatitude": {
+					"$ref": "#/definitions/latitude"
+				}
+			},
+			"required": [
+				"pointLongitude",
+				"pointLatitude"
+			]
+		},
+		"longitude": {
+			"type": "number",
+			"minimum": -180,
+			"maximum": 180
+		},
+		"latitude": {
+			"type": "number",
+			"minimum": -90,
+			"maximum": 90
+		},
+		"funderIdentifierType": {
+			"type": "string",
+			"enum": [
+				"ISNI",
+				"GRID",
+				"Crossref Funder ID",
+				"ROR",
+				"Other"
+			]
+		},
+		"validationType": {
+			"$comment": "The kind of check a validations[] entry records. Values as documented in v4/docs/README.md (CIE 2.5).",
+			"type": "string",
+			"enum": [
+				"sumOfColumns",
+				"sampleRow",
+				"numberOfRows",
+				"numberOfColumns",
+				":unap",
+				"other"
+			]
+		},
+		"wavelengthField": {
+			"$comment": "A wavelength bound or step in nm. For non-spectral data tables, and for a wavelength_step that is not constant over the full range, the sentinel strings documented in v4/docs/README.md (CIE 2.4.5 - 2.4.7) are used instead of a number.",
+			"anyOf": [
+				{
+					"type": "number"
+				},
+				{
+					"type": "string",
+					"enum": [
+						":unap",
+						":null",
+						":unal",
+						":unas"
+					]
+				}
+			]
+		}
+	},
+	"type": "object",
+	"properties": {
+		"types": {
+			"type": "object",
+			"properties": {
+				"resourceType": {
+					"type": "string"
+				},
+				"resourceTypeGeneral": {
+					"$ref": "#/definitions/resourceTypeGeneral"
+				}
+			},
+			"required": [
+				"resourceType",
+				"resourceTypeGeneral"
+			]
+		},
+		"identifier": {
+			"type": "object",
+			"properties": {
+				"identifier": {
+					"type": "string"
+				},
+				"identifierType": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"identifier",
+				"identifierType"
+			]
+		},
+		"creators": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"nameType": {
+						"$ref": "#/definitions/nameType"
+					},
+					"givenName": {
+						"type": "string"
+					},
+					"familyName": {
+						"type": "string"
+					},
+					"nameIdentifiers": {
+						"$ref": "#/definitions/nameIdentifiers"
+					},
+					"affiliations": {
+						"$ref": "#/definitions/affiliations"
+					},
+					"lang": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"name"
+				]
+			},
+			"minItems": 1,
+			"uniqueItems": true
+		},
+		"titles": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"title": {
+						"type": "string"
+					},
+					"titleType": {
+						"$ref": "#/definitions/titleType"
+					},
+					"lang": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"title"
+				]
+			},
+			"minItems": 1,
+			"uniqueItems": true
+		},
+		"publisher": {
+			"type": "string"
+		},
+		"publicationYear": {
+			"type": "string",
+			"format": "year"
+		},
+		"subjects": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"subject": {
+						"type": "string"
+					},
+					"subjectScheme": {
+						"type": "string"
+					},
+					"schemeURI": {
+						"type": "string",
+						"format": "uri"
+					},
+					"valueURI": {
+						"type": "string",
+						"format": "uri"
+					},
+					"classificationCode": {
+						"type": "string"
+					},
+					"lang": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"subject"
+				]
+			},
+			"uniqueItems": true
+		},
+		"contributors": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"contributorType": {
+						"$ref": "#/definitions/contributorType"
+					},
+					"name": {
+						"type": "string"
+					},
+					"nameType": {
+						"$ref": "#/definitions/nameType"
+					},
+					"givenName": {
+						"type": "string"
+					},
+					"familyName": {
+						"type": "string"
+					},
+					"nameIdentifiers": {
+						"$ref": "#/definitions/nameIdentifiers"
+					},
+					"affiliations": {
+						"$ref": "#/definitions/affiliations"
+					},
+					"lang": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"contributorType",
+					"name"
+				]
+			},
+			"uniqueItems": true
+		},
+		"dates": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"date": {
+						"$ref": "#/definitions/date"
+					},
+					"dateType": {
+						"$ref": "#/definitions/dateType"
+					},
+					"dateInformation": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"date",
+					"dateType"
+				]
+			},
+			"uniqueItems": true
+		},
+		"language": {
+			"type": "string",
+			"$comment": "Primary language of the resource. Allowed values are taken from  IETF BCP 47, ISO 639-1 language codes."
+		},
+		"alternateIdentifiers": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"alternateIdentifier": {
+						"type": "string"
+					},
+					"alternateIdentifierType": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"alternateIdentifier",
+					"alternateIdentifierType"
+				]
+			},
+			"uniqueItems": true
+		},
+		"relatedIdentifiers": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"relatedIdentifier": {
+						"type": "string"
+					},
+					"relatedIdentifierType": {
+						"$ref": "#/definitions/relatedIdentifierType"
+					},
+					"relationType": {
+						"$ref": "#/definitions/relationType"
+					},
+					"relatedMetadataScheme": {
+						"type": "string"
+					},
+					"schemeURI": {
+						"type": "string",
+						"format": "uri"
+					},
+					"schemeType": {
+						"type": "string"
+					},
+					"resourceTypeGeneral": {
+						"$ref": "#/definitions/resourceTypeGeneral"
+					}
+				},
+				"required": [
+					"relatedIdentifier",
+					"relatedIdentifierType",
+					"relationType"
+				],
+				"if": {
+					"properties": {
+						"relationType": {
+							"enum": [
+								"HasMetadata",
+								"IsMetadataFor"
+							]
+						}
+					}
+				},
+				"else": {
+					"$comment": "these properties may only be used with relation types HasMetadata/IsMetadataFor",
+					"properties": {
+						"relatedMetadataScheme": false,
+						"schemeURI": false,
+						"schemeType": false
+					}
+				}
+			},
+			"uniqueItems": true
+		},
+		"sizes": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			},
+			"uniqueItems": true
+		},
+		"formats": {
+			"type": "array",
+			"items": {
+				"type": "string"
+			},
+			"uniqueItems": true
+		},
+		"version": {
+			"type": "string"
+		},
+		"rightsList": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"rights": {
+						"type": "string"
+					},
+					"rightsURI": {
+						"type": "string",
+						"format": "uri"
+					},
+					"rightsIdentifier": {
+						"type": "string"
+					},
+					"rightsIdentifierScheme": {
+						"type": "string"
+					},
+					"schemeURI": {
+						"type": "string",
+						"format": "uri"
+					},
+					"lang": {
+						"type": "string"
+					}
+				}
+			},
+			"uniqueItems": true
+		},
+		"descriptions": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"description": {
+						"type": "string"
+					},
+					"descriptionType": {
+						"$ref": "#/definitions/descriptionType"
+					},
+					"lang": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"description",
+					"descriptionType"
+				]
+			},
+			"uniqueItems": true
+		},
+		"geoLocations": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"geoLocationPlace": {
+						"type": "string"
+					},
+					"geoLocationPoint": {
+						"$ref": "#/definitions/geoLocationPoint"
+					},
+					"geoLocationBox": {
+						"type": "object",
+						"properties": {
+							"westBoundLongitude": {
+								"$ref": "#/definitions/longitude"
+							},
+							"eastBoundLongitude": {
+								"$ref": "#/definitions/longitude"
+							},
+							"southBoundLatitude": {
+								"$ref": "#/definitions/latitude"
+							},
+							"northBoundLatitude": {
+								"$ref": "#/definitions/latitude"
+							}
+						},
+						"required": [
+							"westBoundLongitude",
+							"eastBoundLongitude",
+							"southBoundLatitude",
+							"northBoundLatitude"
+						]
+					},
+					"geoLocationPolygons": {
+						"type": "array",
+						"items": {
+							"type": "object",
+							"properties": {
+								"polygonPoints": {
+									"type": "array",
+									"items": {
+										"$ref": "#/definitions/geoLocationPoint"
+									},
+									"minItems": 4
+								},
+								"inPolygonPoint": {
+									"$ref": "#/definitions/geoLocationPoint"
+								}
+							},
+							"required": [
+								"polygonPoints"
+							]
+						},
+						"uniqueItems": true
+					}
+				}
+			},
+			"uniqueItems": true
+		},
+		"fundingReferences": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"funderName": {
+						"type": "string"
+					},
+					"funderIdentifier": {
+						"type": "string"
+					},
+					"funderIdentifierType": {
+						"$ref": "#/definitions/funderIdentifierType"
+					},
+					"awardNumber": {
+						"type": "string"
+					},
+					"awardURI": {
+						"type": "string",
+						"format": "uri"
+					},
+					"awardTitle": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"funderName"
+				]
+			},
+			"uniqueItems": true
+		},
+		"relatedItems": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"relatedItemType": {
+						"$ref": "#/definitions/resourceTypeGeneral"
+					},
+					"relationType": {
+						"$ref": "#/definitions/relationType"
+					},
+					"relatedItemIdentifier": {
+						"type": "string"
+					},
+					"relatedItemIdentifierType": {
+						"$ref": "#/definitions/relatedIdentifierType"
+					},
+					"relatedMetadataScheme": {
+						"type": "string"
+					},
+					"schemeURI": {
+						"type": "string",
+						"format": "uri"
+					},
+					"schemeType": {
+						"type": "string"
+					},
+					"titles": {
+						"type": "array",
+                          			"items" : {
+                            				"type": "string"
+            						}
+					},
+					"resourceTypeGeneral": {
+						"$ref": "#/definitions/resourceTypeGeneral"
+					}
+				},
+				"required": [
+					"relatedItemType",
+					"relationType"
+				],
+				"if": {
+					"properties": {
+						"relationType": {
+							"enum": [
+								"HasMetadata",
+								"IsMetadataFor"
+							]
+						}
+					}
+				},
+				"else": {
+					"$comment": "these properties may only be used with relation types HasMetadata/IsMetadataFor",
+					"properties": {
+						"relatedMetadataScheme": false,
+						"schemeURI": false,
+						"schemeType": false
+					}
+				}
+			},
+			"uniqueItems": true
+		},
+		"schemaName": {
+			"type": "string",
+			"const": "CIEmetaDigitalProduct"
+		},
+		"schemaVersion": {
+			"type": "number",
+			"const": 4
+		},
+		"schemaURL": {
+			"type": "string",
+			"const": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+		},
+		"metadataRevision": {
+			"type": "integer",
+			"minimum": 1,
+			"$comment": "CIE: revision number of THIS JSON metadata file. Starts at 1 and increments only when the metadata content changes; it is NOT bumped by envelope-level changes such as the DOI landing-page URL or the CIE division. Distinct from the DataCite 'version' field, which versions the described resource. Optional for backward compatibility."
+		},
+		"datatableInfo": {
+			"type": "object",
+			"properties": {
+				"interpolationMethod": {
+					"$ref": "#/definitions/interpolationMethod"
+				},
+				"extrapolationMethod": {
+					"$ref": "#/definitions/extrapolationMethod"
+				},
+				"dataQuality": {
+					"$ref": "#/definitions/dataQuality"
+				},
+				"validations": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"validationType": {
+								"$ref": "#/definitions/validationType"
+							},
+							"validationAlgorithm": {
+								"type": "string"
+							},
+							"validationParameter": {
+								"type": "string"
+							},
+							"validationValue": {
+								"type": "string"
+							}
+						}
+					},
+					"uniqueItems": true
+				},
+				"columnHeaders": {
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"title": {
+								"type": "string"
+							},
+							"unit": {
+								"type": "string"
+							},
+							"quantity": {
+								"type": "string"
+							},
+							"description": {
+								"type": "string"
+							},
+							"wavelength_first": {
+								"$ref": "#/definitions/wavelengthField"
+							},
+							"wavelength_last": {
+								"$ref": "#/definitions/wavelengthField"
+							},
+							"wavelength_step": {
+								"$ref": "#/definitions/wavelengthField"
+							}
+						}
+					},
+					"uniqueItems": true
+				}
+			}
+		},
+		"checksums": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"hashMethod": {
+						"type": "string"
+					},
+					"checksum": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"hashMethod",
+					"checksum"
+				]
+			},
+			"uniqueItems": true
+		}
+	},
+	"required": [
+		"identifier",
+		"creators",
+		"titles",
+		"publisher",
+		"publicationYear",
+		"types",
+		"schemaName",
+		"schemaVersion",
+		"schemaURL"
+	]
+}
+</script>
+
 <script>
 "use strict";
 /* ============================================================================
@@ -221,7 +1178,7 @@
 
 /* ---------- constants ---------- */
 const APP = {
-  VERSION: "1.8.0",
+  VERSION: "1.9.0",
   DB_SCHEMA_NAME: "CIEmetaDB",
   DB_SCHEMA_VERSION: 1,
   DOI_PREFIX: "10.25039/CIE.DS.",
@@ -272,20 +1229,37 @@ const DEFAULT_VALUES = {
   crInstitutionDepartment: "CIE Central Bureau"
 };
 
-/* enum catalogues (from CIEmetaDigitalProduct_schema_04.json) */
-const ENUMS = {
-  nameType:["Organizational","Personal"],
-  titleType:["","AlternativeTitle","Subtitle","TranslatedTitle","Other"],
-  resourceTypeGeneral:["Audiovisual","Book","Bookchapter","Collection","ComputationalNotebook","ConferencePaper","ConferenceProceeding","DataPaper","Dataset","Dissertation","Event","Image","InteractiveResource","Journal","JournalArticle","Model","OutputManagementPlan","PeerReview","PhysicalObject","Preprint","Report","Service","Software","Sound","Standard","Text","Workflow","Other"],
-  relatedIdentifierType:["ARK","arXiv","bibcode","DOI","EAN13","EISSN","Handle","IGSN","ISBN","ISSN","ISTC","LISSN","LSID","PMID","PURL","UPC","URL","URN","w3id"],
-  relationType:["IsCitedBy","Cites","IsSupplementTo","IsSupplementedBy","IsContinuedBy","Continues","IsDescribedBy","Describes","HasMetadata","IsMetadataFor","HasVersion","IsVersionOf","IsNewVersionOf","IsPreviousVersionOf","IsPartOf","HasPart","IsPublishedIn","IsReferencedBy","References","IsDocumentedBy","Documents","IsCompiledBy","Compiles","IsVariantFormOf","IsOriginalFormOf","IsIdenticalTo","IsReviewedBy","Reviews","IsDerivedFrom","IsSourceOf","IsRequiredBy","Requires","IsObsoletedBy","Obsoletes"],
-  descriptionType:["Abstract","Methods","SeriesInformation","TableOfContents","TechnicalInfo","Other"],
-  interpolationMethod:["",":unal",":unap",":unas","nearest","linear","cubic-spline","cubic-Hermite","Sprague","Lagrange","useRelatedDataset","useRelatedFormula","other"],
-  extrapolationMethod:["",":unal",":unap",":unas","nearest","zero","useRelatedDataset","useRelatedFormula","other"],
-  dataQuality:["",":unap",":unas","nominal","fromFormula","approximated","other"],
-  validationType:["sumOfColumns","sampleRow","numberOfRows","numberOfColumns",":unap","other"],
-  hashMethod:["md5","sha256"]
-};
+/* ----------------------------------------------------------------------------
+   The CIEmetaDigitalProduct schema.
+
+   Parsed from the <script type="application/json" id="cieSchemaSource"> block
+   above, which is a character-for-character copy of
+   ../../schema/CIEmetaDigitalProduct_schema_04.json (line endings aside).
+
+   That block is the SINGLE SOURCE OF TRUTH: the schema is no longer restated in
+   JavaScript here, so the two cannot drift apart. To change the schema, edit the
+   file and run `python sync_schema.py` (or `--check` in CI).
+
+   The file cannot be fetched at runtime: this tool is designed to run from
+   file://, where fetch() is blocked by CORS. Embedding is what makes a single
+   definition possible while keeping the tool a self-contained offline file.
+   --------------------------------------------------------------------------*/
+const CIE_SCHEMA = JSON.parse(document.getElementById("cieSchemaSource").textContent);
+
+/* Enum catalogues backing the form dropdowns, derived from the schema so they
+   cannot fall out of step with it.
+
+   `hashMethod` is the one exception and is deliberately not an enum in the
+   schema: v4/docs/README.md (CIE 1) presents md5 and sha256 as examples ("there
+   are different standards, e.g. ..."), not as a closed list, so the field stays
+   a free string and these two are offered only as UI suggestions. */
+const ENUMS = (() => {
+  const e = {};
+  for(const [k,d] of Object.entries(CIE_SCHEMA.definitions||{}))
+    if(Array.isArray(d.enum)) e[k] = d.enum.slice();
+  e.hashMethod = ["md5","sha256"];   // suggestions, not a constraint
+  return e;
+})();
 
 /* fields shown in the "Edit defaults" dialog (order = display order) */
 const DEFAULT_FIELDS = [
@@ -524,6 +1498,15 @@ function reconstruct(history, rev){
 
 /* ============================================================================
    Minimal draft-07 validator for the embedded CIE schema
+
+   Supports the keywords the schema actually relies on for structure:
+     $ref, type, enum, const, required, properties, items, anyOf,
+     minItems, uniqueItems, minimum, maximum
+   Deliberately ignored (annotations, or constraints this tool does not police):
+     title, description, $comment, $id, $schema, format, if/then/else
+   Ignoring a keyword only ever makes validation more permissive, never wrong:
+   a payload this validator accepts may still be rejected by a full draft-07
+   validator, so the schema file remains the authority.
    ==========================================================================*/
 function validate(payload, schema){
   const root=schema;
@@ -559,6 +1542,10 @@ function validate(payload, schema){
         return errs;
       }
     }
+    if(typeof v==="number"){
+      if(sch.minimum!=null && v<sch.minimum) errs.push(`${path||"(root)"}: must be >= ${sch.minimum}`);
+      if(sch.maximum!=null && v>sch.maximum) errs.push(`${path||"(root)"}: must be <= ${sch.maximum}`);
+    }
     if(Array.isArray(v)){
       if(sch.minItems!=null && v.length<sch.minItems) errs.push(`${path}: needs at least ${sch.minItems} item(s)`);
       if(sch.uniqueItems){
@@ -574,55 +1561,6 @@ function validate(payload, schema){
     return errs;
   }
   return chk(payload, root, "");
-}
-
-/* embedded CIEmetaDigitalProduct schema (structural subset for validation) */
-const CIE_SCHEMA = buildCieSchema();
-function buildCieSchema(){
-  const D=ENUMS;
-  const strEnum=arr=>({type:"string",enum:arr});
-  // mirrors definitions.wavelengthField in CIEmetaDigitalProduct_schema_04.json: a number,
-  // or one of the sentinel strings the CIE README allows for non-spectral tables
-  const wlField={anyOf:[{type:"number"},{type:"string",enum:[":unap",":null",":unal",":unas"]}]};
-  const nameIds={type:"array",items:{type:"object",properties:{nameIdentifier:{type:"string"},nameIdentifierScheme:{type:"string"},schemeURI:{type:"string"}},required:["nameIdentifier","nameIdentifierScheme"]}};
-  const affils={type:"array",items:{type:"object",properties:{affiliation:{type:"string"}},required:["affiliation"]}};
-  const agent={type:"object",properties:{name:{type:"string"},nameType:strEnum(D.nameType),givenName:{type:"string"},familyName:{type:"string"},nameIdentifiers:nameIds,affiliations:affils,lang:{type:"string"}},required:["name"]};
-  return {
-    type:"object",
-    properties:{
-      types:{type:"object",properties:{resourceType:{type:"string"},resourceTypeGeneral:strEnum(D.resourceTypeGeneral)},required:["resourceType","resourceTypeGeneral"]},
-      identifier:{type:"object",properties:{identifier:{type:"string"},identifierType:{type:"string"}},required:["identifier","identifierType"]},
-      creators:{type:"array",minItems:1,items:agent},
-      titles:{type:"array",minItems:1,items:{type:"object",properties:{title:{type:"string"},titleType:strEnum(D.titleType),lang:{type:"string"}},required:["title"]}},
-      publisher:{type:"string"},
-      publicationYear:{type:"string"},
-      subjects:{type:"array",items:{type:"object",properties:{subject:{type:"string"},subjectScheme:{type:"string"},schemeURI:{type:"string"},valueURI:{type:"string"},classificationCode:{type:"string"},lang:{type:"string"}},required:["subject"]}},
-      contributors:{type:"array",items:Object.assign({},agent)},
-      dates:{type:"array",items:{type:"object",properties:{date:{type:"string"},dateType:{type:"string"},dateInformation:{type:"string"}},required:["date","dateType"]}},
-      language:{type:"string"},
-      alternateIdentifiers:{type:"array",items:{type:"object",properties:{alternateIdentifier:{type:"string"},alternateIdentifierType:{type:"string"}},required:["alternateIdentifier","alternateIdentifierType"]}},
-      relatedIdentifiers:{type:"array",items:{type:"object",properties:{relatedIdentifier:{type:"string"},relatedIdentifierType:strEnum(D.relatedIdentifierType),relationType:strEnum(D.relationType),resourceTypeGeneral:strEnum(D.resourceTypeGeneral)},required:["relatedIdentifier","relatedIdentifierType","relationType"]}},
-      sizes:{type:"array",items:{type:"string"}},
-      formats:{type:"array",items:{type:"string"}},
-      version:{type:"string"},
-      rightsList:{type:"array",items:{type:"object",properties:{rights:{type:"string"},rightsURI:{type:"string"},rightsIdentifier:{type:"string"},rightsIdentifierScheme:{type:"string"},schemeURI:{type:"string"},lang:{type:"string"}}}},
-      descriptions:{type:"array",items:{type:"object",properties:{description:{type:"string"},descriptionType:strEnum(D.descriptionType),lang:{type:"string"}},required:["description","descriptionType"]}},
-      relatedItems:{type:"array",items:{type:"object",properties:{relatedItemType:strEnum(D.resourceTypeGeneral),relationType:strEnum(D.relationType),relatedItemIdentifier:{type:"string"},relatedItemIdentifierType:strEnum(D.relatedIdentifierType),titles:{type:"array",items:{type:"string"}},resourceTypeGeneral:strEnum(D.resourceTypeGeneral)},required:["relatedItemType","relationType"]}},
-      schemaName:{type:"string",const:"CIEmetaDigitalProduct"},
-      schemaVersion:{type:"number",const:4},
-      schemaURL:{type:"string",const:APP.SCHEMA_URL},
-      metadataRevision:{type:"integer",minimum:1},
-      datatableInfo:{type:"object",properties:{
-        interpolationMethod:strEnum(D.interpolationMethod),
-        extrapolationMethod:strEnum(D.extrapolationMethod),
-        dataQuality:strEnum(D.dataQuality),
-        validations:{type:"array",items:{type:"object",properties:{validationType:{type:"string"},validationAlgorithm:{type:"string"},validationParameter:{type:"string"},validationValue:{type:"string"}}}},
-        columnHeaders:{type:"array",items:{type:"object",properties:{title:{type:"string"},unit:{type:"string"},quantity:{type:"string"},description:{type:"string"},wavelength_first:wlField,wavelength_last:wlField,wavelength_step:wlField}}}
-      }},
-      checksums:{type:"array",items:{type:"object",properties:{hashMethod:{type:"string"},checksum:{type:"string"}},required:["hashMethod","checksum"]}}
-    },
-    required:["identifier","creators","titles","publisher","publicationYear","types","schemaName","schemaVersion","schemaURL"]
-  };
 }
 
 /* ============================================================================
@@ -1210,10 +2148,18 @@ function inp(obj,key,opts){
   };
   return i;
 }
-function sel(obj,key,options){
+/* cfg.none: the property is optional and has no "" member in its schema enum,
+   so offer a "(none)" choice that REMOVES the key rather than writing "".
+   Writing "" would produce a payload the published schema rejects. */
+function sel(obj,key,options,cfg){
   const s=document.createElement("select");
-  s.innerHTML=options.map(o=>`<option value="${esc(o)}"${String(obj[key]||"")===o?" selected":""}>${esc(o===""?"(none)":o)}</option>`).join("");
-  s.onchange=()=>{ obj[key]=s.value; markDirty(); };
+  const offerNone=!!(cfg&&cfg.none)&&!options.includes("");
+  const opts=offerNone?["",...options]:options;
+  s.innerHTML=opts.map(o=>`<option value="${esc(o)}"${String(obj[key]||"")===o?" selected":""}>${esc(o===""?"(none)":o)}</option>`).join("");
+  s.onchange=()=>{
+    if(s.value===""&&offerNone) delete obj[key]; else obj[key]=s.value;
+    markDirty();
+  };
   return s;
 }
 function arraySection(parent, title, arr, itemRender, factory){
@@ -1330,7 +2276,7 @@ function renderForm(page,e){
   p.titles=p.titles||[];
   arraySection(page,"Titles",p.titles,(g,it)=>{
     g2(g,"Title",inp(it,"title"));
-    g2(g,"Title type",sel(it,"titleType",ENUMS.titleType));
+    g2(g,"Title type",sel(it,"titleType",ENUMS.titleType,{none:true}));
     g2(g,"Language",inp(it,"lang",{placeholder:"(optional)",deleteIfEmpty:true}));
   },()=>({title:""}));
 

@@ -20,10 +20,40 @@ including the link to the Crossref deposit validator.
 | `CIEmetaDB_schema.json` | JSON Schema (draft-07) for the metadatabase envelope — the **data model**. |
 | `CIEmetaDB_starter.json` | Starter database built from the 36 records in `../../examples/`. |
 | `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text). |
+| `sync_schema.py` | Keeps the schema embedded in `CIEmetaDB.html` identical to the schema file. See below. |
 | `README.md` | This file. |
 
 The metadata payload of each entry conforms to
 `../../schema/CIEmetaDigitalProduct_schema_04.json`.
+
+### The embedded schema
+
+`CIEmetaDB.html` contains a copy of `CIEmetaDigitalProduct_schema_04.json` in a
+`<script type="application/json" id="cieSchemaSource">` block near the top of the
+file. The application parses that block for both structural validation and the
+enum catalogues behind the form dropdowns, so **the schema is written down once**.
+
+It has to be embedded rather than loaded: the tool is designed to run from
+`file://`, where `fetch()` is blocked by CORS. Embedding keeps the tool a
+self-contained offline file while still having a single definition.
+
+**Never edit the embedded copy.** Edit `../../schema/CIEmetaDigitalProduct_schema_04.json`,
+then run:
+
+```
+python sync_schema.py            # re-embed the schema file into the HTML
+python sync_schema.py --check    # verify they match; exit 1 if they do not
+```
+
+Run `--check` in CI on any change to either file. The comparison is
+character-for-character (line endings excluded, since the two files differ there),
+so it cannot miss a divergence.
+
+This replaces an earlier arrangement in which the schema was restated by hand in
+JavaScript inside `CIEmetaDB.html`. The two definitions drifted apart twice — the
+tool accepted `wavelength_*` sentinel strings the published schema rejected, and
+offered a `titleType` value (`""`) the schema did not allow — and neither was
+caught by review.
 
 ## Running
 
