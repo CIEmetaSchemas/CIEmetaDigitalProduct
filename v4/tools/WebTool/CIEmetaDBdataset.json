@@ -4,7 +4,7 @@
   "dbId": "4cd12818-04ed-4654-b9f7-dbf622b029d1",
   "title": "CIE data-table metadatabase",
   "description": "Curated CIEmetaDigitalProduct metadata for the CIE published data tables (https://cie.co.at/data-tables).",
-  "baseHash": "6e76b4172f505c8585ba86de0bac44d8fe9987328800933e1a9f2f6b341fd267",
+  "baseHash": "024ab45d0e6cdda888c91dd755c8bf849b827eceed4c3b686933d76f9b27235e",
   "generatedAt": "2026-07-22T14:03:46.058Z",
   "lastModifiedDate": "2026-07-22T14:03:46.058Z",
   "lastModifiedBy": "peter.blattner@metas.ch",
@@ -62,7 +62,7 @@
     {
       "entryId": "dd141f8a-31b5-41cc-bf57-7eef4504829a",
       "rev": 2,
-      "contentHash": "64f60c28a898c7f96e03ed3329de496dfb0171a0f3b6856e7a77ff80aaf96648",
+      "contentHash": "2ed52df93e49e40fb631ebfda65bb5236c9c08dee81fed6b49d5d50b80f905a2",
       "status": "published",
       "domains": [
         "D1"
@@ -414,6 +414,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -422,7 +427,7 @@
           "by": "Peter Blattner",
           "date": "2024-09-20T16:00:00.000Z",
           "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
-          "baseHash": "d72f9f6338d60338ade0b9d22d3db2020737cb6707901c48cd0c70c491eb8e6b",
+          "baseHash": "a845c5c8584e5737a750b06f24e9944ff8f697fcf44288ce971557b84831636d",
           "patch": [
             {
               "op": "replace",
@@ -437,6 +442,11 @@
                   "checksum": "1f1413de6d58e533e8a3d26e4b7dc30f4cd6f67aebb7593fa3553394da939952"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -493,7 +503,7 @@
     {
       "entryId": "ef380a5a-482c-4318-84c9-902095e2d306",
       "rev": 2,
-      "contentHash": "4b23944ef15ed70d5edd03bbc9d3ab825474b7728fd5b41fe88d4a706c4166ea",
+      "contentHash": "fb046f4f8e6b69b50161e37bbb2d34162b9f5cebb36af84f00dfd7f4d19304b9",
       "status": "published",
       "domains": [
         "D2"
@@ -793,6 +803,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -801,7 +816,7 @@
           "by": "Peter Blattner",
           "date": "2024-09-20T16:00:00.000Z",
           "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
-          "baseHash": "93afeac26b6c667a12bdd2a25f48c3fb200fa866d961227b8c6430b8f3960c6f",
+          "baseHash": "191b94ad18f3e0aeb2cab88a393988663d632c17163f9b4a4e2040602374679a",
           "patch": [
             {
               "op": "replace",
@@ -816,6 +831,11 @@
                   "checksum": "23e07c6b8a2f5273f9e3abb3c64a374f3456eee0a70dd447fdb14c617f55224e"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -872,7 +892,7 @@
     {
       "entryId": "1668e71d-7473-44e5-9481-82b9d4dd2fee",
       "rev": 1,
-      "contentHash": "2618c071bd28098faccdd404d347aa8d9f68d9fe86d21fbf63fb6b9b581bd614",
+      "contentHash": "07283e3bd10e0c8069b497a1e9b41f3c92c2c258d0e26a11ae858df25f015ab4",
       "status": "published",
       "domains": [
         "D1",
@@ -1269,6 +1289,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -1325,7 +1350,7 @@
     {
       "entryId": "ef65a1df-6316-4826-9242-71ea739c0f48",
       "rev": 1,
-      "contentHash": "a70469b2387c32d5acff7b9b723f139603af7db5e20e21581aec793af743696e",
+      "contentHash": "8f34d40f16d8dfd2a7cfde9daccceeac19597aa4997f82783780d91ac9794425",
       "status": "published",
       "domains": [
         "D1",
@@ -1706,6 +1731,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -1762,7 +1792,7 @@
     {
       "entryId": "d7be1e15-2afd-4347-b9d9-7645fb317ec1",
       "rev": 2,
-      "contentHash": "58caaa271b89e268881e48455b5983eab6711ae9878710c64f4191102c314493",
+      "contentHash": "106377b5b07f5ae8ebee38624b1403c23560ab109ebf5c615ba1df7e290632e6",
       "status": "published",
       "domains": [
         "D1"
@@ -2114,6 +2144,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -2122,7 +2157,7 @@
           "by": "peter.blattner@metas.ch",
           "date": "2026-07-21T15:50:38.428Z",
           "comment": "sha256 error fixed",
-          "baseHash": "2ab27fe846e62e8417f717cfd98d3e74959d3c7418a224f719c60621b77bfc2f",
+          "baseHash": "a15cc9cd4ebfc4cf29a5fcd370ff2287a70d5b9f147eb753ed2e0a2aa98d1ef5",
           "patch": [
             {
               "op": "replace",
@@ -2137,6 +2172,11 @@
                   "checksum": "7485d416ac4d6c30269b4267d739aec208d9110a94711537b95c48716890e98c"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -2238,7 +2278,7 @@
     {
       "entryId": "9c52ccc2-5438-428a-ad9d-27efd4e9fa37",
       "rev": 1,
-      "contentHash": "257e6ac6ff1521a78350c5a209df1fc19a29b1a404c34a6748317f46820a4f4a",
+      "contentHash": "eaeaa49168aaf30fa39e09409bed58595bb3843ce7ad5386668a25c775bca177",
       "status": "published",
       "domains": [
         "D1"
@@ -2558,6 +2598,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -2614,7 +2659,7 @@
     {
       "entryId": "7d8e5446-fab6-4c64-8e3a-c01b5c93bef9",
       "rev": 2,
-      "contentHash": "c22ababe9427d818515c2409cba012b898a36cc9695a67cdf8e84bb0d53b1649",
+      "contentHash": "86bdc97d71478e67c8cc612473c8582f2ccc79843a0e13935272578553d0eec4",
       "status": "published",
       "domains": [
         "D1"
@@ -2934,6 +2979,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -2942,7 +2992,7 @@
           "by": "peter.blattner@metas.ch",
           "date": "2026-07-21T16:03:35.436Z",
           "comment": "sha256 fixed",
-          "baseHash": "6a7c0bf4b09ce32f7c2e820829b67d7dc28416a75041a97667139aa6c54a86ed",
+          "baseHash": "ace7008ffe861e7c9c609336020ffdaaa825af0dea7d32f8274d481c25b910bb",
           "patch": [
             {
               "op": "replace",
@@ -2957,6 +3007,11 @@
                   "checksum": "e2a07b2bbab0dc800b35d2b070e79b87674740bd8c4ceb53ae78c6053c0e2316"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -3058,7 +3113,7 @@
     {
       "entryId": "4d6fc561-cab2-458b-9d09-af87ee92faaa",
       "rev": 1,
-      "contentHash": "bc4e9d56099fa215a65489370d55e0321e1f9b6fcf9c58e32b5add71cc3959af",
+      "contentHash": "37c6f2da33a09453b4e11f477a99f026dec4a78506aafbf1274c0682cf7ffe0d",
       "status": "published",
       "domains": [
         "D1"
@@ -3410,6 +3465,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -3466,7 +3526,7 @@
     {
       "entryId": "3a2166a3-91ec-4b93-bd27-88d6ba1170d7",
       "rev": 1,
-      "contentHash": "636ae61477fbe7068c9e00829a2426538eeaff58c56a90f5dc84a0707cbc703a",
+      "contentHash": "fc6653574ea0d670524899180692dc54d4cc70836b79266f0f9ab1d1ecb927fc",
       "status": "published",
       "domains": [
         "D1"
@@ -3818,6 +3878,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -3874,7 +3939,7 @@
     {
       "entryId": "9afa2e4c-4812-45e2-b546-2b7d6ca39496",
       "rev": 2,
-      "contentHash": "4ceeba8498cefcbe1a369b09ba139c2e4e226238281e24f37bb3b705a59b1809",
+      "contentHash": "05da5b6f70be90ce6a9edb5ce58a719517f3b20c3ce15a2e9dd0b6623a8a2b05",
       "status": "published",
       "domains": [
         "D1"
@@ -4200,6 +4265,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -4208,7 +4278,7 @@
           "by": "Peter Blattner",
           "date": "2024-09-20T16:00:00.000Z",
           "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
-          "baseHash": "b8fb69af097128895b569365c61dfbcf99e33d8d77d3cdb420abb8458f042299",
+          "baseHash": "b7f1e062350d65d99f0efc8be735eff76017e3b87bb7d96e261d7427ac5f940c",
           "patch": [
             {
               "op": "replace",
@@ -4223,6 +4293,11 @@
                   "checksum": "51c53bf065345fc1fb9d50aff40fb0a2ce370bcf35121a3dc4bafc0888602f0b"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -4279,7 +4354,7 @@
     {
       "entryId": "02fa7b50-31e1-418a-b345-750f0af013ee",
       "rev": 1,
-      "contentHash": "7139d1e64fb4675806c6b44230c5fe40e8e129d8e24eef99e63b0477d1acf623",
+      "contentHash": "36f8547304c0d460ae1204cefbf42529e47e5db7323ba0f9bebbbf06a8e7ad48",
       "status": "published",
       "domains": [
         "D1"
@@ -4605,6 +4680,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -4661,7 +4741,7 @@
     {
       "entryId": "0f13447e-9229-4279-be5b-539910ef4bb7",
       "rev": 2,
-      "contentHash": "82054e066dba97502491eb130275ef2b8e6fc2f684fa6736e785328aa3450a86",
+      "contentHash": "524f44ffe5b1a85601a88f0b236c57417ccce65d4b26e795fc5a8e0bba643f15",
       "status": "published",
       "domains": [
         "D1"
@@ -4987,6 +5067,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -4995,7 +5080,7 @@
           "by": "Peter Blattner",
           "date": "2024-09-20T16:00:00.000Z",
           "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
-          "baseHash": "bcbc3d48d222b934c8dcddb2c00989055a9699499774ad18f4fbabf8dfc9d993",
+          "baseHash": "ded8303d8f6976d76491ab4c4b1c28dff1d989585e5a4e9ad42d63b2085192de",
           "patch": [
             {
               "op": "replace",
@@ -5010,6 +5095,11 @@
                   "checksum": "573a08831f2bcdf18a8e333490049e6d0fabaf1d1c0abbc2a49d6247a939b62d"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -5066,7 +5156,7 @@
     {
       "entryId": "71689b69-76d2-430b-afe6-fce220a9cf38",
       "rev": 2,
-      "contentHash": "73913237162df12dae612fc238a2cad96378b0f3739b9bfb537a73b4ffc65999",
+      "contentHash": "643678a7dbe91359c453eda9ed4961256db8a4d92df961e1eb3e8184ca12061e",
       "status": "published",
       "domains": [
         "D1"
@@ -5400,6 +5490,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -5408,7 +5503,7 @@
           "by": "peter.blattner@metas.ch",
           "date": "2026-07-21T16:11:01.495Z",
           "comment": "upper wvl limit fixed",
-          "baseHash": "aedcd38879a527a1480f89a3adcfef8d59640db5065f419b435edbfba88838b7",
+          "baseHash": "46604d7c7f94276bb8e907baebbfcab21179347abb0224c416e90e358ab00ae7",
           "patch": [
             {
               "op": "replace",
@@ -5435,6 +5530,11 @@
                   "unit": "dimensionless"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -5536,7 +5636,7 @@
     {
       "entryId": "09a4ebd0-cbc4-47aa-802f-f9998a82b765",
       "rev": 1,
-      "contentHash": "e4317f4c637626e2f9509f8cecf6f900e4330f97075e8a3bf24dbdb6c112c8e1",
+      "contentHash": "60bd4be25f6eabb5a616ca38bcfeccb80346874267254e0dbfc0ddbadc15ad8e",
       "status": "published",
       "domains": [
         "D1"
@@ -6340,6 +6440,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -6401,7 +6506,7 @@
     {
       "entryId": "60ae9dea-8473-4ee0-b2a6-fd8c9b01ca7d",
       "rev": 1,
-      "contentHash": "547318a9b1c89aa60b169d7127872f94a39f1c10a38818ac906c5d81dba94a6f",
+      "contentHash": "11130d51892add10ffa1ebd374b7b0ce37c8c38fae1f79727d679167555b2187",
       "status": "published",
       "domains": [
         "D1"
@@ -7205,6 +7310,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -7266,7 +7376,7 @@
     {
       "entryId": "7a4b58c2-3d2e-42f3-9203-c386f9be89cd",
       "rev": 2,
-      "contentHash": "1d42824a52a03a79651ead80c47ec270b7de160a12d477898d5b23d59b70c2b5",
+      "contentHash": "03f5070c8e22e2325dbfcd622f37958b006b5d5bcaf2c2e0237eefee7d4b3cf9",
       "status": "published",
       "domains": [
         "D1"
@@ -7666,6 +7776,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -7674,7 +7789,7 @@
           "by": "Peter Blattner",
           "date": "2024-09-20T16:00:00.000Z",
           "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
-          "baseHash": "32835d8c2ad0f2b7c241643e3fbe439d17de429222181b85b0ed9e4f8795e025",
+          "baseHash": "8e66acf58bc7ca8869060db0923412249c299915ba065586d6c151b92c7f7441",
           "patch": [
             {
               "op": "replace",
@@ -7689,6 +7804,11 @@
                   "checksum": "035e09d62b27f4b1e362ff1ba99a50235f0d7886c2781c50d49851b6e4bb4552"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -7745,7 +7865,7 @@
     {
       "entryId": "f4bb3fee-99e2-4d54-a315-31a5114f7ef1",
       "rev": 1,
-      "contentHash": "3e839cd423da1e6d1cdb7ad70f6b55f5eb324b7665136d8c509d6afa0eb0eca0",
+      "contentHash": "008a6f8185cbabe013b4524734b22e2113e5a1e59c2dc960a25153aa87f83834",
       "status": "published",
       "domains": [
         "D1"
@@ -8059,6 +8179,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -8115,7 +8240,7 @@
     {
       "entryId": "6c7d55ee-5743-4b92-9a21-4f7c034f6f85",
       "rev": 2,
-      "contentHash": "0e89da8d2be4abfc42e91b2705dffcda7a6eda36f29b09878f1b1d84542e634b",
+      "contentHash": "edc1b849c4f1bbd4df000d0364364dd7c8cdd83c253f85af290bd97cad77c4a2",
       "status": "published",
       "domains": [
         "D1"
@@ -8429,6 +8554,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -8437,7 +8567,7 @@
           "by": "Peter Blattner",
           "date": "2024-09-20T16:00:00.000Z",
           "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
-          "baseHash": "d127bf8c065fac792f6abf526b7f6ba639e251ae9712b5a881d1235959f4312a",
+          "baseHash": "32a07fa88750cac40a16fe27fec4675eb6fdfaa7ba72995a2099ef66c9e9587c",
           "patch": [
             {
               "op": "replace",
@@ -8452,6 +8582,11 @@
                   "checksum": "be1dc615b4b03e0b4b3e294660101526a30ed17dc800e85786c29759b3dcb7a6"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -8508,7 +8643,7 @@
     {
       "entryId": "f82d0656-040a-4318-b4e8-4101c9461ff7",
       "rev": 2,
-      "contentHash": "0f4bdf1905b537b340790b909563044621f83eedf1150f9f2183912f8814a058",
+      "contentHash": "1a959a8a1c0d72a4b0147507273041501d1dfed00f4e6e7c5a72f38264522dfe",
       "status": "published",
       "domains": [
         "D1"
@@ -8980,6 +9115,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -8988,7 +9128,7 @@
           "by": "Peter Blattner",
           "date": "2024-09-20T16:00:00.000Z",
           "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
-          "baseHash": "dd328822cf099402051502b17d8185cdb3e11a4844e28fbe730198485233378b",
+          "baseHash": "e6042591f67a37da87b7db8fe66eeca4f5cdb7b139b5671abe4297cdd3a8ef9b",
           "patch": [
             {
               "op": "replace",
@@ -9003,6 +9143,11 @@
                   "checksum": "6147313bd1ec570ef308df222e1fe1e58115fde1ad0a7d4ba91fb9dcb776b267"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -9059,7 +9204,7 @@
     {
       "entryId": "e49b6446-2747-4485-8a96-b34c74c3c0e9",
       "rev": 1,
-      "contentHash": "94cc36a8b9297e007dc3ae0924919fbe9bb616e56a04219d7b5140704ec600bf",
+      "contentHash": "f61cc194ba6b7d73721926f2db83403779fbb0348543ec4478c2ca77e1753f7e",
       "status": "published",
       "domains": [
         "D1"
@@ -9531,6 +9676,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -9587,7 +9737,7 @@
     {
       "entryId": "e350a9a4-c885-40b5-835e-dfea29a33a7c",
       "rev": 2,
-      "contentHash": "e48f67f52158ee072b7d953cf8fc47d412ebf5e14cb8242d35300aab1a4be2c9",
+      "contentHash": "0f1fbf0c6524ec49f44cb879c06ae715d381ce99aab9d13e41124b377c8dc710",
       "status": "published",
       "domains": [
         "D1"
@@ -9933,6 +10083,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -9941,7 +10096,7 @@
           "by": "peter.blattner@metas.ch",
           "date": "2026-07-21T16:02:22.576Z",
           "comment": "checksum fixed",
-          "baseHash": "55535a7e7f87bc0ebdff08d4b7577d6dfabff531a3b8209578a054e16a83aea5",
+          "baseHash": "5fcc1f4a16e84e43d768c477651ffabfe3739bcaaade1fb0def72a5972ca2de1",
           "patch": [
             {
               "op": "replace",
@@ -9956,6 +10111,11 @@
                   "checksum": "bd64f1f688a4b319c6d3fa6b31770a32eaaaaea0eed532befd0424f96304db18"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -10057,7 +10217,7 @@
     {
       "entryId": "e5ade036-e6ba-47cc-bf31-fb366369d050",
       "rev": 1,
-      "contentHash": "0dbc80d180f10fef3f5866823fcf13296cbacfc1e7a300cb877730b69cdba423",
+      "contentHash": "d9737466ed4d982d7da0764c525e155a6f5a78175f5c2fdcbcd13ca69119e771",
       "status": "published",
       "domains": [
         "D1"
@@ -10403,6 +10563,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -10459,7 +10624,7 @@
     {
       "entryId": "9e3359aa-92cd-4843-8bc6-1fce79d241a5",
       "rev": 1,
-      "contentHash": "232231e62f26afb934931abb244b63779d7c976e2ccdde53f559bc13fa31b1f7",
+      "contentHash": "a304b82d1754d8e2b030c0d1bfefedcf644d0418228c29222dfe2e8c8dc7ac1e",
       "status": "published",
       "domains": [
         "D2"
@@ -10783,6 +10948,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -10874,7 +11044,7 @@
     {
       "entryId": "b97812bb-e5d7-4ce7-9f21-4308326929a6",
       "rev": 2,
-      "contentHash": "14a239d887619d34068f7d79288f2c13ed5c1e2fde475841320495d15f601e91",
+      "contentHash": "4b2f9a3c4c0412cf1406c7fc33222b36ff07549b1a14002e66216bffc978042e",
       "status": "published",
       "domains": [
         "D2"
@@ -11194,6 +11364,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -11202,7 +11377,7 @@
           "by": "peter.blattner@metas.ch",
           "date": "2026-07-21T16:06:48.122Z",
           "comment": "sha256 fixed",
-          "baseHash": "c71088c901772d50b11a30e79af441133febca96b051caef9db650c56bc5ed2d",
+          "baseHash": "78526fd55504b426b6f7b38b53877d20054af5bc10ec45722e3a3177b4487a87",
           "patch": [
             {
               "op": "replace",
@@ -11217,6 +11392,11 @@
                   "checksum": "e67e0c48406bdb6cef7ce03c42bd66f9dfc8601fb0a60837f8971973d4b960c9"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -11318,7 +11498,7 @@
     {
       "entryId": "85a2057c-dce0-4232-82f4-1d2539e8664c",
       "rev": 2,
-      "contentHash": "8ab9efe671b9721487c3b68f45e15ce3bb7c00269917a3e8a2b0e4e35046bb11",
+      "contentHash": "9c575431de87832db9ba6c8aeb0cc59b65ae7b45fb6caae6b31e90dd2683eb65",
       "status": "published",
       "domains": [
         "D2"
@@ -11638,6 +11818,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -11646,7 +11831,7 @@
           "by": "peter.blattner@metas.ch",
           "date": "2026-07-21T16:07:38.987Z",
           "comment": "sha256 fixed",
-          "baseHash": "14674732405008ceefe5af384b8cbc40e031123707d64e8d6ea82824f484b7dc",
+          "baseHash": "bd2c77e8adaaeb4023d7a14868b73e80c0af67360db3755acd0d5666532a0e1e",
           "patch": [
             {
               "op": "replace",
@@ -11661,6 +11846,11 @@
                   "checksum": "fa643111e81c16661cb7c2d30b9dca6d71ef1c3a4b602a82110a1e3f4aa1f8cd"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -11762,7 +11952,7 @@
     {
       "entryId": "eed5ac4a-ebef-45a2-bcf8-1d2e7ba9511a",
       "rev": 1,
-      "contentHash": "cf6792a47fb8fbb9ab5e18d3062e8650eb189ceb85484c2582fd5fb66bccfe51",
+      "contentHash": "4060b4d6ac60e7565c6d6d5ab876f89cdbe216aef23d3589ab98c13ffaf0ec5c",
       "status": "published",
       "domains": [
         "D1",
@@ -12121,6 +12311,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -12177,7 +12372,7 @@
     {
       "entryId": "48b6aefd-ecac-45d9-9f8f-b78bcc063006",
       "rev": 1,
-      "contentHash": "4ff5d79a96f591679e7ca5d01e8eb03b1b35354d8ed242d90dcefc8744964506",
+      "contentHash": "2418a62bb430c2565e31afeb876d60c3878426e1272323d55d237cfd31c1218f",
       "status": "published",
       "domains": [
         "D2"
@@ -12501,6 +12696,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -12557,7 +12757,7 @@
     {
       "entryId": "91b5c255-bee7-4824-8ba5-bde671673855",
       "rev": 2,
-      "contentHash": "fc8af48106bbb8c62ca7247a20a445aa690cf04046c7abd3c7d767710f9025da",
+      "contentHash": "cf9716527d561130015d50b0a6d782d367c28a5fa54e133d72510318c8ba6941",
       "status": "published",
       "domains": [
         "D1"
@@ -12915,6 +13115,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -12923,7 +13128,7 @@
           "by": "peter.blattner@metas.ch",
           "date": "2026-07-21T16:08:40.500Z",
           "comment": "sha256 fixed",
-          "baseHash": "a47a942a4620705701fef73e4a205d6472e5992a9f0a91402c318d531be0711e",
+          "baseHash": "b897a0977ec9df55a8e5c869235f770c09f40de3849b39505924bfa5b1bd2bd6",
           "patch": [
             {
               "op": "replace",
@@ -12938,6 +13143,11 @@
                   "checksum": "570a53ce67409cd698530acf9dc14bb6aa91f51b94dd9544e8aaf224895c141b"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -13039,7 +13249,7 @@
     {
       "entryId": "2aae303c-2e93-4964-a817-487e448ac682",
       "rev": 2,
-      "contentHash": "bc21125470e3df266344f4c867a1ad2c8682b3c1a6c235202fefef6d97056437",
+      "contentHash": "cd44c34bc34894e1bfefa571d0dc267878ad2463ed30d450a32c182ff026ee66",
       "status": "published",
       "domains": [
         "D1"
@@ -13593,6 +13803,11 @@
                 "resourceType": "dataTable",
                 "resourceTypeGeneral": "Dataset"
               }
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -13601,7 +13816,7 @@
           "by": "peter.blattner@metas.ch",
           "date": "2026-07-21T16:12:41.330Z",
           "comment": "sample row corrected (trailing 0)",
-          "baseHash": "4c156ea2c8f790835eabbf93ba72c8465f81dfa42fddf29b76774eccdea140f0",
+          "baseHash": "fe5108357577dc888c6c963be57580d33c98725768800a229380a43c038a4115",
           "patch": [
             {
               "op": "replace",
@@ -13617,6 +13832,11 @@
                   "validationValue": "440,0.048,0.0822,0.0559,0.0512,0.0786,0.0722,0.0924,0.1896,0.3201,0.3309,0.3074,0.329,0.3945,0.3657,0.1774"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -13718,7 +13938,7 @@
     {
       "entryId": "05645f9a-8c38-4861-8d58-8927f940eeb0",
       "rev": 2,
-      "contentHash": "a76c5dc2b1d9f19ab9922d0f705257b3bebb57484d98351ab03755cbbf7d65d1",
+      "contentHash": "fdcc032e214c7f8d335622b62a33d24b9c20f9fbdc136f2a37cd40516a525720",
       "status": "published",
       "domains": [
         "D1"
@@ -14066,6 +14286,11 @@
                 "resourceType": "dataTable",
                 "resourceTypeGeneral": "Dataset"
               }
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -14074,7 +14299,7 @@
           "by": "peter.blattner@metas.ch",
           "date": "2026-07-21T16:13:59.632Z",
           "comment": "sample row fixed: spaces removed",
-          "baseHash": "04f1d0537ffa9cdde95688118886a8a58dcab11b6cd29575dd28b975fa1a5209",
+          "baseHash": "f05dfcfc1aee335b9bec41b62e8fbea88322303621f6abf97747880c294f6e8a",
           "patch": [
             {
               "op": "replace",
@@ -14090,6 +14315,11 @@
                   "validationValue": "440,0.058,0.111,0.125,0.154"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -14191,7 +14421,7 @@
     {
       "entryId": "e6791f20-92a5-4057-a821-ea68cfac0621",
       "rev": 2,
-      "contentHash": "a1abf3c1a9b627dd337396b229f73a0d491220248f144c311f9be4d272fe2657",
+      "contentHash": "fbdb46c72d74b50123494621441870a5e5fc50079f49eb36c9ee097d697dbeaa",
       "status": "published",
       "domains": [
         "D1"
@@ -14366,7 +14596,7 @@
                   },
                   {
                     "quantity": "spectral radiance factor",
-                    "title": "β15(λ)",
+                    "title": "beta15(lambda)",
                     "unit": "dimensionless",
                     "wavelength_first": 380,
                     "wavelength_last": 780,
@@ -14491,6 +14721,11 @@
                 "resourceType": "dataTable",
                 "resourceTypeGeneral": "Dataset"
               }
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -14499,7 +14734,7 @@
           "by": "peter.blattner@metas.ch",
           "date": "2026-07-21T16:15:05.911Z",
           "comment": "sample row spaces removed",
-          "baseHash": "9b5c14af8a87046947f1e514b410652a2836b365ef21ec48af38ec011afaffaf",
+          "baseHash": "d94b438e64075a5bb1c9e9bb5d9eeef444518453ecdc18e244690e9bda09bf4d",
           "patch": [
             {
               "op": "replace",
@@ -14515,6 +14750,11 @@
                   "validationValue": "440,0.203"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -14616,7 +14856,7 @@
     {
       "entryId": "6043d076-fd73-4f53-b68a-5817feb6fdd9",
       "rev": 2,
-      "contentHash": "2c6c2f89fdafa53e8c89fdba452c67f256baba36369204b689683b958116acfa",
+      "contentHash": "dcca0d1b6447dcc41657c978cc3e165277263a6f96559e13a03992fd21303388",
       "status": "published",
       "domains": [
         "D1"
@@ -16734,6 +16974,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -16742,7 +16987,7 @@
           "by": "Peter Blattner",
           "date": "2024-09-20T16:00:00.000Z",
           "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
-          "baseHash": "d5332702f2b00ecc651dc54802a26b09562eb2d9324198f20890572ab735974f",
+          "baseHash": "756a112fa8a243182606d6b0688a52799d241fa944b791209f69c32929903d86",
           "patch": [
             {
               "op": "replace",
@@ -16757,6 +17002,11 @@
                   "checksum": "eb1d04a0d489918970f32354c2261581e9f9ba59456e0feae7227c7b5413aa3b"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -16818,7 +17068,7 @@
     {
       "entryId": "a2446659-e673-4417-b297-36fbe32cf044",
       "rev": 2,
-      "contentHash": "ecbe48fcea173fa74770dd697c5fc9d627ed756698c4e40299643fd91c9958c8",
+      "contentHash": "c96924b2dc27c937f179ad5c823ca09e2ab5b1e79a784b3017537e41d942edfd",
       "status": "published",
       "domains": [
         "D1"
@@ -18936,6 +19186,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -18944,7 +19199,7 @@
           "by": "Peter Blattner",
           "date": "2024-09-20T16:00:00.000Z",
           "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
-          "baseHash": "a29891b2cba0937f30defcc88eb24812d4e0e2bb6741cfd441558b6beef36504",
+          "baseHash": "748434e43331a9de5d2e3f097a23cb2856cb10efd22d0b86f19965ec9f878072",
           "patch": [
             {
               "op": "replace",
@@ -18959,6 +19214,11 @@
                   "checksum": "32327de84b4bb8715a2b2f1bce3f5d2eca6276a44bde19c93c6f0aad5742db63"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -19020,7 +19280,7 @@
     {
       "entryId": "020236b1-90d5-4100-baaa-723f3e986df4",
       "rev": 2,
-      "contentHash": "f6c1b6787b84808d0406dd68a5bc7f7d970c797da2a54bc2bac89e9e7566ac28",
+      "contentHash": "4955ee962b7b05979df8c479dc3c6489dea899d606681d9e6ef1b87f54cf16a3",
       "status": "published",
       "domains": [
         "D1"
@@ -19584,6 +19844,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -19592,7 +19857,7 @@
           "by": "Peter Blattner",
           "date": "2024-09-20T16:00:00.000Z",
           "comment": "Correct SHA-256 checksum (fix leading-zero truncation in initial hash algorithm)",
-          "baseHash": "ad3abd39aff1a2ca3bf7d29dc2da21d87fc150494fc433da5670033233127325",
+          "baseHash": "6923366520053856f6b561419c076264cb7d7977b3242685b676ccd91abfcb73",
           "patch": [
             {
               "op": "replace",
@@ -19607,6 +19872,11 @@
                   "checksum": "f461decedb5c18800c61a6923240c71f6cf91fd23ac94865133cbfdb7e05c0ad"
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -19988,6 +20258,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -19996,7 +20271,7 @@
           "by": "peter.blattner@metas.ch",
           "date": "2026-07-22T13:56:36.834Z",
           "comment": "sum of column updated",
-          "baseHash": "2ceca6b1f714475801e0552b7b150a159f043ea09a828e0cfa42802b90ce3a2b",
+          "baseHash": "1593a8d7093b8fa1ccfb20c78ec81e6174235ebabf67e6aa62e962df2886d03b",
           "patch": [
             {
               "op": "replace",
@@ -20118,7 +20393,7 @@
     {
       "entryId": "075b90f6-43e9-4016-a82b-7b48514eadbb",
       "rev": 1,
-      "contentHash": "0b490f354b5979442df67278f48cb22a27d5c1164b4fbb540d361de29e5388db",
+      "contentHash": "589f40847b6b9350545c6207fe5e34473325aaa9d8c3828c302f846135c5d1d9",
       "status": "published",
       "domains": [
         "D1"
@@ -20432,6 +20707,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -20488,7 +20768,7 @@
     {
       "entryId": "94add99f-0fcf-4f00-ba99-526fa4e45f9d",
       "rev": 2,
-      "contentHash": "e9c0d312c651bf16d764ecf55f900337ab7740a109f375316ffddb2328775af8",
+      "contentHash": "60fb8db51e2f8ac54753551d83a85238141f4e7ccc63efdf2d68c542ad35511c",
       "status": "published",
       "domains": [
         "D1"
@@ -20808,6 +21088,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         },
@@ -20816,7 +21101,7 @@
           "by": "peter.blattner@metas.ch",
           "date": "2026-07-21T16:10:07.038Z",
           "comment": "sha256 and lower wvl limit fixed",
-          "baseHash": "9a2ddd7a0d5f8542839c60f3f0aa6c5faff2c6810f381f259dde351946c76084",
+          "baseHash": "04e4f7fdeacfe19e344f365bd157753aa5b0ca734014fb05e45c53e61f82bf7f",
           "patch": [
             {
               "op": "replace",
@@ -20853,6 +21138,11 @@
                   "wavelength_step": 1
                 }
               ]
+            },
+            {
+              "op": "replace",
+              "path": "/metadataRevision",
+              "value": 2
             }
           ]
         }
@@ -20954,7 +21244,7 @@
     {
       "entryId": "decea119-6e29-4a5c-a7fb-12310bb6c29d",
       "rev": 1,
-      "contentHash": "568a1f9de392f43d6c1332b6cbb7ab17c7728d9dea5032e35d3c18d1b703f199",
+      "contentHash": "88972c8a441e17c21b32460c90c295ee345653d985a1e52bd7ad25afb53c0b2e",
       "status": "published",
       "domains": [
         "D1",
@@ -21343,6 +21633,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
@@ -21399,7 +21694,7 @@
     {
       "entryId": "16e2c9f9-4f6e-4825-9ab9-1882ba8fb9f1",
       "rev": 1,
-      "contentHash": "52d86f01c729b5924bb231c7341236d5227bf9f8ec59baad1d36fbe05373816c",
+      "contentHash": "80441fa193ae42a9eace081fb1b897ba519ae1329aa781a9582b369958ca9ae0",
       "status": "published",
       "domains": [
         "D1"
@@ -21761,6 +22056,11 @@
               "op": "add",
               "path": "/schemaURL",
               "value": "https://doi.org/10.25039/CIE.SC.4taqevcd"
+            },
+            {
+              "op": "add",
+              "path": "/metadataRevision",
+              "value": 1
             }
           ]
         }
