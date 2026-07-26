@@ -629,7 +629,7 @@ Independent of the recommendations above. These are defects in the published dat
 measured against the 39 entries in `CIEmetaDBdataset.json`. The affected share of the corpus
 is small — 8 defective columns out of 402, plus the subject-casing issue.
 
-**Defects 3, 4 and 6 have since been corrected**; the remaining ones are 1, 2, 5, 7 and 8.
+**Defects 3, 4, 6 and 7 have since been corrected**; the remaining ones are 1, 2, 5 and 8.
 
 Defects in the *v4 schema file* — it was not valid JSON, it had no `$id`, its `wavelength_*`
 fields rejected the sentinel strings the documentation requires, and `funderIdentifierType`
@@ -649,7 +649,7 @@ example can now be checked against its own schema by a strict parser. `schemaVer
 | 4 | `β15(λ)` — the only non-ASCII column title in the corpus, where every other dataset transliterates (`x_bar`, `lambda`) — **fixed**, now `beta15(lambda)` | 1 column | `CIE_srf_PS_5nm` |
 | 5 | **Subject casing is inconsistent** — the same concept appears under two spellings | 6 subject entries | `Perception of colour` (10) vs `Perception of Colour` (2); `Colour of objects` (10) vs `Colour of Objects` (2); `Colour vision` (10) vs `Colour Vision` (2) |
 | 6 | v3 example declared `"schemaName": "CIEmetaDataProduct"`, which its own schema rejects (`const: "CIEmetaDigitalProduct"`) — **fixed** | 1 file | `v3/examples/CIE_cc_1931_2deg.csv_metadata.json` |
-| 7 | **Stored `contentHash` does not match the payload**, and replaying `history[].patch` does not reproduce it | 38 of 39 entries | all except `CIE_std_illum_A_1nm` |
+| 7 | **Stored `contentHash` does not match the payload**, and replaying `history[].patch` does not reproduce it — **fixed** | 38 of 39 entries, plus 36 of 36 and 9 of 9 in the two bundled starter databases | all except `CIE_std_illum_A_1nm` |
 | 8 | **One schema DOI for two schema versions** — `10.25039/CIE.SC.4taqevcd` is the mandated `schemaURL` of *both* v3 and v4 and the `$id` of v4, so `schemaURL` does not identify which schema a record was written against | both schema files, every published record | v3 and v4 schemas |
 
 Defect 3 was the one that silently lost information: a consumer reading `description` got
@@ -682,22 +682,55 @@ mint a version-distinguishing identifier — a versioned DOI, or one DOI per sch
 with the current one kept as a "latest" alias. It is the same persistence argument made for
 the e-ILV in recommendation G2, applied to CIE's own schema.
 
-Defect 7 is not visible in any published metadata file — it affects the WebTool database
-envelope, not the payloads. Recomputing `contentHash(payload)` with the tool's own
-`canonical()` and SHA-256 reproduces the stored value for exactly one entry, and
-`reconstruct(history, rev)` fails to reproduce the payload for the same 38. The consequence
-is that `historyContainsHash()`, the ancestry test the merge path uses to decide
-fast-forward versus conflict, cannot recognise an ancestor for those entries, so every
-concurrent edit is reported as a conflict. The fix is to recompute both — the payloads
-themselves are sound, and all 39 validate against the schema.
+Defect 7 was not visible in any published metadata file — it affected the WebTool database
+envelope, not the payloads, and all 39 payloads validated throughout. Recomputing
+`contentHash(payload)` with the tool's own `canonical()` and SHA-256 reproduced the stored
+value for exactly one entry, and `reconstruct(history, rev)` failed to reproduce the payload
+for the other 38. The consequence was that `historyContainsHash()`, the ancestry test the
+merge path uses to decide fast-forward versus conflict, could not recognise an ancestor for
+those entries, so every concurrent edit was reported as a conflict.
+
+**Cause — a single line.** `migrateDb()` in `CIEmetaDB.html` backfills the schema-4.1 field
+`metadataRevision` into legacy payloads:
+
+```js
+if(e.payload && e.payload.metadataRevision==null) e.payload.metadataRevision=e.rev;
+```
+
+It does not recompute `contentHash` and does not record the field in the history, so after
+the backfill the stored hash described the *pre-backfill* payload and the history replayed to
+it rather than to the payload. That is exactly what was measured: for 37 of the 39 entries the
+replay differed from the payload by `/metadataRevision` and nothing else, and for 36 of those
+the stored hash was the hash of the replay. The one consistent entry,
+`CIE_std_illum_A_1nm`, is the only one re-published after 4.1, so the tool itself wrote its
+rev-2 patch — `{"op":"replace","path":"/metadataRevision","value":2}` — which is the shape the
+repair reproduces. `createEntry()` and `publishEntry()` both set the field before diffing and
+were never at fault.
+
+**Fix applied.** `v4/tools/WebTool/db_integrity.js` checks the invariants
+`CIEmetaDB_schema.json` declares and repairs the derived fields: it records
+`metadataRevision` in each history patch, recomputes every `history[].baseHash`, every
+`contentHash` and the database `baseHash`. It repairs derived fields only and refuses to
+write if a payload-content divergence would survive, so a stale hash is never replaced by a
+freshly computed hash over a payload its own history contradicts. The two bundled starter
+databases carried the same defect (36 of 36 and 9 of 9) and were repaired too. The hash chain
+is not reimplemented: the script lifts `canonical()`, `contentHash()`, `applyPatch()` and the
+rest out of `CIEmetaDB.html` at run time, for the reason set out in section 10.1.
+
+One consequence is worth stating plainly. `migrateDb()` is unchanged, so the defect is closed
+for the shipped databases — their payloads now carry `metadataRevision`, so the backfill no
+longer fires — but any pre-4.1 database opened in the tool will still be mis-migrated. That
+fix belongs in `migrateDb()` and is pending.
 
 Fixing any of 1, 2 or 5 changes metadata content and therefore increments
-`metadataRevision` per CIE 3. Defects 3 and 4 were applied directly to the stored payloads
-without a revision bump: `rev`, `metadataRevision`, `contentHash` and `audit` are unchanged,
-and the `descrition` correction was also applied inside the rev-1 history patch of
-`CIE_srf_CQS_5nm` — so those two records now differ from what the history replays. This is
-recorded here rather than hidden; whether to reissue them as revision 3 is an editorial
-decision, and doing so would also clear defect 7 for those entries.
+`metadataRevision` per CIE 3. Defects 3 and 4 were instead applied directly to the stored
+payloads without a revision bump: `rev`, `metadataRevision` and `audit` are unchanged. To let
+the history replay to the payload again, the corrections were also written into the rev-1
+patches of `CIE_srf_CQS_5nm` and `CIE_srf_PS_5nm`. **Those two rev-1 patches therefore no
+longer reproduce the file that was imported on 2026-07-21.** This is recorded rather than
+hidden; the alternative was to reissue both as revision 3, which would have changed a
+published `metadataRevision` and required re-publishing two metadata files for a typo and a
+transliteration.
 
 ### 10.1 The schema was defined twice — **resolved**
 
@@ -840,10 +873,14 @@ concept with no identifier — better an honest gap than a fabricated URI.
 - *Schema file: **done.*** Valid JSON, `$id`, sentinel-tolerant `wavelength_*`, ROR.
   `schemaVersion` stays `4`, the schema DOI is unchanged, and all 39 published records now
   validate against the file. See the version history in [README.md](README.md).
-- *Data (section 10): defects 3, 4 and 6 **done**, 1, 2, 5 and 7 outstanding.* Records
+- *Data (section 10): defects 3, 4, 6 and 7 **done**, 1, 2 and 5 outstanding.* Records
   touched increment `metadataRevision` per CIE 3 — note that 3 and 4 were applied in place
   without a bump, see section 10. Effort: small — 8 defective columns out of 402, plus the
-  subject-casing variants and a recomputation of the database hashes.
+  subject-casing variants.
+- *Database integrity (defect 7): **done** for the three shipped databases,* which now satisfy
+  the invariants `CIEmetaDB_schema.json` declares; `db_integrity.js --check` verifies it.
+  The `migrateDb()` backfill that caused it is **still to be fixed**, so a pre-4.1 database
+  opened in the tool would be mis-migrated again.
 - *Schema identifier (defect 8): outstanding and not repairable here.* Needs a
   version-distinguishing schema DOI from CIE; see section 10.
 
