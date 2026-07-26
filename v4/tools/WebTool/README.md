@@ -108,29 +108,67 @@ and email, registrant, database title, publisher name and the institution fields
 (name, acronym, place, department). These are organisation-wide values used by
 **Export to Crossref-file (XML)** (see below); set them once and they apply to every deposit.
 
-## Draft & publish workflow
+## Draft, under revision & published workflow
 
-Each entry is either a **draft** or **published**, and the status is **automatic and
-read-only** — you never set it by hand:
+Each entry has one of **three** statuses, and the status is **automatic and read-only** — you
+never set it by hand:
 
-- Creating or duplicating an entry, or editing any **payload** field, sets the entry to
-  **draft**.
-- **Save draft** stores your edits **without creating a revision** — the revision number is
-  unchanged, no history entry is added, and you are not asked for a comment. Envelope fields
-  (domains, DOI landing page) also save this way and never change status or revision.
-- **Publish entry** is the *only* action that mints a revision. It asks for a short **revision
-  text**, records **one** history entry holding the change since the previous published
-  revision, bumps the revision number and sets status to **published**. History therefore shows
-  revision-to-revision changes only, never intermediate draft saves.
-- Exporting a **draft** appends `_draft` after the (pending) revision number in the file name —
-  e.g. a new draft → `…_metadata_draft.json`, a draft on top of published v1 →
-  `…_metadata_v2_draft.json`.
+| Status | Meaning |
+|---|---|
+| **draft** | a new record (New entry / Duplicate) that has never been published |
+| **under revision** | a revision of a published record, being prepared alongside it |
+| **published** | the current published record |
+
+### Revising a published entry
+
+A published entry is **read-only**. To change it, press **Start revision**: this creates a
+second entry with status **under revision**, and you edit that one.
+
+The published version **stays in the list, unchanged, for the whole time** — you can open,
+compare and export it while the revision is in progress. Each half shows a banner linking to the
+other.
+
+The two halves deliberately **share one DOI** while the revision is open, and that is **not**
+reported as a duplicate. The DOI cannot be edited on a revision, because changing it would break
+the pair. Two *unrelated* entries sharing a DOI are still flagged as before.
+
+**Publishing the revision collapses the pair**: the revision becomes the published entry at the
+next revision number, inheriting the complete revision chain, and the previous published row
+disappears. The DOI is unique again.
+
+```
+[published rev 2]                          Start revision
+        |
+        v
+[published rev 2]  +  [under revision]     both available, same DOI
+        |                    |
+        |                    | Publish
+        v                    v
+              [published rev 3]            history: rev 1, 2, 3
+```
+
+### Saving and publishing
+
+- **Save draft** / **Save revision** stores your edits **without creating a revision** — the
+  revision number is unchanged, no history entry is added, and you are not asked for a comment.
+  Envelope fields (domains, DOI landing page) also save this way and never change status or revision.
+- **Publish** is the *only* action that mints a revision. It asks for a short **revision text**,
+  records **one** history entry holding the change since the previous published revision, bumps
+  the revision number and sets status to **published**. History therefore shows
+  revision-to-revision changes only, never intermediate saves.
+- Exporting anything **not yet published** appends `_draft_TIMESTAMP` after the (pending) revision
+  number in the file name — e.g. a new draft → `…_metadata_draft_20260725T143022.json`, a revision
+  of published v1 → `…_metadata_v2_draft_20260725T143022.json`.
+- A published entry with a revision in progress **cannot be deleted**; discard or publish the
+  revision first.
 
 The action bar also offers two revert actions:
 
 - **Undo changes** — discards unsaved editor edits and returns to the last *saved* version.
-- **Revert to last published** — discards unpublished draft edits and restores the entry to its
-  last published revision (applied immediately, after a confirmation, since draft edits are not
+- **Discard revision** — deletes a revision entirely and returns you to the published entry,
+  which is unaffected (applied immediately, after a confirmation).
+- **Revert to last published** — for a never-published draft, restores the entry to its last
+  published revision (applied immediately, after a confirmation, since unpublished edits are not
   versioned and are lost).
 
 ## Data model (metadatabase envelope)
@@ -150,7 +188,8 @@ entry
 ├─ entryId        internal stable id (independent of the DOI; used for merge matching)
 ├─ rev            last published revision number (0 = never published); only Publish changes it
 ├─ contentHash    sha256 of the canonical payload (concurrency/merge anchor)
-├─ status         draft | published  (automatic; draft while edited, published on Publish)
+├─ status         draft | review | published   (automatic; 'review' displays as "under revision")
+├─ revisionOf     on a 'review' entry only: entryId of the published entry it revises
 ├─ landingPage    URL the DOI resolves to (Crossref <resource>); envelope-level, per entry
 ├─ domains        [ CIE-division codes ]
 ├─ audit          createdBy/Date, modifiedBy/Date, modifiedComment

@@ -76,7 +76,11 @@
 				"status": {
 					"type": "string",
 					"enum": ["draft", "review", "published"],
-					"description": "Editorial workflow state."
+					"description": "Editorial workflow state, derived from the entry rather than chosen by a user. 'draft': a new record (New entry / Duplicate) that has never been published; rev is 0. 'review': a revision of a published record, prepared in parallel with it and displayed as 'under revision'; revisionOf identifies the published entry it revises. 'published': the current published record."
+				},
+				"revisionOf": {
+					"type": "string",
+					"description": "Present only on a 'review' entry: the entryId of the published entry being revised. The revision is a clone of that entry - history and rev included - so the two coexist and share a DOI while the revision is prepared. Because that DOI duplication is legitimate and temporary, it is exempt from the uniqueness rule. Publishing the revision appends rev+1 to the inherited history, removes the published parent and clears this field, collapsing the pair back into a single published entry."
 				},
 				"domains": {
 					"type": "array",
