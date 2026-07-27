@@ -1,3 +1,7 @@
 # Downloaded CIE source datasets (CSV + metadata JSON) — regenerable from cie.co.at
 published/
 temp/
+
+# Generated documentation PDFs — rebuild from the .md sources with pandoc
+README.pdf
+QUICKSTART.pdf
