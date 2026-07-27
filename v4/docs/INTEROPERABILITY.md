@@ -546,10 +546,11 @@ The candidates were checked:
 
 | Scheme | Assessment |
 |---|---|
-| **OECD Fields of Science (FoS)** | Six top-level categories and 42 subcategories. Fits the CIE corpus only at `FOS: Physical sciences` — one value for all 39 records — but that is the field OpenAIRE and the European data portals harvest on. **Recommended as a coarse anchor.** |
+| **OECD Fields of Science (FoS)** | Six top-level categories and 42 subcategories; fits the CIE corpus only at `FOS: Physical sciences`, one value for all 39 records. It is what OpenAIRE and the European data portals harvest on, so the *string* still has to be carried — but **the `schemeURI` DataCite's convention specifies, `http://www.oecd.org/science/inno/38235147.pdf`, is dead: it returns HTTP 410 Gone.** A convention that requires publishing a dead link is a reason to carry EuroSciVoc alongside it, not instead of the compatibility string. |
 | **LCSH** (`id.loc.gov`) | Resolvable, SKOS, content-negotiable, stable, and one of the two schemes the DataCite 4.7 documentation names. An exact match exists for only 3 of the 11 CIE concepts (see section 13); for the rest LCSH is a *broader* term, and in one case it cannot distinguish two CIE concepts at all — `Color perception` is a variant label that LCSH redirects to `Color vision`, whereas the CIE list keeps `Perception of colour` and `Colour vision` apart. **Recommended as an optional `valueURI` where the match is exact, and as the `skos:broadMatch` target otherwise.** |
-| **PhySH** (Physics Subject Headings, APS) | Covers the colorimetry / photometry / radiometry / optical-measurement core — which is essentially all 39 data tables and much of the CIE publication list. Released under **CC0 1.0**, with resolvable concept URIs of the form `https://physh.org/concepts/{id}` and a JSON API (`/disciplines`, `/concepts`, `/facets`). The identifiers are opaque rather than label-derived, so a mapping has to be built through the API and then held, not reconstructed on demand. **Recommended as the physics-domain `valueURI` source.** |
-| **MeSH** (US National Library of Medicine) | Covers the photobiology, UV, vision and circadian cluster that dominates the CIE publication list outside Divisions 1 and 2 — `Photobiology` `D018462`, `Ultraviolet Rays` `D014466`, `Circadian Rhythm` `D002940`, `Circadian Clocks` `D057906`, `Vision, Ocular` `D014785`, `Color Perception` `D003118`. Resolvable URIs of the form `https://id.nlm.nih.gov/mesh/D018462`, RDF and JSON-LD by content negotiation, a lookup API and a SPARQL endpoint. **Recommended for Division 6 material.** |
+| **PhySH** (Physics Subject Headings, APS) | Exemplary infrastructure, disappointing coverage — see the table in section 13. **CC0 1.0**, bulk downloads in JSON-LD, Turtle, N-Triples and RDF/XML, and **a DOI per concept** under prefix `10.29172` resolving to `https://physh.org/concepts/{uuid}`. But release 2.8.0 was measured, and across its 3 910 concepts the strings *colorimetry*, *photometry*, *radiometry*, *photobiology*, *luminous*, *illuminance*, *chromaticity* and *tristimulus* do not occur **at all**. It classifies physics research topics, not measurement disciplines. **Not recommended as the `valueURI` source for this corpus**; keep it in view for physics-adjacent material, and read its DOI practice as the worked precedent for G2. |
+| **MeSH** (US National Library of Medicine) | Covers the photobiology, UV, vision and circadian cluster that dominates the CIE publication list outside Divisions 1 and 2 — verified: `Photobiology` `D018462`, `Ultraviolet Rays` `D014466`, `Circadian Rhythm` `D002940`, `Circadian Clocks` `D057906`, `Vision, Ocular` `D014785`, `Color Perception` `D003118`. Resolvable URIs of the form `https://id.nlm.nih.gov/mesh/D018462`, RDF and JSON-LD by content negotiation, a lookup API and a SPARQL endpoint. Note it is the one scheme here that *does* name photobiology as a concept. **Recommended for Division 6 material.** |
+| **EuroSciVoc** (European Science Vocabulary, Publications Office of the EU) | The maintained successor to the OECD FoS layer, and better on every axis: SKOS-XL, **CC-BY 4.0**, 1 017 concepts, six languages, `skos:notation` codes, bulk Turtle/RDF download, and resolvable URIs `http://data.europa.eu/8mn/euroscivoc/{uuid}` that content-negotiate to RDF. Its first two levels align to the OECD Frascati taxonomy, so it *is* the FoS layer, with identifiers. One level deeper than FoS reaches `optics` (notation `251`) under `physical sciences` (`43`) under `natural sciences` (`23`). **Recommended as the Layer 2 anchor, replacing the bare FoS string.** |
 | **ICS** (International Classification for Standards, ISO) | The classification the standards world already files CIE work under: ISO/CIE 11664-2:2022 sits in **17.180.20 Colours and measurement of light**, under 17.180 Optics and optical measurements, under 17 Metrology and measurement. Physical phenomena. Authoritative, coded and carrying real institutional weight — but weak on identifiers: `https://www.iso.org/ics/17.180.20/x/` is a catalogue browse path, not a term URI. It therefore belongs in **`classificationCode`**, which is precisely the DataCite sub-property provided for schemes without per-term URIs. **Recommended for publications, not for data tables.** |
 | ANZSRC Fields of Research | The other scheme DataCite names. Australian/New Zealand research administration; no advantage over FoS here and no per-term URIs. |
 | UNESCO Thesaurus, Wikidata, QUDT | Too coarse, not authoritative for lighting, or a unit vocabulary rather than a subject one. Not recommended as primary, for the same one-identifier-per-concept reason given against QUDT and UCUM in section 14. |
@@ -609,8 +610,22 @@ published at `schemeURI`: it declares the value set closed, which is what makes 
 variant or an unknown value detectable by a tool instead of only by eye. The scheme name and
 URI above are CIE's to mint and are placeholders here.
 
-*Layer 2 — one coarse external anchor, identical on all 39 records.* A second entry
-alongside the CIE ones:
+*Layer 2 — one coarse external anchor, identical on all 39 records.* Two entries alongside the
+CIE ones, because the scheme that portals key on and the scheme with usable identifiers are
+not the same scheme. The identified one first:
+
+```json
+{
+  "subject": "optics",
+  "subjectScheme": "EuroSciVoc",
+  "schemeURI": "http://data.europa.eu/8mn/euroscivoc",
+  "valueURI": "http://data.europa.eu/8mn/euroscivoc/f3cb3d46-1a4f-4c29-9e80-46a854f53382",
+  "classificationCode": "251",
+  "lang": "en"
+}
+```
+
+and the compatibility string, which harvesters match on:
 
 ```json
 {
@@ -619,6 +634,14 @@ alongside the CIE ones:
   "schemeURI": "http://www.oecd.org/science/inno/38235147.pdf"
 }
 ```
+
+That second `schemeURI` is a **dead link** — HTTP 410 Gone, checked. It is retained only
+because DataCite's FoS convention names that exact URL and OpenAIRE keys on the
+`subjectScheme`/`subject` pair; if CIE would rather not publish a 410, dropping the
+`schemeURI` and keeping the two matched strings is the better trade, and EuroSciVoc carries the
+resolvable identity either way. EuroSciVoc is also a level deeper than FoS can go: `optics`
+rather than all of physical sciences, without inventing anything, because its upper two levels
+*are* the Frascati taxonomy.
 
 This is the smallest change with the largest discovery effect, and recommendation E
 (section 7.1, `dcat:keyword` / `dct:subject`) depends on it.
@@ -630,16 +653,10 @@ are recorded in section 13 nonetheless: they are what the CIE scheme should carr
 `skos:broadMatch` under G9, and putting a broader term in `valueURI` would misstate it as the
 subject itself.
 
-Section 13 gives LCSH because it is the layer that could be resolved and checked from here:
-its identifiers are reachable by label lookup, so the mapping can be verified in a document.
-**For the data tables specifically, PhySH is likely the better `valueURI` source** — it covers
-the colorimetry/photometry/radiometry core at the granularity CIE actually works at, where LCSH
-manages three matches out of eleven. Its concept identifiers are opaque, so they have to be
-pulled from the API rather than derived, and they are deliberately **not** invented here.
-Resolving all eleven is one bounded session against `/concepts`, and it should be done before
-Phase 2 fills the WebTool dropdown. The same applies to MeSH when the first Division 6 table
-arrives, and to ICS `classificationCode` values if the publication records ever adopt this
-model.
+Section 13 gives LCSH and PhySH side by side, and the comparison is instructive: LCSH matches
+three of the eleven exactly, PhySH matches **none**. MeSH remains the right target for Division
+6 concepts once those tables exist, and ICS `classificationCode` values for publication records
+if they ever adopt this model.
 
 One field, one identifier: whichever scheme supplies `valueURI` for a given concept, the others
 belong in the CIE scheme as `skos:exactMatch` / `skos:broadMatch` and not as extra subject
@@ -715,6 +732,13 @@ indirection layer in front of it — a DOI per term, or a `w3id.org`/PURL prefix
 `https://w3id.org/cie/ilv/17-23-053` — with a documented persistence policy. CIE already
 operates a DOI prefix (`10.25039`) for publications and datasets, so the infrastructure and
 the institutional commitment exist.
+
+This is not hypothetical, and the comparison is worth making explicitly: the American Physical
+Society already does it. Every one of the 3 910 concepts in PhySH carries a DOI under prefix
+`10.29172` which resolves to the concept page — `https://doi.org/10.29172/141061f5-…` →
+`https://physh.org/concepts/141061f5-…`. A DOI per term in a subject vocabulary is established
+practice by a comparable learned society, not a novel demand, and CIE is better placed to do it
+than APS was: the DOI prefix is already in service.
 
 **G3 — Structure the entry.** Split the single body field into typed fields: term number,
 preferred term, admitted/deprecated synonyms, symbol, unit, definition, notes (numbered
@@ -1112,35 +1136,57 @@ for the `skos:broadMatch` assertions of G9. Each heading below was looked up in 
 suggest API (`https://id.loc.gov/authorities/subjects/suggest2?q=…`) and the identifier given
 is the authorised URI it returned.
 
-| `subject` | superseded | `valueURI` (LCSH exact) | nearest LCSH broader term |
-|---|---|---|---|
-| `Photometry` | — | `https://id.loc.gov/authorities/subjects/sh85101383` | — |
-| `Objective photometry` | — | *(none)* | Photometry `sh85101383` |
-| `Units. Constants` | — | *(none — one heading, two concepts; see G9)* | Units of measurement `sh85141054`; Physical constants `sh85031311` |
-| `Colorimetry` | — | `https://id.loc.gov/authorities/subjects/sh85028695` | — |
-| `Colour of objects` | `Colour of Objects` | *(none)* | Color `sh85028577` |
-| `Colour vision` | `Colour Vision` | `https://id.loc.gov/authorities/subjects/sh85028654` | — |
-| `Perception of colour` | `Perception of Colour` | *(none — LCSH redirects `Color perception` to `Color vision`, so it cannot hold this distinction)* | Color vision `sh85028654` |
-| `Influence of the colour of the light` | — | *(none)* | — |
-| `Artificial daylight` | — | *(none — LCSH `Daylight` is natural daylight)* | Daylight `sh85035970` |
-| `Lighting with respect to object illuminated` | — | *(none)* | Lighting `sh85076925` |
-| `Evaluation of light sources` | — | *(none)* | Light sources `sh85076909` |
+| `subject` | superseded | `valueURI` (LCSH exact) | nearest LCSH broader | nearest PhySH concept |
+|---|---|---|---|---|
+| `Photometry` | — | `https://id.loc.gov/authorities/subjects/sh85101383` | — | Metrology `141061f5` — far broader |
+| `Objective photometry` | — | *(none)* | Photometry `sh85101383` | Metrology `141061f5` — far broader |
+| `Units. Constants` | — | *(none — one heading, two concepts; see G9)* | Units of measurement `sh85141054`; Physical constants `sh85031311` | Determination of fundamental constants `a17bad0f` |
+| `Colorimetry` | — | `https://id.loc.gov/authorities/subjects/sh85028695` | — | *(none — no colorimetry concept exists)* |
+| `Colour of objects` | `Colour of Objects` | *(none)* | Color `sh85028577` | *(none)* |
+| `Colour vision` | `Colour Vision` | `https://id.loc.gov/authorities/subjects/sh85028654` | — | Color detection `3f8bf87b`, under Vision `0e378245` |
+| `Perception of colour` | `Perception of Colour` | *(none — LCSH redirects `Color perception` to `Color vision`, so it cannot hold this distinction)* | Color vision `sh85028654` | Color detection `3f8bf87b` — cannot hold the distinction either |
+| `Influence of the colour of the light` | — | *(none)* | — | *(none)* |
+| `Artificial daylight` | — | *(none — LCSH `Daylight` is natural daylight)* | Daylight `sh85035970` | *(none)* |
+| `Lighting with respect to object illuminated` | — | *(none)* | Lighting `sh85076925` | *(none)* |
+| `Evaluation of light sources` | — | *(none)* | Light sources `sh85076909` | *(none)* |
+
+PhySH identifiers above are abbreviated to the first eight characters; the full form is
+`https://doi.org/10.29172/{uuid}`, e.g.
+`https://doi.org/10.29172/141061f5-f02c-492c-af56-81c3c49e8b65` for Metrology, which resolves
+through the DOI to `https://physh.org/concepts/{uuid}`.
 
 Three exact matches out of eleven is the measurement that settles the vocabulary question: a
 general thesaurus cannot carry this list, which is why the CIE scheme is primary and LCSH is a
 crosswalk.
 
-**Two columns are deliberately absent.** PhySH almost certainly matches more of these eleven
-than LCSH does, and MeSH will matter as soon as Division 6 publishes a data table — but PhySH
-concept identifiers are opaque UUID-style strings that must be read from its API, and none is
-stated here rather than guessed. Filling those two columns is the first task of the mapping
-work described in section 8.2, not an omission to be worked around.
+**The PhySH column is the surprise, and it is worth stating plainly.** PhySH was expected to be
+the best fit of any external scheme — it is the physics vocabulary, it is CC0, and it mints a
+DOI per concept, which is exactly the infrastructure recommendation G2 asks CIE to build. It
+was measured rather than assumed: release 2.8.0 was downloaded from
+`github.com/physh-org/PhySH` and all 8 547 label strings across its 3 910 concepts were
+searched. *Colorimetry*, *photometry*, *radiometry*, *photobiology*, *illuminance*, *luminous*,
+*chromaticity* and *tristimulus* occur **zero** times. PhySH classifies physics *research
+topics* — `Light scattering`, `Photodetectors`, `Vision`, `Metrology` — not the measurement
+disciplines CIE is the authority for. Three broader concepts are recorded above and no exact
+match exists.
 
-In addition, every record carries the constant Fields-of-Science entry:
+The conclusion is not that PhySH is a poor vocabulary; it is that **the gap this document
+identifies is real and wider than the e-ILV**. Neither the general library scheme, nor the
+physics scheme, nor the EU fields-of-research taxonomy has a concept for colorimetry or
+photometry. That is the strongest available argument for G9, and for CIE treating its own
+vocabularies as the authoritative source rather than expecting to find one.
 
-| `subject` | `subjectScheme` | `schemeURI` |
+**MeSH is left out of this table on purpose**, not for lack of coverage: its terms are the right
+targets for photobiology, UV, circadian and vision concepts, none of which is among these
+eleven. It becomes relevant with the first Division 6 data table, and the descriptors are in
+section 8.2 ready for it.
+
+In addition, every record carries the two field-of-science entries of Layer 2:
+
+| `subject` | `subjectScheme` | `valueURI` / `classificationCode` |
 |---|---|---|
-| `FOS: Physical sciences` | `Fields of Science and Technology (FOS)` | `http://www.oecd.org/science/inno/38235147.pdf` |
+| `optics` | `EuroSciVoc` | `http://data.europa.eu/8mn/euroscivoc/f3cb3d46-1a4f-4c29-9e80-46a854f53382` · `251` |
+| `FOS: Physical sciences` | `Fields of Science and Technology (FOS)` | *(none — the conventional `schemeURI` returns HTTP 410; see 8.2)* |
 
 ### As a lookup object
 
@@ -1173,6 +1219,16 @@ Embeddable directly in the WebTool.
     "schemeURI":     "https://cie.co.at/subject-headings",
     "lang":          "en"
   },
+  "fieldsOfScience": [
+    { "subject": "optics",
+      "subjectScheme": "EuroSciVoc",
+      "schemeURI": "http://data.europa.eu/8mn/euroscivoc",
+      "valueURI": "http://data.europa.eu/8mn/euroscivoc/f3cb3d46-1a4f-4c29-9e80-46a854f53382",
+      "classificationCode": "251",
+      "lang": "en" },
+    { "subject": "FOS: Physical sciences",
+      "subjectScheme": "Fields of Science and Technology (FOS)" }
+  ],
   "subjects": {
     "Photometry":                                  "https://id.loc.gov/authorities/subjects/sh85101383",
     "Objective photometry":                        null,
@@ -1241,11 +1297,20 @@ can be derived when a consumer needs it.
 - Library of Congress Subject Headings — https://id.loc.gov/authorities/subjects/
   (SKOS and JSON-LD by content negotiation; the suggest API at
   `/authorities/subjects/suggest2?q=…` is what the mappings in section 13 were checked against)
-- OECD Fields of Science and Technology — http://www.oecd.org/science/inno/38235147.pdf,
-  the `schemeURI` DataCite uses for `Fields of Science and Technology (FOS)`
+- OECD Fields of Science and Technology — `http://www.oecd.org/science/inno/38235147.pdf` is the
+  `schemeURI` DataCite's FoS convention specifies, and it **returns HTTP 410 Gone**. Cited here
+  as the convention, not as a resource; use EuroSciVoc for the resolvable form
+- EuroSciVoc, the European Science Vocabulary (Publications Office of the EU) —
+  https://interoperable-europe.ec.europa.eu/collection/eu-semantic-interoperability-catalogue/solution/euroscivoc;
+  scheme `http://data.europa.eu/8mn/euroscivoc`, concept URIs
+  `http://data.europa.eu/8mn/euroscivoc/{uuid}` (content-negotiate to RDF); SKOS-XL, CC-BY 4.0,
+  1 017 concepts in 6 languages, upper two levels aligned to the OECD Frascati taxonomy;
+  distributions listed at https://data.europa.eu/data/datasets/euroscivoc-the-european-science-vocabulary
 - PhySH, Physics Subject Headings (American Physical Society) — https://physh.org,
-  licensing https://physh.org/licensing (CC0 1.0), API https://physh.org/apis,
-  concept URIs `https://physh.org/concepts/{id}`
+  licensing https://physh.org/licensing (CC0 1.0), API https://physh.org/apis. Concept
+  identifiers are DOIs under prefix `10.29172` resolving to `https://physh.org/concepts/{uuid}`;
+  bulk JSON-LD, Turtle, N-Triples and RDF/XML releases at https://github.com/physh-org/PhySH
+  (2.8.0 measured for section 13)
 - MeSH (US National Library of Medicine) — https://id.nlm.nih.gov/mesh/, descriptor URIs
   `https://id.nlm.nih.gov/mesh/D018462`; lookup API
   `https://id.nlm.nih.gov/mesh/lookup/descriptor?label=…`, RDF and SPARQL from the same host
