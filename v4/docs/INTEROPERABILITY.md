@@ -534,20 +534,45 @@ subject array. The JSON sidecar is therefore the only carrier of subject informa
 a finding in both directions: subject metadata is invisible to DOI-based discovery today, and
 repairing it changes no external record — only `metadataRevision`, per CIE 3.
 
-**Which subject vocabulary — no established public scheme covers these values.** They are
-facet headings from a classification, not keywords: `Units. Constants` reads as a merged
-heading from a printed
-catalogue, and `Lighting with respect to object illuminated` and `Objective photometry` are
-not phrasings any general thesaurus uses. Searching for the distinctive ones outside
-`cie.co.at` returns nothing. The candidates were checked:
+**Which subject vocabulary — no public scheme can be adopted as the value list.** The
+distinction matters: several public schemes cover the subject *matter* of the CIE corpus well,
+and one covers it very well, but none of them has *these headings*. They are facet headings
+from a classification, not keywords: `Units. Constants` reads as a merged heading from a
+printed catalogue, and `Lighting with respect to object illuminated` and `Objective
+photometry` are not phrasings any general thesaurus uses. Searching for the distinctive ones
+outside `cie.co.at` returns nothing. So the public schemes are **mapping targets, not
+replacements** — which is what the sub-properties `valueURI` and `classificationCode` are for.
+The candidates were checked:
 
 | Scheme | Assessment |
 |---|---|
 | **OECD Fields of Science (FoS)** | Six top-level categories and 42 subcategories. Fits the CIE corpus only at `FOS: Physical sciences` — one value for all 39 records — but that is the field OpenAIRE and the European data portals harvest on. **Recommended as a coarse anchor.** |
 | **LCSH** (`id.loc.gov`) | Resolvable, SKOS, content-negotiable, stable, and one of the two schemes the DataCite 4.7 documentation names. An exact match exists for only 3 of the 11 CIE concepts (see section 13); for the rest LCSH is a *broader* term, and in one case it cannot distinguish two CIE concepts at all — `Color perception` is a variant label that LCSH redirects to `Color vision`, whereas the CIE list keeps `Perception of colour` and `Colour vision` apart. **Recommended as an optional `valueURI` where the match is exact, and as the `skos:broadMatch` target otherwise.** |
+| **PhySH** (Physics Subject Headings, APS) | Covers the colorimetry / photometry / radiometry / optical-measurement core — which is essentially all 39 data tables and much of the CIE publication list. Released under **CC0 1.0**, with resolvable concept URIs of the form `https://physh.org/concepts/{id}` and a JSON API (`/disciplines`, `/concepts`, `/facets`). The identifiers are opaque rather than label-derived, so a mapping has to be built through the API and then held, not reconstructed on demand. **Recommended as the physics-domain `valueURI` source.** |
+| **MeSH** (US National Library of Medicine) | Covers the photobiology, UV, vision and circadian cluster that dominates the CIE publication list outside Divisions 1 and 2 — `Photobiology` `D018462`, `Ultraviolet Rays` `D014466`, `Circadian Rhythm` `D002940`, `Circadian Clocks` `D057906`, `Vision, Ocular` `D014785`, `Color Perception` `D003118`. Resolvable URIs of the form `https://id.nlm.nih.gov/mesh/D018462`, RDF and JSON-LD by content negotiation, a lookup API and a SPARQL endpoint. **Recommended for Division 6 material.** |
+| **ICS** (International Classification for Standards, ISO) | The classification the standards world already files CIE work under: ISO/CIE 11664-2:2022 sits in **17.180.20 Colours and measurement of light**, under 17.180 Optics and optical measurements, under 17 Metrology and measurement. Physical phenomena. Authoritative, coded and carrying real institutional weight — but weak on identifiers: `https://www.iso.org/ics/17.180.20/x/` is a catalogue browse path, not a term URI. It therefore belongs in **`classificationCode`**, which is precisely the DataCite sub-property provided for schemes without per-term URIs. **Recommended for publications, not for data tables.** |
 | ANZSRC Fields of Research | The other scheme DataCite names. Australian/New Zealand research administration; no advantage over FoS here and no per-term URIs. |
 | UNESCO Thesaurus, Wikidata, QUDT | Too coarse, not authoritative for lighting, or a unit vocabulary rather than a subject one. Not recommended as primary, for the same one-identifier-per-concept reason given against QUDT and UCUM in section 14. |
 | IEC 60050-845 / Electropedia | Terminology, not classification — the same objection as the e-ILV below. |
+
+**The choice has to anticipate a wider corpus than the present one.** All 39 published data
+tables come from the work of Divisions 1 and 2 — vision and colour, and the physical
+measurement of light and radiation — which is why colorimetry and photometry exhaust the
+current subject list. That is a property of what has been published so far, not of CIE's
+range: the publication list already extends well beyond it, and Division 6 material in
+particular (photobiology and photochemistry — action spectra, UV, non-visual and circadian
+effects) is the kind that produces data tables. `CIE_a-opic_action_spectra` is already in the
+corpus and is arguably the first of them.
+
+Two consequences for the design. First, **the scheme choice differs by resource type**: ICS is
+the right classification for CIE *publications*, because that is how standards are filed and
+found, and the wrong one for data tables, where per-term identifiers matter more than
+institutional weight. Second, **more than one external scheme will be needed**, and that is
+not a defect — PhySH for the physics core, MeSH for the photobiology cluster, FoS for portal
+harvesting. What must stay singular is the *CIE* value list; the external identifiers hang off
+it as mappings, which is the division of labour recommendation G9 sets out. Choosing a
+single external scheme now, to cover only what is published now, would have to be revisited
+the first time a Division 6 data table appears.
 
 **The CIE e-ILV is the wrong instrument for `subjects[]`, despite being the right one for
 `quantityPID`.** It is a *terminology* vocabulary: its 1 347 entries are term-level concepts —
@@ -604,6 +629,23 @@ that have one, absent for the other eight — the same honest-gap principle appl
 are recorded in section 13 nonetheless: they are what the CIE scheme should carry as
 `skos:broadMatch` under G9, and putting a broader term in `valueURI` would misstate it as the
 subject itself.
+
+Section 13 gives LCSH because it is the layer that could be resolved and checked from here:
+its identifiers are reachable by label lookup, so the mapping can be verified in a document.
+**For the data tables specifically, PhySH is likely the better `valueURI` source** — it covers
+the colorimetry/photometry/radiometry core at the granularity CIE actually works at, where LCSH
+manages three matches out of eleven. Its concept identifiers are opaque, so they have to be
+pulled from the API rather than derived, and they are deliberately **not** invented here.
+Resolving all eleven is one bounded session against `/concepts`, and it should be done before
+Phase 2 fills the WebTool dropdown. The same applies to MeSH when the first Division 6 table
+arrives, and to ICS `classificationCode` values if the publication records ever adopt this
+model.
+
+One field, one identifier: whichever scheme supplies `valueURI` for a given concept, the others
+belong in the CIE scheme as `skos:exactMatch` / `skos:broadMatch` and not as extra subject
+entries per record. That is the same argument section 14 makes against carrying QUDT and UCUM
+alongside the BIPM unit PIDs, and it is the reason the CIE value list has to stay singular
+while the number of external schemes grows.
 
 ### 8.3 Licence
 
@@ -740,9 +782,15 @@ concepts, growing slowly — and it is the prerequisite for `subjectScheme` and 
 recommendation F meaning anything more than a label:
 
 - a `skos:ConceptScheme` at a documented URI, one `skos:Concept` per heading with
-  `skos:prefLabel` (language-tagged, E and F at least, as in G7) and `skos:notation`;
-- `skos:broadMatch` to LCSH and to the OECD Fields of Science category, from the crosswalk in
-  section 13 — the mapping table exists already and needs only to be asserted;
+  `skos:prefLabel` (language-tagged, E and F at least, as in G7) and `skos:notation`. Eleven
+  concepts is the current corpus, not the target: the scheme should be laid out to take the
+  other divisions, photobiology first;
+- `skos:exactMatch` / `skos:broadMatch` to the external schemes of section 8.2 — LCSH and the
+  OECD Fields of Science category from the crosswalk in section 13, PhySH for the physics core,
+  MeSH for the photobiology cluster, and ICS as `skos:notation` where a CIE publication is
+  already filed under one. **This is the layer that has to be maintained centrally rather than
+  per record**, because the number of external schemes will grow with the range of CIE
+  divisions that publish data tables while the CIE value list must not fragment;
 - the **ILV section numbering (`17-21` … `17-32`) as the top level**, which is what makes this
   a CIE classification rather than an ad-hoc list, and which links the subject scheme to the
   terminology scheme rather than duplicating it;
@@ -1080,7 +1128,15 @@ is the authorised URI it returned.
 
 Three exact matches out of eleven is the measurement that settles the vocabulary question: a
 general thesaurus cannot carry this list, which is why the CIE scheme is primary and LCSH is a
-crosswalk. In addition, every record carries the constant Fields-of-Science entry:
+crosswalk.
+
+**Two columns are deliberately absent.** PhySH almost certainly matches more of these eleven
+than LCSH does, and MeSH will matter as soon as Division 6 publishes a data table — but PhySH
+concept identifiers are opaque UUID-style strings that must be read from its API, and none is
+stated here rather than guessed. Filling those two columns is the first task of the mapping
+work described in section 8.2, not an omission to be worked around.
+
+In addition, every record carries the constant Fields-of-Science entry:
 
 | `subject` | `subjectScheme` | `schemeURI` |
 |---|---|---|
@@ -1187,5 +1243,15 @@ can be derived when a consumer needs it.
   `/authorities/subjects/suggest2?q=…` is what the mappings in section 13 were checked against)
 - OECD Fields of Science and Technology — http://www.oecd.org/science/inno/38235147.pdf,
   the `schemeURI` DataCite uses for `Fields of Science and Technology (FOS)`
+- PhySH, Physics Subject Headings (American Physical Society) — https://physh.org,
+  licensing https://physh.org/licensing (CC0 1.0), API https://physh.org/apis,
+  concept URIs `https://physh.org/concepts/{id}`
+- MeSH (US National Library of Medicine) — https://id.nlm.nih.gov/mesh/, descriptor URIs
+  `https://id.nlm.nih.gov/mesh/D018462`; lookup API
+  `https://id.nlm.nih.gov/mesh/lookup/descriptor?label=…`, RDF and SPARQL from the same host
+- ICS, International Classification for Standards (ISO), 7th edition —
+  https://www.iso.org/iso/international_classification_for_standards.pdf; browse a code at
+  `https://www.iso.org/ics/17.180.20/x/`. Note this is a catalogue path, not a term
+  identifier — use `classificationCode`, not `valueURI`
 - SKOS — https://www.w3.org/TR/skos-reference/ (already listed above; the serialisation G9 asks
   for)
