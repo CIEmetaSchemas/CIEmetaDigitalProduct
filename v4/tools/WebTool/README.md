@@ -88,8 +88,7 @@ backfill the schema-4.1 field `metadataRevision` into legacy payloads without
 recomputing `contentHash` or recording it in the history, which left 38 of 39
 entries in `CIEmetaDBdataset.json` (and every entry in both starter databases) with
 a hash describing the pre-backfill payload. Both the data and `migrateDb()` have
-been repaired; see defect 7 in
-[`../../docs/INTEROPERABILITY.md`](../../docs/INTEROPERABILITY.md).
+been repaired.
 
 The repair itself lives in **one** function, `repairDerivedFields()` in
 `CIEmetaDB.html`. `migrateDb()` calls it on every entry it migrates — and reports

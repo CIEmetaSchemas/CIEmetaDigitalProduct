@@ -322,7 +322,7 @@ terminology committee — see recommendation G8.
 Today the symbol is embedded in `title`, and the transliteration is inconsistent. The
 repository contains `x_bar(lambda)`, `V'(lambda)`, `s_mel(lambda)`, `K_m,mes;m`.
 `CIE_srf_PS_5nm` also carried `β15(λ)`, the only non-ASCII column title in the corpus; it
-is now transliterated as `beta15(lambda)` (defect 4, since fixed).
+is now transliterated as `beta15(lambda)`.
 
 `title` has to stay as it is: it is the label a user sees against a CSV column, and ASCII is
 the safe choice for that. But a consumer that wants to render a correct axis label should
@@ -446,8 +446,9 @@ normalised to `NaN` while doing so.
 
 Three identifier hooks already exist in the schema and are unused in all 39 records.
 
-**Creators and publisher.** None of the 39 records carries `nameIdentifiers`. The CIE has a
-ROR identifier, verified:
+### 8.1 Creators and publisher
+
+None of the 39 records carries `nameIdentifiers`. The CIE has a ROR identifier, verified:
 
 ```json
 "creators": [{
@@ -466,9 +467,11 @@ Where an individual is credited, `nameIdentifierScheme: "ORCID"` with the full
 `["ISNI", "GRID", "Crossref Funder ID", "Other"]`, offering the superseded GRID but not ROR;
 **`"ROR"` has since been added** to the schema — see the version history in [README.md](README.md).
 
-**Subjects.** `subjects[]` supports `subjectScheme`, `schemeURI`, `valueURI` and
-`classificationCode`. Across the 39 records there are **113 subject entries drawing on 14
-distinct strings, and `subject` is the only sub-key ever used** — no scheme is declared
+### 8.2 Subjects
+
+`subjects[]` supports `subjectScheme`, `schemeURI`, `valueURI`,
+`classificationCode` and `lang`. Across the 39 records there are **113 subject entries drawing
+on 14 distinct strings, and `subject` is the only sub-key ever used** — no scheme is declared
 anywhere:
 
 | subject | uses | | subject | uses |
@@ -483,12 +486,128 @@ anywhere:
 
 The list reads as entries from a classification rather than free keywords, and the
 right-hand column shows the cost of not saying so: three of the fourteen are
-capitalisation variants of another three (defect 5). Fourteen values is small enough to
-enumerate. Declaring the scheme costs one field per subject and makes the values
-resolvable; if the strings are ad-hoc, CIE should adopt a scheme — the e-ILV itself would
-be a natural source once recommendation G is in place.
+capitalisation variants of another three (defect 5a). Fourteen values is small enough to
+enumerate. But the strings alone understate the problem; three further things follow from
+looking at how the 113 entries are *distributed*.
 
-**Licence.** `rightsIdentifier` is `"CC BY-SA 4.0"`. The SPDX short identifier is
+**The 113 entries form only six distinct sets, and two of those are the same four concepts:**
+
+| records | set |
+|---|---|
+| 18 | `Photometry` · `Objective photometry` · `Units. Constants` |
+| 10 | `Colorimetry` · `Colour of objects` · `Colour vision` · `Perception of colour` |
+| 4 | *(empty — no `subjects[]` entries)* |
+| 4 | `Influence of the colour of the light` · `Artificial daylight` |
+| 2 | `Perception of Colour` · `Colour of Objects` · `Colour Vision` · `Colorimetry` |
+| 1 | `Influence of the colour of the light` · `Lighting with respect to object illuminated` · `Evaluation of light sources` |
+
+The two-record row is the ten-record row again: the same four concepts, in a different order
+and a different casing. Subjects were therefore assigned **per import batch rather than per
+dataset**, and that shows up as content error and not only as spelling. Three groups, twelve
+records:
+
+- the chromaticity-coordinate, colour-matching-function and tristimulus tables
+  (`CIE_cc_1931_2deg`, `CIE_cc_1964_10deg`, `CIE_xyz_1931_2deg`, `CIE_xyz_1964_10deg`,
+  `CIE_cfb_stv_2deg`, `CIE_cfb_stv_10deg`, `CIE_smb_cc_2deg`) carry the *photometry* set and
+  not `Colorimetry`;
+- `CIE_std_illum_A_1nm`, `CIE_std_illum_D50` and `CIE_std_illum_D65` carry the photometry set,
+  while the nine other illuminant tables — `CIE_illum_C`, `D55`, `D75`, `Dxx_comp`, `FLs`,
+  `FLs_1nm`, `HPs`, `LEDs`, `LEDs_1nm` — carry the colorimetry set. Same kind of table, two
+  different answers;
+- `CIE_lms_cf_2deg` and `CIE_lms_cf_10deg` carry `Artificial daylight`, inherited from the
+  `CIE_illum_ID50`/`ID65` pair they were imported with.
+
+Casing is the visible symptom of a batch-assignment practice; declaring a scheme fixes the
+symptom, not the practice (defects 5a and 5c).
+
+**Four of the 39 records carry no subjects at all** — `CIE_RefSpectrum_L41`,
+`CIE_srf_CQS_5nm`, `CIE_srf_FCI_5nm` and `CIE_srf_PS_5nm` (`10.25039/CIE.DS.van56dfj`,
+`.yzfhz3cm`, `.vkss79ef`, `.7chm7z5h`). DataCite makes `subject` *Recommended* rather than
+mandatory, so this is a gap and not an error — but it is a gap in the one field that carries
+topical discoverability (defect 5b).
+
+**Nothing outside this repository holds these subjects.** The CIE dataset DOIs are registered
+at **Crossref, not DataCite**: the prefix `10.25039` returns 1 429 works from the Crossref API
+and none from the DataCite API, and the record for `10.25039/CIE.DS.vqqhzp5a` is
+`type: dataset`, publisher `International Commission on Illumination (CIE)`, with an empty
+subject array. The JSON sidecar is therefore the only carrier of subject information. That is
+a finding in both directions: subject metadata is invisible to DOI-based discovery today, and
+repairing it changes no external record — only `metadataRevision`, per CIE 3.
+
+**Which subject vocabulary — no established public scheme covers these values.** They are
+facet headings from a classification, not keywords: `Units. Constants` reads as a merged
+heading from a printed
+catalogue, and `Lighting with respect to object illuminated` and `Objective photometry` are
+not phrasings any general thesaurus uses. Searching for the distinctive ones outside
+`cie.co.at` returns nothing. The candidates were checked:
+
+| Scheme | Assessment |
+|---|---|
+| **OECD Fields of Science (FoS)** | Six top-level categories and 42 subcategories. Fits the CIE corpus only at `FOS: Physical sciences` — one value for all 39 records — but that is the field OpenAIRE and the European data portals harvest on. **Recommended as a coarse anchor.** |
+| **LCSH** (`id.loc.gov`) | Resolvable, SKOS, content-negotiable, stable, and one of the two schemes the DataCite 4.7 documentation names. An exact match exists for only 3 of the 11 CIE concepts (see section 13); for the rest LCSH is a *broader* term, and in one case it cannot distinguish two CIE concepts at all — `Color perception` is a variant label that LCSH redirects to `Color vision`, whereas the CIE list keeps `Perception of colour` and `Colour vision` apart. **Recommended as an optional `valueURI` where the match is exact, and as the `skos:broadMatch` target otherwise.** |
+| ANZSRC Fields of Research | The other scheme DataCite names. Australian/New Zealand research administration; no advantage over FoS here and no per-term URIs. |
+| UNESCO Thesaurus, Wikidata, QUDT | Too coarse, not authoritative for lighting, or a unit vocabulary rather than a subject one. Not recommended as primary, for the same one-identifier-per-concept reason given against QUDT and UCUM in section 14. |
+| IEC 60050-845 / Electropedia | Terminology, not classification — the same objection as the e-ILV below. |
+
+**The CIE e-ILV is the wrong instrument for `subjects[]`, despite being the right one for
+`quantityPID`.** It is a *terminology* vocabulary: its 1 347 entries are term-level concepts —
+quantities, phenomena, symbols — which is exactly what recommendation B already cites. Using
+ILV terms as subject values would conflate *what a column measures* with *what a dataset is
+about*, duplicate recommendation B at record level, and make `subjects[]` depend on a
+vocabulary that section 9.1 measures as having no content negotiation, no serialisation, no
+bulk download and a CMS-path identifier. Several of the CIE headings — `Artificial daylight`,
+`Evaluation of light sources`, `Lighting with respect to object illuminated` — have no ILV term
+at all, because they are application topics rather than defined concepts.
+
+The e-ILV does have one role here, but a different one: as the **source of a derived CIE
+subject scheme**. The ILV's own section numbering (`17-21` … `17-32`) is already a CIE topical
+classification, and it is the natural top level for one. That is recommendation **G9** below,
+not a change to `subjects[]`.
+
+**Proposal — three layers.**
+
+*Layer 1 — declare the scheme and close the list.* The 14 strings collapse to **11
+concepts**; the canonical form is sentence case, which is the majority spelling in every
+case (10 uses against 2). Each entry gains three fields:
+
+```json
+{
+  "subject": "Perception of colour",
+  "subjectScheme": "CIE Subject Headings",
+  "schemeURI": "https://cie.co.at/subject-headings",
+  "lang": "en"
+}
+```
+
+`subjectScheme` is the field that does the work, and it does it **before** anything is
+published at `schemeURI`: it declares the value set closed, which is what makes a casing
+variant or an unknown value detectable by a tool instead of only by eye. The scheme name and
+URI above are CIE's to mint and are placeholders here.
+
+*Layer 2 — one coarse external anchor, identical on all 39 records.* A second entry
+alongside the CIE ones:
+
+```json
+{
+  "subject": "FOS: Physical sciences",
+  "subjectScheme": "Fields of Science and Technology (FOS)",
+  "schemeURI": "http://www.oecd.org/science/inno/38235147.pdf"
+}
+```
+
+This is the smallest change with the largest discovery effect, and recommendation E
+(section 7.1, `dcat:keyword` / `dct:subject`) depends on it.
+
+*Layer 3 — `valueURI` per concept where an exact match exists.* LCSH for the three concepts
+that have one, absent for the other eight — the same honest-gap principle applied to
+`quantityPID` for `adaptation coefficient` in section 11.3. The nearest LCSH *broader* terms
+are recorded in section 13 nonetheless: they are what the CIE scheme should carry as
+`skos:broadMatch` under G9, and putting a broader term in `valueURI` would misstate it as the
+subject itself.
+
+### 8.3 Licence
+
+`rightsIdentifier` is `"CC BY-SA 4.0"`. The SPDX short identifier is
 `CC-BY-SA-4.0` (hyphenated), which is what automated licence tooling matches on:
 
 ```json
@@ -613,6 +732,30 @@ A useful editorial rule follows from this: **any quantity appearing in a publish
 table should have an ILV term.** The data tables are a good forcing function for
 vocabulary completeness, and the sixteen-row table in section 13 is the current audit.
 
+**G9 — publish the CIE subject headings as a SKOS scheme.** Distinct from G1–G8, which are
+about the ILV itself, but the same argument applied to a second CIE vocabulary. Section 8.2
+shows that the 11 subject headings used across the published data tables belong to no public
+classification: CIE is the only body that can declare them. The deliverable is small — 11
+concepts, growing slowly — and it is the prerequisite for `subjectScheme` and `schemeURI` in
+recommendation F meaning anything more than a label:
+
+- a `skos:ConceptScheme` at a documented URI, one `skos:Concept` per heading with
+  `skos:prefLabel` (language-tagged, E and F at least, as in G7) and `skos:notation`;
+- `skos:broadMatch` to LCSH and to the OECD Fields of Science category, from the crosswalk in
+  section 13 — the mapping table exists already and needs only to be asserted;
+- the **ILV section numbering (`17-21` … `17-32`) as the top level**, which is what makes this
+  a CIE classification rather than an ad-hoc list, and which links the subject scheme to the
+  terminology scheme rather than duplicating it;
+- the same content negotiation, persistence policy and bulk download as G1, G2 and G5 — a
+  scheme cited in permanent records needs them for the same reasons.
+
+Two editorial questions surface as soon as the list is written down as concepts rather than
+strings. `Units. Constants` is a single heading covering two concepts, and reads as a merged
+entry from a printed catalogue; as SKOS it should be two. And `Perception of colour` versus
+`Colour vision` is a distinction the CIE list makes and LCSH does not — worth stating
+explicitly in a `skos:scopeNote`, because it is exactly the kind of distinction that decays
+into a casing variant when nothing records it.
+
 ### 9.3 Why this is worth doing
 
 CIE is the authority for these concepts. If the e-ILV is not machine-actionable, consumers
@@ -627,9 +770,16 @@ that the SI Reference Point has made BIPM the cited source for units.
 
 Independent of the recommendations above. These are defects in the published data,
 measured against the 39 entries in `CIEmetaDBdataset.json`. The affected share of the corpus
-is small — 8 defective columns out of 402, plus the subject-casing issue.
+is small — 8 defective columns out of 402, plus the subject defects.
 
-**Defects 3, 4, 6 and 7 have since been corrected**; the remaining ones are 1, 2, 5 and 8.
+**This register lists open items only.** Four defects recorded in earlier revisions of this
+document — a `descrition` typo for `description`, a non-ASCII column title, a `schemaName`
+typo in the v3 example, and a `contentHash` inconsistency across the WebTool databases — have
+been corrected and their entries removed. The numbering of the remaining items is **not**
+reissued, so 1, 2, 5 and 8 keep the numbers they have always had and references to them from
+outside this document stay valid. The analysis of the `contentHash` defect and its cause in
+`migrateDb()` lives in [`../tools/WebTool/README.md`](../tools/WebTool/README.md); the rest is
+in the git history.
 
 Defects in the *v4 schema file* — it was not valid JSON, it had no `$id`, its `wavelength_*`
 fields rejected the sentinel strings the documentation requires, and `funderIdentifierType`
@@ -645,32 +795,23 @@ example can now be checked against its own schema by a strict parser. `schemaVer
 |---|---|---|---|
 | 1 | `"quantity": "  "` (whitespace) on the `lambda` column | 2 columns | `CIE_illum_D55`, `CIE_illum_D75` |
 | 2 | `quantity` key absent | 6 columns | `CIE_1st_deriv_meta_ind` (`delta_x_bar(lambda)`, `delta_y_bar(lambda)`, `delta_z_bar(lambda)`), `CIE_illum_Dxx_comp` (`S_0(lambda)`, `S_1(lambda)`, `S_2(lambda)`) |
-| 3 | **`descrition` typo** instead of `description` — **fixed** | 15 columns in **1** dataset | `CIE_srf_CQS_5nm` |
-| 4 | `β15(λ)` — the only non-ASCII column title in the corpus, where every other dataset transliterates (`x_bar`, `lambda`) — **fixed**, now `beta15(lambda)` | 1 column | `CIE_srf_PS_5nm` |
-| 5 | **Subject casing is inconsistent** — the same concept appears under two spellings | 6 subject entries | `Perception of colour` (10) vs `Perception of Colour` (2); `Colour of objects` (10) vs `Colour of Objects` (2); `Colour vision` (10) vs `Colour Vision` (2) |
-| 6 | v3 example declared `"schemaName": "CIEmetaDataProduct"`, which its own schema rejects (`const: "CIEmetaDigitalProduct"`) — **fixed** | 1 file | `v3/examples/CIE_cc_1931_2deg.csv_metadata.json` |
-| 7 | **Stored `contentHash` does not match the payload**, and replaying `history[].patch` does not reproduce it — **fixed** | 38 of 39 entries, plus 36 of 36 and 9 of 9 in the two bundled starter databases | all except `CIE_std_illum_A_1nm` |
+| 5a | **Subject casing and order are inconsistent** — `Perception of colour` (10) vs `Perception of Colour` (2), `Colour of objects` (10) vs `Colour of Objects` (2), `Colour vision` (10) vs `Colour Vision` (2), and the four concepts in a different order | 8 subject entries | `CIE_srf_cfi`, `CIE_srf_cfi_1nm` |
+| 5b | **`subjects[]` empty** — no topical metadata at all | 4 of 39 records | `CIE_RefSpectrum_L41`, `CIE_srf_CQS_5nm`, `CIE_srf_FCI_5nm`, `CIE_srf_PS_5nm` |
+| 5c | **Subjects contradict the dataset content**, having been assigned per import batch rather than per dataset — see section 8.2 | 12 records | `CIE_cc_*`, `CIE_xyz_*`, `CIE_cfb_stv_*`, `CIE_smb_cc_2deg`; `CIE_std_illum_A_1nm`, `CIE_std_illum_D50`, `CIE_std_illum_D65`; `CIE_lms_cf_2deg`, `CIE_lms_cf_10deg` |
 | 8 | **One schema DOI for two schema versions** — `10.25039/CIE.SC.4taqevcd` is the mandated `schemaURL` of *both* v3 and v4 and the `$id` of v4, so `schemaURL` does not identify which schema a record was written against | both schema files, every published record | v3 and v4 schemas |
 
-Defect 3 was the one that silently lost information: a consumer reading `description` got
-nothing for those 15 columns. It was **far less widespread than it first appeared** — the
-stale copies in `../examples/` carried the typo in 12 files, but in the live database only
-`CIE_srf_CQS_5nm` still had it. That remainder is now corrected, and the key `descrition`
-occurs nowhere in the database. The stale copies have since been deleted, so the only
-surviving trace of the typo is in the git history.
+Defect 5 is a direct illustration of why recommendation F matters, and it has three parts
+because they need three different repairs. All 113 subject entries are bare strings with no
+`subjectScheme`, `schemeURI` or `valueURI`: nothing prevents the same concept being entered
+twice with different capitalisation (5a), nothing marks a record as having no subjects at all
+(5b), and nothing relates a subject to the content of the table it describes (5c). 5a is
+mechanical — pick the majority spelling, section 13 lists it. 5b and 5c are editorial and
+need CIE, because they are about which topics a dataset belongs to and not about how they are
+written. Declaring the scheme, per section 8.2, is what makes 5a detectable by a tool rather
+than by eye; it does not by itself prevent 5b or 5c.
 
-Defect 5 is a direct illustration of why recommendation F matters. Fourteen distinct subject
-strings are in use across 113 subject entries, all as bare strings with no
-`subjectScheme`, `schemeURI` or `valueURI` — nothing prevents the same concept being
-entered twice with different capitalisation, and nothing detects it afterwards.
-
-Defect 6 was a plain typo — `CIEmetaDataProduct` for `CIEmetaDigitalProduct` — and it was
-the only point on which the v3 example failed its own schema; it now validates with no
-errors. It had gone unnoticed because the v3 schema file could not be parsed (see above), so
-the example had never actually been run against it.
-
-Defect 8 came to light while fixing 6, and it is the one item in this register that cannot be
-repaired in this repository. Both schema versions declare
+Defect 8 came to light while repairing the v3 example, and it is the one item in this register
+that cannot be repaired in this repository. Both schema versions declare
 `"schemaURL": {"const": "https://doi.org/10.25039/CIE.SC.4taqevcd"}`, and v4 additionally
 declares that DOI as its `$id`. A consumer holding a metadata file therefore learns the
 schema version only from `schemaVersion`, never from the identifier the record is required to
@@ -682,83 +823,20 @@ mint a version-distinguishing identifier — a versioned DOI, or one DOI per sch
 with the current one kept as a "latest" alias. It is the same persistence argument made for
 the e-ILV in recommendation G2, applied to CIE's own schema.
 
-Defect 7 was not visible in any published metadata file — it affected the WebTool database
-envelope, not the payloads, and all 39 payloads validated throughout. Recomputing
-`contentHash(payload)` with the tool's own `canonical()` and SHA-256 reproduced the stored
-value for exactly one entry, and `reconstruct(history, rev)` failed to reproduce the payload
-for the other 38. The consequence was that `historyContainsHash()`, the ancestry test the
-merge path uses to decide fast-forward versus conflict, could not recognise an ancestor for
-those entries, so every concurrent edit was reported as a conflict.
-
-**Cause — a single line.** `migrateDb()` in `CIEmetaDB.html` backfilled the schema-4.1 field
-`metadataRevision` into legacy payloads:
-
-```js
-if(e.payload && e.payload.metadataRevision==null) e.payload.metadataRevision=e.rev;
-```
-
-It did not recompute `contentHash` and did not record the field in the history, so after
-the backfill the stored hash described the *pre-backfill* payload and the history replayed to
-it rather than to the payload. That is exactly what was measured: for 37 of the 39 entries the
-replay differed from the payload by `/metadataRevision` and nothing else, and for 36 of those
-the stored hash was the hash of the replay. The one consistent entry,
-`CIE_std_illum_A_1nm`, is the only one re-published after 4.1, so the tool itself wrote its
-rev-2 patch — `{"op":"replace","path":"/metadataRevision","value":2}` — which is the shape the
-repair reproduces. `createEntry()` and `publishEntry()` both set the field before diffing and
-were never at fault.
-
-**Fix applied.** `v4/tools/WebTool/db_integrity.js` checks the invariants
-`CIEmetaDB_schema.json` declares and repairs the derived fields: it records
-`metadataRevision` in each history patch, recomputes every `history[].baseHash`, every
-`contentHash` and the database `baseHash`. It repairs derived fields only and refuses to
-write if a payload-content divergence would survive, so a stale hash is never replaced by a
-freshly computed hash over a payload its own history contradicts. The two bundled starter
-databases carried the same defect (36 of 36 and 9 of 9) and were repaired too. Nothing in the
-script is reimplemented: it lifts `canonical()`, `contentHash()`, `applyPatch()`, `kindOf()`,
-`repairDerivedFields()` and the rest out of `CIEmetaDB.html` at run time, for the reason set out
-in section 10.1.
-
-**Cause removed as well.** Repairing the data alone would have left the mechanism in place for
-the next pre-4.1 database anyone opens, so `migrateDb()` was corrected too. The repair is now
-one function, `repairDerivedFields()`, which `migrateDb()` calls on every entry it migrates and
-which `db_integrity.js` lifts instead of restating — so the tool and the checker cannot
-disagree about what a consistent entry looks like. Three things changed:
-
-- **Order — three passes.** Structural defaults first (`rev`, `history`, `revisionOf`), then
-  `migrateStatuses()`, then the payload backfill and the derived fields over the resulting
-  list. Previously `contentHash` was computed *before* the backfill mutated the payload, so
-  even a freshly computed hash was stale the moment it was written. `migrateStatuses()` has to
-  sit in the middle because it can **split** a legacy record — unpublished edits stored on top
-  of a published revision — into a published parent plus a revision of it, and that parent is a
-  new entry no earlier pass has seen; repairing per entry before the split would miss it.
-- **`pendingRev()` rather than `rev`.** An unpublished payload is the revision waiting to be
-  published, so it carries `rev + 1` — which is what `storeDraft()` and `publishEntry()`
-  record. The old backfill gave `rev`, understating every unpublished edit by one.
-  `pendingRev()` reads `kindOf()`, which depends on `rev` and `revisionOf` and not on the
-  stored status, so it is right for all three states once the first pass has run.
-- **The migration is no longer silent.** `loadDbFromText()` reports how many derived fields
-  were repaired and leaves the database marked unsaved, so the repair can be written back
-  instead of being redone on every open.
-
-This was verified against a database reduced to its genuine pre-4.1 state — no
-`metadataRevision` in any payload or patch, hashes recomputed over those payloads, plus a
-legacy record holding unpublished edits, since no shipped database contains one. In that state
-the hash chain is sound, and the only entry flagged is that legacy record, which is precisely
-what `migrateStatuses()` exists to resolve. Applying the old one-line backfill reproduces
-defect 7 exactly (`E3` and `E4` across the corpus). Applying the corrected `migrateDb()` yields
-a database that passes `db_integrity.js --check`, splits the legacy record into a published
-parent at `metadataRevision = rev` and a revision at `rev + 1` where the old code gave both
-`rev`, and repairs nothing on a second migration.
-
 Fixing any of 1, 2 or 5 changes metadata content and therefore increments
-`metadataRevision` per CIE 3. Defects 3 and 4 were instead applied directly to the stored
-payloads without a revision bump: `rev`, `metadataRevision` and `audit` are unchanged. To let
-the history replay to the payload again, the corrections were also written into the rev-1
-patches of `CIE_srf_CQS_5nm` and `CIE_srf_PS_5nm`. **Those two rev-1 patches therefore no
-longer reproduce the file that was imported on 2026-07-21.** This is recorded rather than
-hidden; the alternative was to reissue both as revision 3, which would have changed a
-published `metadataRevision` and required re-publishing two metadata files for a typo and a
-transliteration.
+`metadataRevision` per CIE 3. For subjects there is nothing else to keep in step: as section
+8.2 records, no DOI record carries them, so a subject repair is invisible outside this
+repository.
+
+**One consequence of an earlier repair is still a live property of the database.** Two
+corrections — a `description` key typo in `CIE_srf_CQS_5nm` and a non-ASCII column title in
+`CIE_srf_PS_5nm` — were applied directly to the stored payloads without a revision bump, so
+`rev`, `metadataRevision` and `audit` are unchanged, and to let the history replay to the
+payload again the corrections were written into the rev-1 patches of those two entries.
+**Those two rev-1 patches therefore no longer reproduce the files that were imported on
+2026-07-21.** This is recorded rather than hidden; the alternative was to reissue both as
+revision 3, which would have changed a published `metadataRevision` and required
+re-publishing two metadata files for a typo and a transliteration.
 
 ### 10.1 The schema was defined twice — **resolved**
 
@@ -901,14 +979,15 @@ concept with no identifier — better an honest gap than a fabricated URI.
 - *Schema file: **done.*** Valid JSON, `$id`, sentinel-tolerant `wavelength_*`, ROR.
   `schemaVersion` stays `4`, the schema DOI is unchanged, and all 39 published records now
   validate against the file. See the version history in [README.md](README.md).
-- *Data (section 10): defects 3, 4, 6 and 7 **done**, 1, 2 and 5 outstanding.* Records
-  touched increment `metadataRevision` per CIE 3 — note that 3 and 4 were applied in place
-  without a bump, see section 10. Effort: small — 8 defective columns out of 402, plus the
-  subject-casing variants.
-- *Database integrity (defect 7): **done.*** The three shipped databases now satisfy the
-  invariants `CIEmetaDB_schema.json` declares, `db_integrity.js --check` verifies it, and the
-  `migrateDb()` backfill that caused it has been corrected so a pre-4.1 database migrates
-  consistently.
+- *Data (section 10): 1, 2, 5a and 5b outstanding.* Records touched increment
+  `metadataRevision` per CIE 3. Effort: small and local — 8 defective columns out of 402,
+  8 mis-cased subject entries in 2 records, and 4 records with no subjects. 5a needs only the
+  majority spelling from section 13; 5b needs CIE to say which topics those four datasets
+  belong to.
+- *Subject assignment (defect 5c): outstanding, editorial.* Twelve records carry the subject
+  set of the batch they were imported with rather than of their own content. Not a spelling
+  question and not repairable mechanically; it needs CIE, and it is the item that argues most
+  strongly for the closed list of section 8.2 and the scheme of G9.
 - *Schema identifier (defect 8): outstanding and not repairable here.* Needs a
   version-distinguishing schema DOI from CIE; see section 10.
 
@@ -917,23 +996,32 @@ fields; publish the appendix table as a normative annex to README.md; extend the
 the Quantity and Unit inputs become dropdowns backed by that table, with the PID filled in
 automatically. Currently both are plain text inputs (`CIEmetaDB.html` around lines
 1443–1444) and the conventions are enforced by nothing — which is how the whitespace and
-missing-key defects arose. Remember the two-places rule for schema changes (section 10.1).
+missing-key defects arose. **Apply the same treatment to the Subject input**, backed by the
+eleven-value list in section 13 with `subjectScheme`, `schemeURI` and `lang` filled in
+automatically: the subject field has exactly the defect history of the quantity field and the
+same cause, and closing the list is what turns 5a from an editorial habit into a validation
+error. Remember the two-places rule for schema changes (section 10.1).
 `schemaVersion` stays `4`; document the change as 4.2. Effort: small for the data, moderate
 for the tool.
 
 **Phase 3 — linked data.** `@context`, the DCAT/schema.org crosswalk on DOI landing pages,
-derived CSVW sidecars, and the agent PIDs of recommendation F. Effort: moderate, and
-partly dependent on CIE web infrastructure rather than on this repository.
+derived CSVW sidecars, and the agent, subject and licence PIDs of recommendation F — including
+the `FOS: Physical sciences` entry and the LCSH `valueURI` values of section 8.2, which is
+where a portal harvest starts paying off. Effort: moderate, and partly dependent on CIE web
+infrastructure rather than on this repository.
 
 **Parallel track — recommendation G.** Not on this repository's critical path, and on a
 different timescale. Phases 1–3 are worth doing whether or not G happens; G1, G2 and G4
-would make the `quantityPID` values from Phase 2 substantially more useful.
+would make the `quantityPID` values from Phase 2 substantially more useful, and G9 would do
+the same for `subjectScheme` — which is the one place in Phase 1 where this repository can
+only put a placeholder, because the vocabulary does not exist outside CIE.
 
 ---
 
 ## 13. Appendix — normative mapping table
 
-The complete vocabulary of the CIE data-table corpus. Sixteen rows.
+The complete vocabulary of the CIE data-table corpus: sixteen rows for units and quantities,
+and eleven for subjects.
 
 ### Units
 
@@ -962,6 +1050,42 @@ The complete vocabulary of the CIE data-table corpus. Sixteen rows.
 | `maximum luminous efficacy` | `https://cie.co.at/eilvterm/17-21-092` |
 | `adaptation coefficient` | *(no term — see 4.1 and G8)* |
 
+### Subjects
+
+The fourteen strings in use collapse to eleven concepts. `subject` is the canonical form —
+sentence case, the majority spelling in every case; `superseded` lists the variants to be
+replaced by it. All eleven carry
+`subjectScheme: "CIE Subject Headings"`, `schemeURI: "https://cie.co.at/subject-headings"` and
+`lang: "en"` — placeholders until CIE mints them, per G9.
+
+`valueURI` is given only where LCSH has an **exact** match; the *nearest LCSH broader term*
+column is not a `valueURI` and must not be written into a record as one — it is the crosswalk
+for the `skos:broadMatch` assertions of G9. Each heading below was looked up in the LCSH
+suggest API (`https://id.loc.gov/authorities/subjects/suggest2?q=…`) and the identifier given
+is the authorised URI it returned.
+
+| `subject` | superseded | `valueURI` (LCSH exact) | nearest LCSH broader term |
+|---|---|---|---|
+| `Photometry` | — | `https://id.loc.gov/authorities/subjects/sh85101383` | — |
+| `Objective photometry` | — | *(none)* | Photometry `sh85101383` |
+| `Units. Constants` | — | *(none — one heading, two concepts; see G9)* | Units of measurement `sh85141054`; Physical constants `sh85031311` |
+| `Colorimetry` | — | `https://id.loc.gov/authorities/subjects/sh85028695` | — |
+| `Colour of objects` | `Colour of Objects` | *(none)* | Color `sh85028577` |
+| `Colour vision` | `Colour Vision` | `https://id.loc.gov/authorities/subjects/sh85028654` | — |
+| `Perception of colour` | `Perception of Colour` | *(none — LCSH redirects `Color perception` to `Color vision`, so it cannot hold this distinction)* | Color vision `sh85028654` |
+| `Influence of the colour of the light` | — | *(none)* | — |
+| `Artificial daylight` | — | *(none — LCSH `Daylight` is natural daylight)* | Daylight `sh85035970` |
+| `Lighting with respect to object illuminated` | — | *(none)* | Lighting `sh85076925` |
+| `Evaluation of light sources` | — | *(none)* | Light sources `sh85076909` |
+
+Three exact matches out of eleven is the measurement that settles the vocabulary question: a
+general thesaurus cannot carry this list, which is why the CIE scheme is primary and LCSH is a
+crosswalk. In addition, every record carries the constant Fields-of-Science entry:
+
+| `subject` | `subjectScheme` | `schemeURI` |
+|---|---|---|
+| `FOS: Physical sciences` | `Fields of Science and Technology (FOS)` | `http://www.oecd.org/science/inno/38235147.pdf` |
+
 ### As a lookup object
 
 Embeddable directly in the WebTool.
@@ -987,9 +1111,36 @@ Embeddable directly in the WebTool.
     "spectral luminous efficiency":      "https://cie.co.at/eilvterm/17-21-035",
     "luminous efficiency":               "https://cie.co.at/eilvterm/17-21-094",
     "maximum luminous efficacy":         "https://cie.co.at/eilvterm/17-21-092"
+  },
+  "subjectScheme": {
+    "subjectScheme": "CIE Subject Headings",
+    "schemeURI":     "https://cie.co.at/subject-headings",
+    "lang":          "en"
+  },
+  "subjects": {
+    "Photometry":                                  "https://id.loc.gov/authorities/subjects/sh85101383",
+    "Objective photometry":                        null,
+    "Units. Constants":                            null,
+    "Colorimetry":                                 "https://id.loc.gov/authorities/subjects/sh85028695",
+    "Colour of objects":                           null,
+    "Colour vision":                               "https://id.loc.gov/authorities/subjects/sh85028654",
+    "Perception of colour":                        null,
+    "Influence of the colour of the light":        null,
+    "Artificial daylight":                         null,
+    "Lighting with respect to object illuminated": null,
+    "Evaluation of light sources":                 null
+  },
+  "subjectVariants": {
+    "Colour of Objects":    "Colour of objects",
+    "Colour Vision":        "Colour vision",
+    "Perception of Colour": "Perception of colour"
   }
 }
 ```
+
+The value of `subjects` is the `valueURI` where one exists and `null` where none does — a
+`null` here means *no exact identifier exists*, and a tool must leave `valueURI` absent rather
+than write an empty string. `subjectVariants` is the migration map for defect 5a.
 
 ---
 
@@ -1027,3 +1178,14 @@ can be derived when a consumer needs it.
 - ROR — https://ror.org (CIE: https://ror.org/05w2j5k62)
 - ORCID — https://orcid.org
 - SPDX licence list — https://spdx.org/licenses/
+
+**Subjects**
+- DataCite `Subject` property, sub-properties and guidance —
+  https://datacite-metadata-schema.readthedocs.io/en/4.7/properties/subject/
+- Library of Congress Subject Headings — https://id.loc.gov/authorities/subjects/
+  (SKOS and JSON-LD by content negotiation; the suggest API at
+  `/authorities/subjects/suggest2?q=…` is what the mappings in section 13 were checked against)
+- OECD Fields of Science and Technology — http://www.oecd.org/science/inno/38235147.pdf,
+  the `schemeURI` DataCite uses for `Fields of Science and Technology (FOS)`
+- SKOS — https://www.w3.org/TR/skos-reference/ (already listed above; the serialisation G9 asks
+  for)

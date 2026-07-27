@@ -10,7 +10,7 @@
  *
  *   - migrateDb() has to leave a database consistent. When it did not, the symptom was not an
  *     error but every entry being reported as a merge conflict, because a stale contentHash
- *     silently defeats historyContainsHash(). See defect 7 in ../../docs/INTEROPERABILITY.md.
+ *     silently defeats historyContainsHash(). See the contentHash section of ./README.md.
  *   - the revision pair (Start revision / publish / discard) has to leave the published parent
  *     untouched and the history chain contiguous. Getting that wrong corrupts the audit trail
  *     of a published record.
