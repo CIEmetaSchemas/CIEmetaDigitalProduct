@@ -34,7 +34,8 @@ const vm = require("vm");
 const crypto = require("crypto");
 
 const HERE = __dirname;
-const HTML = path.join(HERE, "CIEmetaDB.html");
+const TOOL_DIR = path.join(HERE, "..");
+const HTML = path.join(TOOL_DIR, "CIEmetaDB.html");
 const INTEGRITY = path.join(HERE, "db_integrity.js");
 const DATASET = "CIEmetaDBdataset.json";
 const STARTER_SHORT = "CIEmetaDB_starter_short.json";
@@ -136,7 +137,7 @@ function ok(cond, msg) {
   console.log(`  ${cond ? "pass" : "FAIL"}  ${msg}`);
 }
 
-const readDb = (name) => JSON.parse(fs.readFileSync(path.join(HERE, name), "utf8"));
+const readDb = (name) => JSON.parse(fs.readFileSync(path.join(TOOL_DIR, name), "utf8"));
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const nameOf = (e) => {
   const alt = ((e.payload && e.payload.alternateIdentifiers) || []).find((a) =>

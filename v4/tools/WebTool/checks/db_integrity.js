@@ -19,7 +19,7 @@
  *     node db_integrity.js --check    report violations; exit 1 if any
  *     node db_integrity.js --fix      repair the derived fields in place
  *
- * With no file arguments both modes act on the three databases stored beside this script.
+ * With no file arguments both modes act on the three databases in the WebTool folder above.
  *
  * Nothing here is reimplemented. canonical(), contentHash(), applyPatch(), kindOf(),
  * repairDerivedFields() and friends are lifted verbatim out of CIEmetaDB.html at run time, so
@@ -35,13 +35,15 @@ const path = require("path");
 const vm = require("vm");
 const crypto = require("crypto");
 
+/* HERE is checks/; the tool and its databases sit one level up, in the WebTool folder. */
 const HERE = __dirname;
-const HTML = path.join(HERE, "CIEmetaDB.html");
+const TOOL_DIR = path.join(HERE, "..");
+const HTML = path.join(TOOL_DIR, "CIEmetaDB.html");
 const DEFAULT_DBS = [
   "CIEmetaDBdataset.json",
   "CIEmetaDB_starter.json",
   "CIEmetaDB_starter_short.json",
-].map((f) => path.join(HERE, f));
+].map((f) => path.join(TOOL_DIR, f));
 
 /* ============================================================================
    lift the primitives out of CIEmetaDB.html
@@ -123,7 +125,7 @@ function liftPrimitives() {
 /* CIE_std_illum_A_1nm is the one entry in CIEmetaDBdataset.json that was published after
    metadataRevision was introduced, so the tool wrote its contentHash over the payload as it
    stands. Reproducing that hash proves the lift is faithful. */
-const WITNESS_FILE = path.join(HERE, "CIEmetaDBdataset.json");
+const WITNESS_FILE = path.join(TOOL_DIR, "CIEmetaDBdataset.json");
 const WITNESS_ENTRY = "CIE_std_illum_A_1nm.csv";
 
 function selfTest(api) {
