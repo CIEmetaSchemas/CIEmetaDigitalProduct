@@ -2429,7 +2429,7 @@ function g2(g,label,node){ const l=document.createElement("label"); l.textConten
    Returns a container div with the select (and optional text input) inside.
    Selecting a known value auto-populates obj[pidKey]; selecting "(other)" clears it
    and reveals a text input for a custom value. */
-function comboInp(obj, key, lookupMap, pidKey){
+function comboInp(obj, key, lookupMap, pidKey, pidInputEl){
   const pidMap = new Map(lookupMap.map(e=>[e.value, e.pid]));
   const known  = lookupMap.map(e=>e.value);
   const currentVal = obj[key] || "";
@@ -2458,11 +2458,13 @@ function comboInp(obj, key, lookupMap, pidKey){
       textInp.style.display = "";
       obj[key] = textInp.value || "";
       delete obj[pidKey];
+      if(pidInputEl) pidInputEl.value="";
     } else {
       textInp.style.display = "none";
       obj[key] = sel.value;
       const pid = pidMap.get(sel.value);
-      if(pid) obj[pidKey] = pid; else delete obj[pidKey];
+      if(pid){ obj[pidKey]=pid; if(pidInputEl) pidInputEl.value=pid; }
+      else { delete obj[pidKey]; if(pidInputEl) pidInputEl.value=""; }
     }
     markDirty();
   };
@@ -2687,8 +2689,11 @@ function renderForm(page,e){
     numLbl.textContent="Column "+(idx+1);
     g.appendChild(numLbl);
     g2(g,"Title",inp(it,"title"));
-    g2(g,"Quantity",comboInp(it,"quantity",getVocab("quantities"),"quantityPID"));
-    g2(g,"Unit",comboInp(it,"unit",getVocab("units"),"unitPID"));
+    // Create PID inputs before the combos so comboInp can keep their displayed value in sync
+    const qpidInp=inp(it,"quantityPID",{deleteIfEmpty:true}); qpidInp.placeholder="auto-filled from Quantity dropdown"; qpidInp.style.flex="1";
+    const upidInp=inp(it,"unitPID",{deleteIfEmpty:true}); upidInp.placeholder="auto-filled from Unit dropdown"; upidInp.style.flex="1";
+    g2(g,"Quantity",comboInp(it,"quantity",getVocab("quantities"),"quantityPID",qpidInp));
+    g2(g,"Unit",    comboInp(it,"unit",    getVocab("units"),      "unitPID",    upidInp));
     g2(g,"Description",inp(it,"description",{deleteIfEmpty:true}));
     g2(g,"Wavelength first",inp(it,"wavelength_first",{number:true,deleteIfEmpty:true}));
     g2(g,"Wavelength last",inp(it,"wavelength_last",{number:true,deleteIfEmpty:true}));
@@ -2696,13 +2701,18 @@ function renderForm(page,e){
     const wlHint=document.createElement("p"); wlHint.className="hint"; wlHint.style.gridColumn="1/-1";
     wlHint.textContent='Enter ":unap" in Wavelength first/last/step if not applicable (no wavelengths in this column); use ":null" for Wavelength step if spacing is non-uniform.';
     g.appendChild(wlHint);
-    // PID fields — auto-populated by the combos above; editable for compound/novel units.
-    const qpidRow = inp(it,"quantityPID",{deleteIfEmpty:true}); qpidRow.placeholder="auto-filled from Quantity dropdown";
-    g2(g,"Quantity PID",qpidRow);
+    // Quantity PID — visible, editable, with Open button
+    const qpidWrap=document.createElement("div"); qpidWrap.style.display="flex"; qpidWrap.style.gap="4px"; qpidWrap.style.alignItems="center";
+    const qOpenBtn=document.createElement("button"); qOpenBtn.type="button"; qOpenBtn.className="ghost small"; qOpenBtn.title="Open quantityPID in CIE e-ILV"; qOpenBtn.textContent="Open ↗";
+    qOpenBtn.onclick=()=>{ if(it.quantityPID) window.open(it.quantityPID,"_blank"); else toast("No quantityPID set","warn"); };
+    qpidWrap.appendChild(qpidInp); qpidWrap.appendChild(qOpenBtn);
+    g2(g,"Quantity PID",qpidWrap);
+    // Unit PID — visible, editable, with Open button and parser link
     const upidWrap=document.createElement("div"); upidWrap.style.display="flex"; upidWrap.style.gap="4px"; upidWrap.style.alignItems="center";
-    const upidInp=inp(it,"unitPID",{deleteIfEmpty:true}); upidInp.placeholder="auto-filled from Unit dropdown"; upidInp.style.flex="1";
+    const uOpenBtn=document.createElement("button"); uOpenBtn.type="button"; uOpenBtn.className="ghost small"; uOpenBtn.title="Open unitPID in BIPM SI Digital Framework"; uOpenBtn.textContent="Open ↗";
+    uOpenBtn.onclick=()=>{ if(it.unitPID) window.open(it.unitPID,"_blank"); else toast("No unitPID set","warn"); };
     const upidLink=document.createElement("a"); upidLink.href="https://si-digital-framework.org/SI/unitExpr"; upidLink.target="_blank"; upidLink.title="BIPM unit expression parser — build a PID for compound units"; upidLink.textContent="? Build PID…"; upidLink.className="hint"; upidLink.style.whiteSpace="nowrap";
-    upidWrap.appendChild(upidInp); upidWrap.appendChild(upidLink);
+    upidWrap.appendChild(upidInp); upidWrap.appendChild(uOpenBtn); upidWrap.appendChild(upidLink);
     g2(g,"Unit PID",upidWrap);
     g2(g,"Symbol (Unicode)",inp(it,"symbol",{deleteIfEmpty:true}));
     g2(g,"Symbol (LaTeX)",inp(it,"symbolLatex",{deleteIfEmpty:true}));
@@ -3274,8 +3284,8 @@ function openVocabDialog(type){
   const label=type==="units"?"Units":"Quantities";
   const body=document.createElement("div");
   const info=document.createElement("p"); info.className="hint";
-  info.textContent=label+" vocabulary: display value and its permanent identifier (PID). "+
-    "Editable; the column-header dropdown is built from this list.";
+  info.innerHTML=label+" vocabulary: display value and its permanent identifier (PID). Editable; the column-header dropdown is built from this list."
+    +(type==="units"?' <a href="https://si-digital-framework.org/SI/unitExpr" target="_blank" title="BIPM unit expression parser — build a PID for compound units">? Build compound unit PID…</a>':"");
   body.appendChild(info);
   const list=document.createElement("div"); list.className="divmgr";
   if(!DB.vocabularies) DB.vocabularies={};
@@ -3289,8 +3299,10 @@ function openVocabDialog(type){
       v.oninput=()=>{draft[i].value=v.value;};
       const p=document.createElement("input"); p.placeholder="PID (URI)"; p.value=row.pid||""; p.style.flex="2";
       p.oninput=()=>{draft[i].pid=p.value;};
+      const openA=document.createElement("a"); openA.href="#"; openA.title="Open PID in new tab"; openA.textContent="↗"; openA.className="hint"; openA.style.whiteSpace="nowrap";
+      openA.onclick=(e)=>{e.preventDefault(); const u=draft[i].pid; if(u) window.open(u,"_blank"); else toast("No PID set","warn");};
       const rm=mkBtn("Remove","danger small",()=>{draft.splice(i,1);paint();});
-      row_el.appendChild(v); row_el.appendChild(p); row_el.appendChild(rm);
+      row_el.appendChild(v); row_el.appendChild(p); row_el.appendChild(openA); row_el.appendChild(rm);
       list.appendChild(row_el);
     });
   }
