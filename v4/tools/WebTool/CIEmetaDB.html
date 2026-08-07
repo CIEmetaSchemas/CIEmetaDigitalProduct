@@ -2693,20 +2693,15 @@ function renderForm(page,e){
     const qpidInp=inp(it,"quantityPID",{deleteIfEmpty:true}); qpidInp.placeholder="auto-filled from Quantity dropdown"; qpidInp.style.flex="1";
     const upidInp=inp(it,"unitPID",{deleteIfEmpty:true}); upidInp.placeholder="auto-filled from Unit dropdown"; upidInp.style.flex="1";
     g2(g,"Quantity",comboInp(it,"quantity",getVocab("quantities"),"quantityPID",qpidInp));
-    g2(g,"Unit",    comboInp(it,"unit",    getVocab("units"),      "unitPID",    upidInp));
-    g2(g,"Description",inp(it,"description",{deleteIfEmpty:true}));
-    g2(g,"Wavelength first",inp(it,"wavelength_first",{number:true,deleteIfEmpty:true}));
-    g2(g,"Wavelength last",inp(it,"wavelength_last",{number:true,deleteIfEmpty:true}));
-    g2(g,"Wavelength step",inp(it,"wavelength_step",{number:true,deleteIfEmpty:true}));
-    const wlHint=document.createElement("p"); wlHint.className="hint"; wlHint.style.gridColumn="1/-1";
-    wlHint.textContent='Enter ":unap" in Wavelength first/last/step if not applicable (no wavelengths in this column); use ":null" for Wavelength step if spacing is non-uniform.';
-    g.appendChild(wlHint);
+    g2(g,"Symbol (Unicode)",inp(it,"symbol",{deleteIfEmpty:true}));
+    g2(g,"Symbol (LaTeX)",inp(it,"symbolLatex",{deleteIfEmpty:true}));
     // Quantity PID — visible, editable, with Open button
     const qpidWrap=document.createElement("div"); qpidWrap.style.display="flex"; qpidWrap.style.gap="4px"; qpidWrap.style.alignItems="center";
     const qOpenBtn=document.createElement("button"); qOpenBtn.type="button"; qOpenBtn.className="ghost small"; qOpenBtn.title="Open quantityPID in CIE e-ILV"; qOpenBtn.textContent="Open ↗";
     qOpenBtn.onclick=()=>{ if(it.quantityPID) window.open(it.quantityPID,"_blank"); else toast("No quantityPID set","warn"); };
     qpidWrap.appendChild(qpidInp); qpidWrap.appendChild(qOpenBtn);
     g2(g,"Quantity PID",qpidWrap);
+    g2(g,"Unit",    comboInp(it,"unit",    getVocab("units"),      "unitPID",    upidInp));
     // Unit PID — visible, editable, with Open button and parser link
     const upidWrap=document.createElement("div"); upidWrap.style.display="flex"; upidWrap.style.gap="4px"; upidWrap.style.alignItems="center";
     const uOpenBtn=document.createElement("button"); uOpenBtn.type="button"; uOpenBtn.className="ghost small"; uOpenBtn.title="Open unitPID in BIPM SI Digital Framework"; uOpenBtn.textContent="Open ↗";
@@ -2714,8 +2709,13 @@ function renderForm(page,e){
     const upidLink=document.createElement("a"); upidLink.href="https://si-digital-framework.org/SI/unitExpr"; upidLink.target="_blank"; upidLink.title="BIPM unit expression parser — build a PID for compound units"; upidLink.textContent="? Build PID…"; upidLink.className="hint"; upidLink.style.whiteSpace="nowrap";
     upidWrap.appendChild(upidInp); upidWrap.appendChild(uOpenBtn); upidWrap.appendChild(upidLink);
     g2(g,"Unit PID",upidWrap);
-    g2(g,"Symbol (Unicode)",inp(it,"symbol",{deleteIfEmpty:true}));
-    g2(g,"Symbol (LaTeX)",inp(it,"symbolLatex",{deleteIfEmpty:true}));
+    g2(g,"Description",inp(it,"description",{deleteIfEmpty:true}));
+    g2(g,"Wavelength first",inp(it,"wavelength_first",{number:true,deleteIfEmpty:true}));
+    g2(g,"Wavelength last",inp(it,"wavelength_last",{number:true,deleteIfEmpty:true}));
+    g2(g,"Wavelength step",inp(it,"wavelength_step",{number:true,deleteIfEmpty:true}));
+    const wlHint=document.createElement("p"); wlHint.className="hint"; wlHint.style.gridColumn="1/-1";
+    wlHint.textContent='Enter ":unap" in Wavelength first/last/step if not applicable (no wavelengths in this column); use ":null" for Wavelength step if spacing is non-uniform.';
+    g.appendChild(wlHint);
   },()=>({title:"",quantity:"",unit:""}));
 
   // validation summary
