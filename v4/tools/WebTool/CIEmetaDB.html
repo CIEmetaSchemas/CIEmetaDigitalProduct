@@ -168,6 +168,8 @@
   <span style="flex:1"></span>
   <button id="btnNewEntry" class="sec">+ New entry</button>
   <button id="btnDomains" class="ghost">Domains&hellip;</button>
+  <button id="btnUnits" class="ghost" title="Manage the unit vocabulary: display values and their BIPM SI Reference Point PIDs">Units&hellip;</button>
+  <button id="btnQuantities" class="ghost" title="Manage the quantity vocabulary: display values and their CIE e-ILV PIDs">Quantities&hellip;</button>
   <button id="btnDefaults" class="ghost">Edit defaults&hellip;</button>
   <button id="btnExportDataCite" class="ghost" title="Export all entries as *.csv_metadata.json files">Export metadata-files&hellip;</button>
   <button id="btnHelp" class="ghost" title="Help &amp; information">? Help</button>
@@ -1222,30 +1224,34 @@ const APP = {
   LS_USER: "ciemetadb.user"
 };
 
-/* Interoperability lookup — normative mapping from unit/quantity strings to PIDs.
-   Source: v4/docs/INTEROPERABILITY.md section 13 (schema version 4.2). */
-const INTEROP_LOOKUP = {
-  units: {
-    "nm":            "https://si-digital-framework.org/SI/units/nanometre",
-    "dimensionless": "https://si-digital-framework.org/SI/units/one",
-    "lm/W":          "https://si-digital-framework.org/SI/units/lumen.watt-1"
-  },
-  quantities: {
-    "wavelength":                        "https://cie.co.at/eilvterm/17-21-025",
-    "spectral distribution":             "https://cie.co.at/eilvterm/17-21-029",
-    "spectral radiance factor":          "https://cie.co.at/eilvterm/17-24-075",
-    "chromaticity coordinates":          "https://cie.co.at/eilvterm/17-23-053",
-    "spectral chromaticity coordinates": "https://cie.co.at/eilvterm/17-23-055",
-    "colour-matching function":          "https://cie.co.at/eilvterm/17-23-039",
-    "CIE colour-matching functions":     "https://cie.co.at/eilvterm/17-23-047",
-    "spectral tristimulus values":       "https://cie.co.at/eilvterm/17-23-038",
-    "spectral sensitivity":              "https://cie.co.at/eilvterm/17-25-063",
-    "action spectra":                    "https://cie.co.at/eilvterm/17-26-027",
-    "spectral luminous efficiency":      "https://cie.co.at/eilvterm/17-21-035",
-    "luminous efficiency":               "https://cie.co.at/eilvterm/17-21-094",
-    "maximum luminous efficacy":         "https://cie.co.at/eilvterm/17-21-092"
-  }
-};
+/* Default interoperability vocabularies — normative mapping from unit/quantity strings to PIDs.
+   Source: v4/docs/INTEROPERABILITY.md section 13 (schema version 4.2).
+   Stored in db.vocabularies at runtime and editable via the Units… / Quantities… toolbar buttons.
+   These constants seed new databases and act as fallback when an existing DB lacks db.vocabularies. */
+const DEFAULT_UNITS = [
+  {value:"nm",            pid:"https://si-digital-framework.org/SI/units/nanometre"},
+  {value:"dimensionless", pid:"https://si-digital-framework.org/SI/units/one"},
+  {value:"lm/W",          pid:"https://si-digital-framework.org/SI/units/lumen.watt-1"}
+];
+const DEFAULT_QUANTITIES = [
+  {value:"wavelength",                        pid:"https://cie.co.at/eilvterm/17-21-025"},
+  {value:"spectral distribution",             pid:"https://cie.co.at/eilvterm/17-21-029"},
+  {value:"spectral radiance factor",          pid:"https://cie.co.at/eilvterm/17-24-075"},
+  {value:"chromaticity coordinates",          pid:"https://cie.co.at/eilvterm/17-23-053"},
+  {value:"spectral chromaticity coordinates", pid:"https://cie.co.at/eilvterm/17-23-055"},
+  {value:"colour-matching function",          pid:"https://cie.co.at/eilvterm/17-23-039"},
+  {value:"CIE colour-matching functions",     pid:"https://cie.co.at/eilvterm/17-23-047"},
+  {value:"spectral tristimulus values",       pid:"https://cie.co.at/eilvterm/17-23-038"},
+  {value:"spectral sensitivity",             pid:"https://cie.co.at/eilvterm/17-25-063"},
+  {value:"action spectra",                    pid:"https://cie.co.at/eilvterm/17-26-027"},
+  {value:"spectral luminous efficiency",      pid:"https://cie.co.at/eilvterm/17-21-035"},
+  {value:"luminous efficiency",               pid:"https://cie.co.at/eilvterm/17-21-094"},
+  {value:"maximum luminous efficacy",         pid:"https://cie.co.at/eilvterm/17-21-092"}
+];
+function getVocab(type){
+  return (DB && DB.vocabularies && DB.vocabularies[type]) ||
+         (type==="units" ? DEFAULT_UNITS : DEFAULT_QUANTITIES);
+}
 
 const DEFAULT_DOMAINS = [
   {code:"D1", label:"Vision and Colour"},
@@ -1667,7 +1673,9 @@ function newDB(){
     dbSchemaName:APP.DB_SCHEMA_NAME, dbSchemaVersion:APP.DB_SCHEMA_VERSION,
     dbId:uuid(), title:"", description:"", baseHash:"", generatedAt:now,
     lastModifiedDate:now, lastModifiedBy:currentUser(),
-    domains:clone(DEFAULT_DOMAINS), defaults:clone(DEFAULT_VALUES), entries:[]
+    domains:clone(DEFAULT_DOMAINS),
+    vocabularies:{units:clone(DEFAULT_UNITS), quantities:clone(DEFAULT_QUANTITIES)},
+    defaults:clone(DEFAULT_VALUES), entries:[]
   };
 }
 /* per-entry fingerprint for the DB hash: payload contentHash PLUS the envelope fields
@@ -2417,14 +2425,15 @@ function arraySection(parent, title, arr, itemRender, factory){
 function g2(g,label,node){ const l=document.createElement("label"); l.textContent=label; g.appendChild(l); g.appendChild(node); }
 
 /* Combo input for quantity/unit: dropdown of known values + free-text fallback.
-   lookupMap: e.g. INTEROP_LOOKUP.quantities. pidKey: e.g. "quantityPID".
+   lookupMap: array of {value, pid} from getVocab(). pidKey: e.g. "quantityPID".
    Returns a container div with the select (and optional text input) inside.
    Selecting a known value auto-populates obj[pidKey]; selecting "(other)" clears it
    and reveals a text input for a custom value. */
 function comboInp(obj, key, lookupMap, pidKey){
-  const known = Object.keys(lookupMap);
+  const pidMap = new Map(lookupMap.map(e=>[e.value, e.pid]));
+  const known  = lookupMap.map(e=>e.value);
   const currentVal = obj[key] || "";
-  const isKnown = known.includes(currentVal);
+  const isKnown = pidMap.has(currentVal);
 
   const wrap = document.createElement("div"); wrap.style.display="flex"; wrap.style.flexDirection="column"; wrap.style.gap="3px";
 
@@ -2452,7 +2461,7 @@ function comboInp(obj, key, lookupMap, pidKey){
     } else {
       textInp.style.display = "none";
       obj[key] = sel.value;
-      const pid = lookupMap[sel.value];
+      const pid = pidMap.get(sel.value);
       if(pid) obj[pidKey] = pid; else delete obj[pidKey];
     }
     markDirty();
@@ -2678,8 +2687,8 @@ function renderForm(page,e){
     numLbl.textContent="Column "+(idx+1);
     g.appendChild(numLbl);
     g2(g,"Title",inp(it,"title"));
-    g2(g,"Quantity",comboInp(it,"quantity",INTEROP_LOOKUP.quantities,"quantityPID"));
-    g2(g,"Unit",comboInp(it,"unit",INTEROP_LOOKUP.units,"unitPID"));
+    g2(g,"Quantity",comboInp(it,"quantity",getVocab("quantities"),"quantityPID"));
+    g2(g,"Unit",comboInp(it,"unit",getVocab("units"),"unitPID"));
     g2(g,"Description",inp(it,"description",{deleteIfEmpty:true}));
     g2(g,"Wavelength first",inp(it,"wavelength_first",{number:true,deleteIfEmpty:true}));
     g2(g,"Wavelength last",inp(it,"wavelength_last",{number:true,deleteIfEmpty:true}));
@@ -2704,6 +2713,13 @@ function renderForm(page,e){
   const box=document.createElement("fieldset"); box.innerHTML='<legend>Schema validation</legend>';
   if(errs.length===0) box.innerHTML+='<div class="val-ok">✓ Valid against CIEmetaDigitalProduct v4 schema</div>';
   else box.innerHTML+='<ul class="val-list">'+errs.map(x=>`<li class="e">${esc(x)}</li>`).join("")+'</ul>';
+  const pidWarns=[];
+  (p.datatableInfo&&p.datatableInfo.columnHeaders||[]).forEach((ch,i)=>{
+    const col="Column "+(i+1)+" ("+esc(ch.title||"untitled")+")";
+    if(!ch.quantityPID) pidWarns.push(col+": quantityPID missing (Recommended, CIE 2.4.9)");
+    if(!ch.unitPID)     pidWarns.push(col+": unitPID missing (Recommended, CIE 2.4.8)");
+  });
+  if(pidWarns.length) box.innerHTML+='<ul class="val-list">'+pidWarns.map(w=>`<li class="w">${w}</li>`).join("")+'</ul>';
   page.appendChild(box);
 }
 
@@ -3252,6 +3268,40 @@ function openDomainsDialog(){
     DB.domains=draft.filter(d=>d.code.trim()); persist(); refreshDomainFilter(); closeModal(); renderDetail(); renderList(); toast("Domains updated","ok");
   });
   modal("Manage domains",body,[mkBtn("Cancel","ghost",closeModal),save]);
+}
+
+function openVocabDialog(type){
+  const label=type==="units"?"Units":"Quantities";
+  const body=document.createElement("div");
+  const info=document.createElement("p"); info.className="hint";
+  info.textContent=label+" vocabulary: display value and its permanent identifier (PID). "+
+    "Editable; the column-header dropdown is built from this list.";
+  body.appendChild(info);
+  const list=document.createElement("div"); list.className="divmgr";
+  if(!DB.vocabularies) DB.vocabularies={};
+  if(!DB.vocabularies[type]) DB.vocabularies[type]=clone(type==="units"?DEFAULT_UNITS:DEFAULT_QUANTITIES);
+  const draft=clone(DB.vocabularies[type]);
+  function paint(){
+    list.innerHTML="";
+    draft.forEach((row,i)=>{
+      const row_el=document.createElement("div"); row_el.className="arr-item";
+      const v=document.createElement("input"); v.placeholder="value (e.g. nm)"; v.value=row.value||""; v.style.flex="1";
+      v.oninput=()=>{draft[i].value=v.value;};
+      const p=document.createElement("input"); p.placeholder="PID (URI)"; p.value=row.pid||""; p.style.flex="2";
+      p.oninput=()=>{draft[i].pid=p.value;};
+      const rm=mkBtn("Remove","danger small",()=>{draft.splice(i,1);paint();});
+      row_el.appendChild(v); row_el.appendChild(p); row_el.appendChild(rm);
+      list.appendChild(row_el);
+    });
+  }
+  paint(); body.appendChild(list);
+  const add=mkBtn("+ Add entry","ghost small",()=>{draft.push({value:"",pid:""});paint();});
+  body.appendChild(add);
+  const save=mkBtn("Save "+label,"sec",()=>{
+    DB.vocabularies[type]=draft.filter(r=>r.value.trim());
+    persist(); closeModal(); renderDetail(); toast(label+" vocabulary updated","ok");
+  });
+  modal("Manage "+label,body,[mkBtn("Cancel","ghost",closeModal),save]);
 }
 
 function openDefaultsDialog(){
@@ -3965,7 +4015,7 @@ function pickFile(accept, cb){
 /* enable/disable toolbar actions that require an open database */
 function updateToolbarState(){
   const hasDb = !!DB;
-  ["btnSave","btnSaveAs","btnDbInfo","btnNewEntry","btnDomains","btnDefaults","btnExportDataCite","btnImport"]
+  ["btnSave","btnSaveAs","btnDbInfo","btnNewEntry","btnDomains","btnUnits","btnQuantities","btnDefaults","btnExportDataCite","btnImport"]
     .forEach(id=>{ const b=el(id); if(b) b.disabled=!hasDb; });
 }
 /* true when the open DB has changes not yet written to its file (baseHash drifted
@@ -4198,6 +4248,8 @@ function wire(){
   el("btnSaveAs").onclick=()=>saveDb(true);
   el("btnNewEntry").onclick=()=>{ if(!DB) return; openNewEntryDialog(); };
   el("btnDomains").onclick=openDomainsDialog;
+  el("btnUnits").onclick=()=>openVocabDialog("units");
+  el("btnQuantities").onclick=()=>openVocabDialog("quantities");
   el("btnDefaults").onclick=()=>{ if(!DB) return; openDefaultsDialog(); };
   el("btnExportDataCite").onclick=()=>{ if(DB&&DB.entries.length) exportDataCiteFiles(DB.entries); else toast("No entries to export"); };
   el("btnHelp").onclick=openHelpDialog;
