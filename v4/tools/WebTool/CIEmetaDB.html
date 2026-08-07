@@ -238,7 +238,7 @@
 	"$id": "https://doi.org/10.25039/CIE.SC.4taqevcd",
 	"title": "CIEmetaDigitalProduct",
 	"description": "Metadata schema for digital products published by the International Commission on Illumination (CIE), in particular data tables distributed as CSV alongside CIE publications. Based on the DataCite metadata kernel with CIE-specific additions. The accompanying description of the metadata model, including the obligation (mandatory / recommended / optional) of each property, is published at https://github.com/CIEmetaSchemas/CIEmetaDigitalProduct (v4/docs/README.md). To validate a metadata file against this schema, any JSON Schema draft-07 validator can be used, for example https://www.jsonschemavalidator.net/ .",
-	"$comment": "Based on the DataCite kernel-4.3 JSON schema:\nhttps://github.com/datacite/schema/blob/76de5e551d19e3e9b829af2f38ccc13e8c7677fe/source/json/kernel-4.3/datacite_4.3_schema.json\n\nChanges towards DataCite version 4.4:\n- field classificationCode added in the subjects field\n- address of metaschema has been changed\n- additional resourceTypeGeneral items\n- relatedItem added\n- only one identifier is allowed (as in the official schema), additional ones are introduced by \"alternateIdentifier\"\n- schemaType replaced by schemaName\n- relatedItem.title replaced by relatedItem.titles (array of string) to be compatible with the strict DataCite 4.4 XML definition\n\nCIE additions:\n- checksums (recommended)\n- datatableInfo (validation, dataQuality, extrapolationMethod, interpolationMethod)\n- schemaName (required)\n- schemaVersion (required)\n- schemaURL (required)\n- metadataRevision (optional): revision of the JSON metadata file itself (not the resource; see DataCite \"version\"). Increments only on metadata-content changes.\n\nVersion history:\n4.0 : new fields added in the column headers: wavelength_first, wavelength_last, wavelength_step\n4.1 : optional field metadataRevision added (revision of the JSON metadata file; backward-compatible, schemaVersion stays 4)\n4.1 : schema file corrections (editorial only; schemaVersion stays 4 and the schema DOI is unchanged). None of these can invalidate an existing metadata file - they only widen what is accepted:\n      - the file is now valid JSON. The descriptive header was previously written as // line comments inside the root object, which made the file unparsable by a strict JSON parser (and therefore unusable with the validators recommended above). That text is now carried in description and in this $comment.\n      - $id added.\n      - wavelength_first / wavelength_last / wavelength_step now reference definitions.wavelengthField, which accepts a number or one of the sentinel strings documented in v4/docs/README.md (CIE 2.4.5 - 2.4.7). Previously declared as plain numbers, which contradicted both the documentation and published metadata files for non-spectral data tables.\n      - \"ROR\" added to funderIdentifierType (GRID has been superseded by ROR).\n4.1 : validationType constrained to the value table already published in v4/docs/README.md (CIE 2.5): sumOfColumns, sampleRow, numberOfRows, numberOfColumns, :unap, other. It was the only one of the four README value tables not encoded as an enum here; the other three (interpolationMethod, extrapolationMethod, dataQuality) always were. Unlike the corrections above this one NARROWS what is accepted, so it is noted separately - but every value in every published CIE metadata file is already within the list. hashMethod is deliberately NOT constrained: README (CIE 1) gives md5 and sha256 as examples of a deliberately open set.",
+	"$comment": "Based on the DataCite kernel-4.3 JSON schema:\nhttps://github.com/datacite/schema/blob/76de5e551d19e3e9b829af2f38ccc13e8c7677fe/source/json/kernel-4.3/datacite_4.3_schema.json\n\nChanges towards DataCite version 4.4:\n- field classificationCode added in the subjects field\n- address of metaschema has been changed\n- additional resourceTypeGeneral items\n- relatedItem added\n- only one identifier is allowed (as in the official schema), additional ones are introduced by \"alternateIdentifier\"\n- schemaType replaced by schemaName\n- relatedItem.title replaced by relatedItem.titles (array of string) to be compatible with the strict DataCite 4.4 XML definition\n\nCIE additions:\n- checksums (recommended)\n- datatableInfo (validation, dataQuality, extrapolationMethod, interpolationMethod)\n- schemaName (required)\n- schemaVersion (required)\n- schemaURL (required)\n- metadataRevision (optional): revision of the JSON metadata file itself (not the resource; see DataCite \"version\"). Increments only on metadata-content changes.\n\nVersion history:\n4.0 : new fields added in the column headers: wavelength_first, wavelength_last, wavelength_step\n4.1 : optional field metadataRevision added (revision of the JSON metadata file; backward-compatible, schemaVersion stays 4)\n4.1 : schema file corrections (editorial only; schemaVersion stays 4 and the schema DOI is unchanged). None of these can invalidate an existing metadata file - they only widen what is accepted:\n      - the file is now valid JSON. The descriptive header was previously written as // line comments inside the root object, which made the file unparsable by a strict JSON parser (and therefore unusable with the validators recommended above). That text is now carried in description and in this $comment.\n      - $id added.\n      - wavelength_first / wavelength_last / wavelength_step now reference definitions.wavelengthField, which accepts a number or one of the sentinel strings documented in v4/docs/README.md (CIE 2.4.5 - 2.4.7). Previously declared as plain numbers, which contradicted both the documentation and published metadata files for non-spectral data tables.\n      - \"ROR\" added to funderIdentifierType (GRID has been superseded by ROR).\n4.1 : validationType constrained to the value table already published in v4/docs/README.md (CIE 2.5): sumOfColumns, sampleRow, numberOfRows, numberOfColumns, :unap, other. It was the only one of the four README value tables not encoded as an enum here; the other three (interpolationMethod, extrapolationMethod, dataQuality) always were. Unlike the corrections above this one NARROWS what is accepted, so it is noted separately - but every value in every published CIE metadata file is already within the list. hashMethod is deliberately NOT constrained: README (CIE 1) gives md5 and sha256 as examples of a deliberately open set.\n4.2 : optional fields added in columnHeaders items — strictly additive, all existing records remain valid, schemaVersion stays 4:\n      - unitPID (CIE 2.4.8, Recommended): permanent URI from the BIPM SI Reference Point (https://si-digital-framework.org/SI/units/) identifying the unit. Normative mapping table in v4/docs/INTEROPERABILITY.md section 13.\n      - quantityPID (CIE 2.4.9, Recommended): permanent URI from the CIE e-ILV (https://cie.co.at/eilvterm/) or BIPM quantities KB identifying the quantity. Absent when no resolvable PID exists (e.g. 'adaptation coefficient').\n      - symbol (CIE 2.4.10, Optional): Unicode symbol for the column quantity, e.g. x̄(λ). Distinct from title, which is the ASCII column label.\n      - symbolLatex (CIE 2.4.11, Optional): LaTeX representation of the symbol, e.g. \\bar{x}(\\lambda).",
 	"definitions": {
 		"nameType": {
 			"type": "string",
@@ -1132,6 +1132,24 @@
 							"description": {
 								"type": "string"
 							},
+							"unitPID": {
+								"type": "string",
+								"format": "uri",
+								"$comment": "Permanent identifier for the unit from the BIPM SI Reference Point (https://si-digital-framework.org/SI/units/) or another authoritative vocabulary. Optional: absent when no resolvable PID exists. Normative mapping table in v4/docs/INTEROPERABILITY.md section 13."
+							},
+							"quantityPID": {
+								"type": "string",
+								"format": "uri",
+								"$comment": "Permanent identifier for the quantity from the CIE e-ILV (https://cie.co.at/eilvterm/) or BIPM quantities KB (https://si-digital-framework.org/quantities/). Optional: absent when no resolvable PID exists, e.g. 'adaptation coefficient' has no e-ILV term."
+							},
+							"symbol": {
+								"type": "string",
+								"$comment": "The quantity symbol in Unicode, e.g. 'λ', 'x̄(λ)'. Distinct from title, which is the ASCII column label in the CSV."
+							},
+							"symbolLatex": {
+								"type": "string",
+								"$comment": "LaTeX representation of the symbol, e.g. '\\bar{x}(\\lambda)'. For use in typesetting consumers."
+							},
 							"wavelength_first": {
 								"$ref": "#/definitions/wavelengthField"
 							},
@@ -1190,7 +1208,7 @@
 
 /* ---------- constants ---------- */
 const APP = {
-  VERSION: "1.10.0",
+  VERSION: "1.11.0",
   DB_SCHEMA_NAME: "CIEmetaDB",
   DB_SCHEMA_VERSION: 1,
   DOI_PREFIX: "10.25039/CIE.DS.",
@@ -1202,6 +1220,31 @@ const APP = {
   LS_DB: "ciemetadb.workingcopy",
   LS_SAVED_HASH: "ciemetadb.savedhash",
   LS_USER: "ciemetadb.user"
+};
+
+/* Interoperability lookup — normative mapping from unit/quantity strings to PIDs.
+   Source: v4/docs/INTEROPERABILITY.md section 13 (schema version 4.2). */
+const INTEROP_LOOKUP = {
+  units: {
+    "nm":            "https://si-digital-framework.org/SI/units/nanometre",
+    "dimensionless": "https://si-digital-framework.org/SI/units/one",
+    "lm/W":          "https://si-digital-framework.org/SI/units/lumen.watt-1"
+  },
+  quantities: {
+    "wavelength":                        "https://cie.co.at/eilvterm/17-21-025",
+    "spectral distribution":             "https://cie.co.at/eilvterm/17-21-029",
+    "spectral radiance factor":          "https://cie.co.at/eilvterm/17-24-075",
+    "chromaticity coordinates":          "https://cie.co.at/eilvterm/17-23-053",
+    "spectral chromaticity coordinates": "https://cie.co.at/eilvterm/17-23-055",
+    "colour-matching function":          "https://cie.co.at/eilvterm/17-23-039",
+    "CIE colour-matching functions":     "https://cie.co.at/eilvterm/17-23-047",
+    "spectral tristimulus values":       "https://cie.co.at/eilvterm/17-23-038",
+    "spectral sensitivity":              "https://cie.co.at/eilvterm/17-25-063",
+    "action spectra":                    "https://cie.co.at/eilvterm/17-26-027",
+    "spectral luminous efficiency":      "https://cie.co.at/eilvterm/17-21-035",
+    "luminous efficiency":               "https://cie.co.at/eilvterm/17-21-094",
+    "maximum luminous efficacy":         "https://cie.co.at/eilvterm/17-21-092"
+  }
 };
 
 const DEFAULT_DOMAINS = [
@@ -2373,8 +2416,54 @@ function arraySection(parent, title, arr, itemRender, factory){
 }
 function g2(g,label,node){ const l=document.createElement("label"); l.textContent=label; g.appendChild(l); g.appendChild(node); }
 
-const COLUMN_HEADER_FIELD_LABELS=["Title","Quantity","Unit","Description","Wavelength first","Wavelength last","Wavelength step"];
-const COLUMN_HEADER_FIELD_KEYS=["title","quantity","unit","description","wavelength_first","wavelength_last","wavelength_step"];
+/* Combo input for quantity/unit: dropdown of known values + free-text fallback.
+   lookupMap: e.g. INTEROP_LOOKUP.quantities. pidKey: e.g. "quantityPID".
+   Returns a container div with the select (and optional text input) inside.
+   Selecting a known value auto-populates obj[pidKey]; selecting "(other)" clears it
+   and reveals a text input for a custom value. */
+function comboInp(obj, key, lookupMap, pidKey){
+  const known = Object.keys(lookupMap);
+  const currentVal = obj[key] || "";
+  const isKnown = known.includes(currentVal);
+
+  const wrap = document.createElement("div"); wrap.style.display="flex"; wrap.style.flexDirection="column"; wrap.style.gap="3px";
+
+  const sel = document.createElement("select");
+  const optionValues = [...known, "(other)"];
+  optionValues.forEach(v=>{
+    const o = document.createElement("option");
+    o.value = v; o.textContent = v;
+    if(isKnown && v === currentVal) o.selected = true;
+    if(!isKnown && v === "(other)") o.selected = true;
+    sel.appendChild(o);
+  });
+
+  const textInp = document.createElement("input");
+  textInp.value = isKnown ? "" : currentVal;
+  textInp.placeholder = "Enter value…";
+  textInp.style.display = isKnown ? "none" : "";
+  textInp.oninput = ()=>{ obj[key] = textInp.value; delete obj[pidKey]; markDirty(); };
+
+  sel.onchange = ()=>{
+    if(sel.value === "(other)"){
+      textInp.style.display = "";
+      obj[key] = textInp.value || "";
+      delete obj[pidKey];
+    } else {
+      textInp.style.display = "none";
+      obj[key] = sel.value;
+      const pid = lookupMap[sel.value];
+      if(pid) obj[pidKey] = pid; else delete obj[pidKey];
+    }
+    markDirty();
+  };
+
+  wrap.appendChild(sel); wrap.appendChild(textInp);
+  return wrap;
+}
+
+const COLUMN_HEADER_FIELD_LABELS=["Title","Quantity","Unit","Description","Wavelength first","Wavelength last","Wavelength step","Quantity PID","Unit PID","Symbol","Symbol (LaTeX)"];
+const COLUMN_HEADER_FIELD_KEYS=["title","quantity","unit","description","wavelength_first","wavelength_last","wavelength_step","quantityPID","unitPID","symbol","symbolLatex"];
 function parseColumnHeaderPaste(text){
   let lines=text.replace(/\r\n?/g,"\n").split("\n");
   while(lines.length && lines[lines.length-1].trim()==="") lines.pop();
@@ -2589,8 +2678,8 @@ function renderForm(page,e){
     numLbl.textContent="Column "+(idx+1);
     g.appendChild(numLbl);
     g2(g,"Title",inp(it,"title"));
-    g2(g,"Quantity",inp(it,"quantity"));
-    g2(g,"Unit",inp(it,"unit"));
+    g2(g,"Quantity",comboInp(it,"quantity",INTEROP_LOOKUP.quantities,"quantityPID"));
+    g2(g,"Unit",comboInp(it,"unit",INTEROP_LOOKUP.units,"unitPID"));
     g2(g,"Description",inp(it,"description",{deleteIfEmpty:true}));
     g2(g,"Wavelength first",inp(it,"wavelength_first",{number:true,deleteIfEmpty:true}));
     g2(g,"Wavelength last",inp(it,"wavelength_last",{number:true,deleteIfEmpty:true}));
@@ -2598,6 +2687,16 @@ function renderForm(page,e){
     const wlHint=document.createElement("p"); wlHint.className="hint"; wlHint.style.gridColumn="1/-1";
     wlHint.textContent='Enter ":unap" in Wavelength first/last/step if not applicable (no wavelengths in this column); use ":null" for Wavelength step if spacing is non-uniform.';
     g.appendChild(wlHint);
+    // PID fields — auto-populated by the combos above; editable for compound/novel units.
+    const qpidRow = inp(it,"quantityPID",{deleteIfEmpty:true}); qpidRow.placeholder="auto-filled from Quantity dropdown";
+    g2(g,"Quantity PID",qpidRow);
+    const upidWrap=document.createElement("div"); upidWrap.style.display="flex"; upidWrap.style.gap="4px"; upidWrap.style.alignItems="center";
+    const upidInp=inp(it,"unitPID",{deleteIfEmpty:true}); upidInp.placeholder="auto-filled from Unit dropdown"; upidInp.style.flex="1";
+    const upidLink=document.createElement("a"); upidLink.href="https://si-digital-framework.org/SI/unitExpr"; upidLink.target="_blank"; upidLink.title="BIPM unit expression parser — build a PID for compound units"; upidLink.textContent="? Build PID…"; upidLink.className="hint"; upidLink.style.whiteSpace="nowrap";
+    upidWrap.appendChild(upidInp); upidWrap.appendChild(upidLink);
+    g2(g,"Unit PID",upidWrap);
+    g2(g,"Symbol (Unicode)",inp(it,"symbol",{deleteIfEmpty:true}));
+    g2(g,"Symbol (LaTeX)",inp(it,"symbolLatex",{deleteIfEmpty:true}));
   },()=>({title:"",quantity:"",unit:""}));
 
   // validation summary

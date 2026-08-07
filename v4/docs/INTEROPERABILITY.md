@@ -1,6 +1,6 @@
 # CIEmetaDigitalProduct - Interoperability recommendations
 
-Advisory document, based on schema version 4.1.
+Advisory document, based on schema version 4.2.
 
 This document accompanies [README.md](README.md), which remains the normative description
 of the metadata model. Nothing here changes the current model; it collects recommendations
@@ -1063,18 +1063,18 @@ concept with no identifier — better an honest gap than a fabricated URI.
 - *Schema identifier (defect 8): outstanding and not repairable here.* Needs a
   version-distinguishing schema DOI from CIE; see section 10.
 
-**Phase 2 — semantic annotation.** Add `unitPID`, `quantityPID`, `symbol` as optional
-fields; publish the appendix table as a normative annex to README.md; extend the WebTool so
-the Quantity and Unit inputs become dropdowns backed by that table, with the PID filled in
-automatically. Currently both are plain text inputs (`CIEmetaDB.html` around lines
-1443–1444) and the conventions are enforced by nothing — which is how the whitespace and
-missing-key defects arose. **Apply the same treatment to the Subject input**, backed by the
-eleven-value list in section 13 with `subjectScheme`, `schemeURI` and `lang` filled in
-automatically: the subject field has exactly the defect history of the quantity field and the
-same cause, and closing the list is what turns 5a from an editorial habit into a validation
-error. Remember the two-places rule for schema changes (section 10.1).
-`schemaVersion` stays `4`; document the change as 4.2. Effort: small for the data, moderate
-for the tool.
+**Phase 2 — semantic annotation. Done in schema version 4.2.** Added `unitPID` (CIE 2.4.8),
+`quantityPID` (CIE 2.4.9), `symbol` (CIE 2.4.10), and `symbolLatex` (CIE 2.4.11) as optional
+fields in `columnHeaders` items. The normative mapping table in section 13 is now referenced
+from README.md. The WebTool `Quantity` and `Unit` column-header inputs are now dropdowns
+backed by `INTEROP_LOOKUP`, auto-populating the PID fields for all known values; a helper
+link opens the BIPM unit expression parser for compound units not yet in the table.
+`schemaVersion` stays `4`. **Still outstanding in Phase 2:** subject-input dropdown
+(backed by the eleven-value list in section 13 with `subjectScheme`, `schemeURI` and `lang`
+filled in automatically) — the subject field has the same defect history as the quantity
+field and the same cause; closing the list turns 5a from an editorial habit into a validation
+error. The two-places rule (section 10.1) was followed: the embedded schema in
+`CIEmetaDB.html` was updated via `sync_schema.py`.
 
 **Phase 3 — linked data.** `@context`, the DCAT/schema.org crosswalk on DOI landing pages,
 derived CSVW sidecars, and the agent, subject and licence PIDs of recommendation F — including

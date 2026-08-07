@@ -1,6 +1,6 @@
 # CIEmetaDigitalProduct - Description
 
-Version 4.1
+Version 4.2
 
 The CIEmetaDigitalProduct meta schema is based on the most recent version of the DataCite schema (https://schema.datacite.org/meta/kernel-4.4/ ) . Additional, CIE relevant fields are defined as outlined below. The JSON schema description can be found here: https://doi.org/10.25039/CIE.SC.4taqevcd .
 To validate your JSON metadatafile with the schema definition you may want to use: https://www.jsonschemavalidator.net/ 
@@ -294,6 +294,10 @@ The property can have the following values:
 |CIE 2.4.5|wavelength_first|O|
 |CIE 2.4.6|wavelength_last|O|
 |CIE 2.4.7|wavelength_step|O|
+|CIE 2.4.8|unitPID|R|
+|CIE 2.4.9|quantityPID|R|
+|CIE 2.4.10|symbol|O|
+|CIE 2.4.11|symbolLatex|O|
 
 
 For data tables that are typically distributed CIE publication, additional information shall be provided to increase the machine interpretability of the datasets. In particular, for each column: 
@@ -324,6 +328,22 @@ for none spectral datatable to
 |Value|Descrition|
 |---|---|
 |":unap"|not applicable, makes no sense|
+
+unitPID: A permanent URI from the BIPM SI Reference Point identifying the unit of the column. The complete normative mapping for the current corpus is in `v4/docs/INTEROPERABILITY.md` section 13. Examples:
+
+|unit|unitPID|
+|---|---|
+|`nm`|`https://si-digital-framework.org/SI/units/nanometre`|
+|`dimensionless`|`https://si-digital-framework.org/SI/units/one`|
+|`lm/W`|`https://si-digital-framework.org/SI/units/lumen.watt-1`|
+
+For compound units not yet in the mapping table, use the BIPM compound-unit grammar (dot-separated full unit names with integer exponents) and verify via the parser at `https://si-digital-framework.org/SI/unitExpr`. Leave the field absent when no resolvable PID exists.
+
+quantityPID: A permanent URI from the CIE e-ILV (`https://cie.co.at/eilvterm/`) or the BIPM quantities knowledge base (`https://si-digital-framework.org/quantities/`) identifying the quantity of the column. The complete normative mapping for the current corpus is in `v4/docs/INTEROPERABILITY.md` section 13. Leave the field absent when no resolvable PID exists (e.g. `adaptation coefficient` has no e-ILV term as of this writing).
+
+symbol: The quantity symbol in Unicode, e.g. `λ`, `x̄(λ)`. Distinct from `title`, which is the ASCII column label in the CSV. The e-ILV publishes the authoritative symbol for each term.
+
+symbolLatex: The LaTeX representation of the symbol, e.g. `\bar{x}(\lambda)`. For use by typesetting consumers.
 
 
 
@@ -373,6 +393,15 @@ Editorial corrections to `CIEmetaDigitalProduct_schema_04.json` only. The metada
 - `wavelength_first`, `wavelength_last` and `wavelength_step` now reference a new `definitions.wavelengthField`, which accepts **either** a number **or** one of the sentinel strings `":unap"`, `":null"`, `":unal"`, `":unas"`. They were previously declared as plain numbers, which contradicted CIE 2.4.5 - 2.4.7 above and rejected the published metadata of non-spectral data tables such as `CIE_max_sle_mesopic`.
 - `"ROR"` added to `funderIdentifierType` (property 19), which previously offered the superseded GRID but not ROR.
 - `validationType` (CIE 2.5) is now an enum in the schema, carrying exactly the six values already listed in the table above: `"sumOfColumns"`, `"sampleRow"`, `"numberOfRows"`, `"numberOfColumns"`, `":unap"`, `"other"`. It was the only one of the four value tables in this document not encoded in the schema - `interpolationMethod`, `extrapolationMethod` and `dataQuality` always were. Note that unlike the corrections above, this one **narrows** what the schema accepts; every value used in every published CIE metadata file is already within the list, so no existing file is affected. `hashMethod` (CIE 1) is deliberately left unconstrained, because md5 and sha256 are given there as examples rather than as a closed list.
+
+Version 4.2 - semantic annotation fields (strictly additive; schemaVersion stays 4, schema DOI unchanged, all existing records remain valid):
+- Four optional fields added to `datatableInfo.columnHeaders` items:
+  - `unitPID` (CIE 2.4.8, Recommended): permanent URI identifying the column unit, from the BIPM SI Reference Point or another authoritative vocabulary.
+  - `quantityPID` (CIE 2.4.9, Recommended): permanent URI identifying the column quantity, from the CIE e-ILV or BIPM quantities knowledge base.
+  - `symbol` (CIE 2.4.10, Optional): Unicode symbol for the quantity (e.g. `x̄(λ)`), distinct from `title`.
+  - `symbolLatex` (CIE 2.4.11, Optional): LaTeX representation of the symbol (e.g. `\bar{x}(\lambda)`).
+- The normative mapping table covering all units and quantities in the current published corpus is in `v4/docs/INTEROPERABILITY.md` section 13.
+- The WebTool column-header editor now provides controlled dropdowns for `quantity` and `unit` that auto-populate `quantityPID` and `unitPID` for known values; a helper link opens the BIPM unit expression parser for compound units.
 
 Version 4.1:
 - Optional field `metadataRevision` added (see CIE 3 above). It is the revision of the JSON metadata file itself:
