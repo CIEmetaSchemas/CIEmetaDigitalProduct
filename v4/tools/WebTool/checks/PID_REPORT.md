@@ -19,7 +19,8 @@ quantityPID and unitPID (schema v4.2)`). Checked 2026-10-11. Read-only: no data 
 - **Consistency.** The DB vocabulary (`db.vocabularies`), `DEFAULT_UNITS` / `DEFAULT_QUANTITIES` in
   `CIEmetaDB.html` and the normative table in `v4/docs/INTEROPERABILITY.md` section 13 are identical
   (16 rows). Every unit or quantity string maps to exactly one PID.
-- **Units: correct.** One spelling mismatch (`lm / W` in the data, `lm/W` in the vocabulary).
+- **Units: correct.** One spelling mismatch (`lm / W` in the data, `lm/W` in the vocabulary);
+  since fixed in the open revision (#36), the published record follows when it is published.
 - **Quantities: four mappings are wrong or imprecise** (luminous efficiency, chromaticity
   coordinates, spectral distribution, spectral tristimulus values), one is questionable (spectral
   sensitivity), and 13 columns have no quantity PID.
@@ -44,7 +45,7 @@ quantityPID and unitPID (schema v4.2)`). Checked 2026-10-11. Read-only: no data 
 |---|---|---|---:|---|
 | `nm` | https://si-digital-framework.org/SI/units/nanometre | prefix nano (n) x metre (m), 1 nm = 10^-9 m | 38 | Correct |
 | `dimensionless` | https://si-digital-framework.org/SI/units/one | unit *one*, symbol 1 | 363 | Correct |
-| `lm / W` | https://si-digital-framework.org/SI/units/lumen.watt-1 | lumen (lm) x watt (W)^-1 | 1 | Correct; but the vocabulary key is `lm/W` (no spaces), so the string in the data does not match the vocabulary entry |
+| `lm / W` | https://si-digital-framework.org/SI/units/lumen.watt-1 | lumen (lm) x watt (W)^-1 | 1 | Correct; but the vocabulary key is `lm/W` (no spaces), so the string in the data does not match the vocabulary entry. Fixed in the open revision (#36) |
 
 ## Quantities: e-ILV terms behind the PIDs
 

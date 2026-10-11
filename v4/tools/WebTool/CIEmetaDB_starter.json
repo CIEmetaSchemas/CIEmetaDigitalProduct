@@ -4,7 +4,7 @@
   "dbId": "c4d247e0-ad8a-f983-eaf1-abd993d11eea",
   "title": "CIE Metadatabase — starter (example records)",
   "description": "Starter database assembled from the example CIEmetaDigitalProduct records shipped with the tool.",
-  "baseHash": "91874768b81b7a591eb79da8c5af643bd23da2facbf7d683bd6c22ac93e9e0c2",
+  "baseHash": "178e24e2d534d1b7f082fb5f586f48569932c788fc167601ffc4f1f4dfd7587f",
   "generatedAt": "2026-10-11T19:06:58.814Z",
   "lastModifiedDate": "2026-10-11T19:06:58.814Z",
   "lastModifiedBy": "Peter Blattner",
@@ -18409,15 +18409,15 @@
     {
       "entryId": "0a598644-258f-5ff8-6cf4-265b7496885d-rev",
       "rev": 1,
-      "contentHash": "cb6de7ac29be3f9996dde33dffe7733bef17c49e69af271e7c6361cd702ec8b9",
+      "contentHash": "765a352afb399dd8689286f2430f9f869bc3ff98d0aea09a2b84f6810488f317",
       "status": "review",
       "domains": [],
       "audit": {
         "createdBy": "import",
         "createdDate": "2024-01-01T00:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-10-11T19:06:58.798Z",
-        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
+        "modifiedDate": "2026-10-11T20:39:51.000Z",
+        "modifiedComment": "Unit lm / W -> lm/W (#36)"
       },
       "payload": {
         "identifier": {
@@ -18524,7 +18524,7 @@
             },
             {
               "title": "K_m,mes;m",
-              "unit": "lm / W",
+              "unit": "lm/W",
               "quantity": "maximum luminous efficacy",
               "descrition": "maximum luminous efficacy for a given adaptation coefficient m",
               "wavelength_first": ":unap",

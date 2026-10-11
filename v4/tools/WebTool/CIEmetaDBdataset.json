@@ -4,9 +4,9 @@
   "dbId": "4cd12818-04ed-4654-b9f7-dbf622b029d1",
   "title": "CIE data-table metadatabase",
   "description": "Curated CIEmetaDigitalProduct metadata for the CIE published data tables (https://cie.co.at/data-tables).",
-  "baseHash": "88371f9fdd02630eef327da6fb1a6ee7eff4c7492536eec92bb4e32b8e4516ac",
-  "generatedAt": "2026-10-11T19:06:58.702Z",
-  "lastModifiedDate": "2026-10-11T19:06:58.702Z",
+  "baseHash": "627a82f3d41c612efccb507e00617ac77cd085c6eb5a6603f02e3f114ac6a596",
+  "generatedAt": "2026-10-11T20:35:00.990Z",
+  "lastModifiedDate": "2026-10-11T20:35:00.990Z",
   "lastModifiedBy": "Peter Blattner",
   "domains": [
     {
@@ -21764,7 +21764,7 @@
     {
       "entryId": "9e3359aa-92cd-4843-8bc6-1fce79d241a5-rev",
       "rev": 1,
-      "contentHash": "d4c7a2ad340fcdf29ad629f4b3572f997bdc8e5d5841c834267a5ee42e6b1115",
+      "contentHash": "f38938f5495b1369c9ffad5e307b764ee16f180f170ff99e0f27d05e35d67c6f",
       "status": "review",
       "domains": [
         "D2"
@@ -21773,8 +21773,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-10-11T19:06:58.682Z",
-        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
+        "modifiedDate": "2026-10-11T20:34:51.040Z",
+        "modifiedComment": "Unit lm / W -> lm/W (#36)"
       },
       "payload": {
         "identifier": {
@@ -21881,7 +21881,7 @@
             },
             {
               "title": "K_m,mes;m",
-              "unit": "lm / W",
+              "unit": "lm/W",
               "quantity": "maximum luminous efficacy",
               "description": "maximum luminous efficacy for a given adaptation coefficient m",
               "wavelength_first": ":unap",
