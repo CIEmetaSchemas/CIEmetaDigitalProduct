@@ -106,7 +106,10 @@
   .grid{display:grid;grid-template-columns:180px 1fr;gap:8px 12px;align-items:start}
   .grid label{color:var(--muted);padding-top:6px;font-size:12.5px}
   .arr-item{border:1px solid var(--line);border-radius:7px;padding:10px;margin:8px 0;background:#fff;position:relative}
-  .arr-item .rm{position:absolute;top:8px;right:8px}
+  /* Remove is centred on the item's first row: 10px padding + (32px input - 22px small button)/2.
+     Column headers lead with a 20px "Column N" label instead, which top:8px already centres on. */
+  .arr-item .rm{position:absolute;top:15px;right:8px}
+  .arr-item:has(> .arr-grid > div:first-child) > .rm{top:8px}
   /* the first field of an item shares its row with the Remove button above, so it stops short of
      it instead of running underneath (column headers lead with a full-width "Column N" label
      instead, which this does not match) */
