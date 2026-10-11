@@ -51,7 +51,7 @@ CIE corpus is a day of editorial work, not a project.
 |---|---|---|---|---|
 | A | Unit PIDs from the BIPM SI Reference Point | R | No | Low |
 | B | Quantity PIDs from the SI quantities KB and the CIE e-ILV | R | No | Low |
-| C | Explicit `symbol` field, separate from `title` | O | No | Low |
+| C | Explicit `quantitySymbol` field, separate from `title` | O | No | Low |
 | D | Optional JSON-LD `@context` at record root | O | No | Medium |
 | E | DCAT-AP / schema.org crosswalk, derived CSVW sidecar | O | No | Medium |
 | F | PIDs for creators, publisher, subjects and licence | R | No | Low |
@@ -63,7 +63,7 @@ invalidating it, and every existing record remains valid unchanged. `schemaName`
 `CIEmetaDigitalProduct` and `schemaVersion` stays `4`.
 
 This was checked, not assumed: the published `CIE_cc_1931_2deg` payload with `unitPID`,
-`quantityPID` and `symbol` added to every column validates against
+`quantityPID` and `quantitySymbol` added to every column validates against
 `CIEmetaDigitalProduct_schema_04.json` under a draft-07 validator.
 
 Section 10 lists defects that already exist in v4 and should be repaired regardless of
@@ -317,7 +317,7 @@ terminology committee — see recommendation G8.
 
 ---
 
-## 5. Recommendation C — an explicit `symbol` field
+## 5. Recommendation C: an explicit `quantitySymbol` field
 
 Today the symbol is embedded in `title`, and the transliteration is inconsistent. The
 repository contains `x_bar(lambda)`, `V'(lambda)`, `s_mel(lambda)`, `K_m,mes;m`.
@@ -330,18 +330,18 @@ not have to reverse-engineer `x_bar(lambda)` into *x̄*(λ).
 
 | ID | Property | Obligation |
 |---|---|---|
-| CIE 2.4.10 | symbol | O |
+| CIE 2.4.10 | quantitySymbol | O |
 
 ```json
 {
   "title":  "x_bar(lambda)",
-  "symbol": "x̄(λ)",
+  "quantitySymbol": "x̄(λ)",
   "quantity": "colour-matching function",
   "quantityPID": "https://cie.co.at/eilvterm/17-23-047"
 }
 ```
 
-Optionally a `symbolLatex` (`\bar{x}(\lambda)`) for typesetting consumers. Note that the
+Optionally a `quantitySymbolLatex` (`\bar{x}(\lambda)`) for typesetting consumers. Note that the
 e-ILV already publishes the authoritative symbol for each term — `λ` for 17-21-025 — so
 this field can be populated from the same source as `quantityPID`.
 
@@ -984,7 +984,7 @@ Every recommendation applied. Existing fields are untouched; four keys are added
 "columnHeaders": [
   {
     "title": "lambda",
-    "symbol": "λ",
+    "quantitySymbol": "λ",
     "unit": "nm",
     "unitPID": "https://si-digital-framework.org/SI/units/nanometre",
     "quantity": "wavelength",
@@ -993,7 +993,7 @@ Every recommendation applied. Existing fields are untouched; four keys are added
   },
   {
     "title": "x(lambda)",
-    "symbol": "x(λ)",
+    "quantitySymbol": "x(λ)",
     "unit": "dimensionless",
     "unitPID": "https://si-digital-framework.org/SI/units/one",
     "quantity": "chromaticity coordinates",
@@ -1019,7 +1019,7 @@ values the schema file used to reject.
 "columnHeaders": [
   {
     "title": "m",
-    "symbol": "m",
+    "quantitySymbol": "m",
     "unit": "dimensionless",
     "unitPID": "https://si-digital-framework.org/SI/units/one",
     "quantity": "adaptation coefficient",
@@ -1028,7 +1028,7 @@ values the schema file used to reject.
   },
   {
     "title": "K_m,mes;m",
-    "symbol": "K_m,mes;m",
+    "quantitySymbol": "K_m,mes;m",
     "unit": "lm/W",
     "unitPID": "https://si-digital-framework.org/SI/units/lumen.watt-1",
     "quantity": "maximum luminous efficacy",
@@ -1064,7 +1064,7 @@ concept with no identifier — better an honest gap than a fabricated URI.
   version-distinguishing schema DOI from CIE; see section 10.
 
 **Phase 2 — semantic annotation. Done in schema version 4.2.** Added `unitPID` (CIE 2.4.8),
-`quantityPID` (CIE 2.4.9), `symbol` (CIE 2.4.10), and `symbolLatex` (CIE 2.4.11) as optional
+`quantityPID` (CIE 2.4.9), `quantitySymbol` (CIE 2.4.10), and `quantitySymbolLatex` (CIE 2.4.11) as optional
 fields in `columnHeaders` items. The normative mapping table in section 13 is now referenced
 from README.md. The WebTool `Quantity` and `Unit` column-header inputs are now dropdowns
 backed by `INTEROP_LOOKUP`, auto-populating the PID fields for all known values; a helper

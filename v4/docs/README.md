@@ -296,8 +296,8 @@ The property can have the following values:
 |CIE 2.4.7|wavelength_step|O|
 |CIE 2.4.8|unitPID|R|
 |CIE 2.4.9|quantityPID|R|
-|CIE 2.4.10|symbol|O|
-|CIE 2.4.11|symbolLatex|O|
+|CIE 2.4.10|quantitySymbol|O|
+|CIE 2.4.11|quantitySymbolLatex|O|
 
 
 For data tables that are typically distributed CIE publication, additional information shall be provided to increase the machine interpretability of the datasets. In particular, for each column: 
@@ -306,7 +306,7 @@ Title: The title includes typically the quantity and additional relevant informa
 
 Quantity: The generic quantity
 
-Unit: the unit associated with the quantity ("dimensionless" for relative quantity or those that are based on counting).
+Unit: the symbol of the unit associated with the quantity, as written in the table (e.g. `nm`, `lm/W`); "dimensionless" for relative quantities or those based on counting (the SI unit one, symbol 1). The unit itself is identified by `unitPID`; the symbol of the quantity goes in `quantitySymbol`.
 
 Description: Additional information about the column can be stated. This information can also be given in a structure JSON string. Example 
 
@@ -341,9 +341,9 @@ For compound units not yet in the mapping table, use the BIPM compound-unit gram
 
 quantityPID: A permanent URI from the CIE e-ILV (`https://cie.co.at/eilvterm/`) or the BIPM quantities knowledge base (`https://si-digital-framework.org/quantities/`) identifying the quantity of the column. The complete normative mapping for the current corpus is in `v4/docs/INTEROPERABILITY.md` section 13. Leave the field absent when no resolvable PID exists (e.g. `adaptation coefficient` has no e-ILV term as of this writing).
 
-symbol: The quantity symbol in Unicode, e.g. `λ`, `x̄(λ)`. Distinct from `title`, which is the ASCII column label in the CSV. The e-ILV publishes the authoritative symbol for each term.
+quantitySymbol: The quantity symbol in Unicode, e.g. `λ`, `x̄(λ)` (the symbol of the quantity, not of its unit, which is `unit`). Distinct from `title`, which is the ASCII column label in the CSV. The e-ILV publishes the authoritative symbol for each term.
 
-symbolLatex: The LaTeX representation of the symbol, e.g. `\bar{x}(\lambda)`. For use by typesetting consumers.
+quantitySymbolLatex: The LaTeX representation of the quantity symbol, e.g. `\bar{x}(\lambda)`. For use by typesetting consumers.
 
 
 
@@ -398,8 +398,8 @@ Version 4.2 - semantic annotation fields (strictly additive; schemaVersion stays
 - Four optional fields added to `datatableInfo.columnHeaders` items:
   - `unitPID` (CIE 2.4.8, Recommended): permanent URI identifying the column unit, from the BIPM SI Reference Point or another authoritative vocabulary.
   - `quantityPID` (CIE 2.4.9, Recommended): permanent URI identifying the column quantity, from the CIE e-ILV or BIPM quantities knowledge base.
-  - `symbol` (CIE 2.4.10, Optional): Unicode symbol for the quantity (e.g. `x̄(λ)`), distinct from `title`.
-  - `symbolLatex` (CIE 2.4.11, Optional): LaTeX representation of the symbol (e.g. `\bar{x}(\lambda)`).
+  - `quantitySymbol` (CIE 2.4.10, Optional): Unicode symbol of the quantity (not of the unit) (e.g. `x̄(λ)`), distinct from `title`.
+  - `quantitySymbolLatex` (CIE 2.4.11, Optional): LaTeX representation of the quantity symbol (e.g. `\bar{x}(\lambda)`).
 - The normative mapping table covering all units and quantities in the current published corpus is in `v4/docs/INTEROPERABILITY.md` section 13.
 - The WebTool column-header editor now provides controlled dropdowns for `quantity` and `unit` that auto-populate `quantityPID` and `unitPID` for known values; a helper link opens the BIPM unit expression parser for compound units.
 
