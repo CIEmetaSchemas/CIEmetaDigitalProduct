@@ -23,6 +23,7 @@ including the link to the Crossref deposit validator.
 | `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text), plus three `*.csv` data files with their `*_metadata_v2.json` payloads for trying out metadata-file import and CSV validation. |
 | `sync_schema.py` | Keeps the schema embedded in `CIEmetaDB.html` identical to the schema file. See below. |
 | `checks/` | Every command-line check, with the reports two of them write. `db_integrity.js` (derived fields of a database: hashes and history), `selftest.js` (the tool's own migration and revision-pair code), `validate_published.js` (each CSV against its metadata) `compare_published.js` (each database entry against its published metadata file) and `check_related_dois.js` (each related-item DOI against doi.org). All five read `CIEmetaDB.html` and the databases from this folder; see below. |
+| `QUICKSTART.md` | Short, task-oriented guide for curators. This README is the full reference. |
 | `README.md` | This file. |
 
 The metadata payload of each entry conforms to
@@ -224,7 +225,7 @@ new entries always use the current year.
 The same dialog also holds the **Crossref deposit-header defaults** — depositor name
 and email, registrant, database title, publisher name and the institution fields
 (name, acronym, place, department). These are organisation-wide values used by
-**Export to Crossref-file (XML)** (see below); set them once and they apply to every deposit.
+**Create Crossref-file (XML)** (see below); set them once and they apply to every deposit.
 
 ## Draft, under revision & published workflow
 
@@ -377,7 +378,7 @@ of exported DataCite `*.csv_metadata.json` files), shown as a link next to the D
 in the entry header and editable in the **Database entry** section of the Form tab.
 Like other envelope changes (domains) it saves without a version bump and does not change status.
 
-It is required for Crossref deposit: if it is empty when you **Export to Crossref-file (XML)**,
+It is required for Crossref deposit: if it is empty when you **Create Crossref-file (XML)**,
 the tool prompts for the URL and saves it on the entry. Existing landing pages can be
 recovered from a registered DOI via the Crossref REST API
 (`https://api.crossref.org/works/<doi>` → `resource.primary.URL`) or by following
@@ -680,14 +681,14 @@ more per entry. Entries can be filtered by domain in the list.
 ## Export
 
 - **Save DB** / **Save DB As…** — the whole metadatabase (with history and audit).
-- **Export metadata-files…** (toolbar) or **Export to metadata-file (JSON)** (per entry) — emits
+- **Export metadata-files…** (toolbar) or **Export metadata-file (JSON)** (per entry) - emits
   standard `*.csv_metadata.json` files as published on the CIE website — the payload alone,
   with the database envelope, history and audit stripped — ready for publication.
-- **Export to Crossref-file (XML)** (per entry) — see below.
+- **Create Crossref-file (XML)** (per entry) - see below.
 
-### Export to Crossref-file (XML) (DOI registration)
+### Create Crossref-file (XML) (DOI registration)
 
-The per-entry **Export to Crossref-file (XML)** button (entry action bar) generates a
+The per-entry **Create Crossref-file (XML)** button (entry action bar) generates a
 **Crossref 5.3.1 `<doi_batch>`** deposit file for the selected entry, ready to
 register the DOI. The file is named `<dataset>(<YYYYMMDDHHMMSS>).xml`.
 
