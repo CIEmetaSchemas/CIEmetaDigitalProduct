@@ -2208,6 +2208,30 @@ function doiStatusHtml(r){
   if(r.state==="error") return `<span class="warn">&#9888; could not check</span> ${esc(r.message)}`;
   return `<span class="bad">&#10007; ${r.state==="invalid"?"invalid":"not found"}</span> ${esc(r.message)}`;
 }
+/* validation findings for the related-item DOIs of a payload: {findings:[{level:"e"|"w", text}],
+   unchecked}. Offline - an identifier that is not DOI-shaped is always an error, while doi.org's
+   answer counts only once a check has run (cache: lowercase DOI -> checkDoi() result). */
+function relatedDoiFindings(payload, cache){
+  const findings=[]; let unchecked=0;
+  ((payload&&payload.relatedItems)||[]).forEach((it,i)=>{
+    if(it.relatedItemIdentifierType!=="DOI" || !String(it.relatedItemIdentifier||"").trim()) return;
+    const d=normalizeDoi(it.relatedItemIdentifier), at="Related item "+(i+1)+": ";
+    if(!isDoiSyntax(d)){ findings.push({level:"e", text:at+'"'+it.relatedItemIdentifier+'" is not a DOI (expected 10.<prefix>/<suffix>)'}); return; }
+    const r=cache&&cache.get(d.toLowerCase());
+    if(!r) unchecked++;
+    else if(r.state==="missing") findings.push({level:"e", text:at+"DOI "+d+" is not registered at doi.org"});
+    else if(r.state==="error") findings.push({level:"w", text:at+"DOI "+d+" could not be checked ("+r.message+")"});
+  });
+  return {findings, unchecked};
+}
+/* the related-item DOI part of the Form tab's validation summary. Redrawn in place when a check
+   finishes or an identifier changes, so the form itself is not re-rendered. */
+function renderDoiFindings(target){
+  const box=target||el("doiFindings"); if(!box || !editModel) return;
+  const {findings, unchecked}=relatedDoiFindings(editModel, doiCheckCache);
+  box.innerHTML=(findings.length?'<ul class="val-list">'+findings.map(f=>`<li class="${f.level}">${esc(f.text)}</li>`).join("")+"</ul>":"")
+    +(unchecked?`<p class="hint">${unchecked} related-item DOI${unchecked===1?" is":"s are"} not checked against doi.org yet: press <b>Check</b> in Related items, or <b>Check related DOIs&hellip;</b> in the toolbar.</p>`:"");
+}
 /* DOIs must be unique: map of doi -> [entries] for any DOI used more than once.
    A published entry and its open revision legitimately share a DOI while the revision is
    being prepared, so that pair is exempt (see isRevisionPair). */
@@ -2634,18 +2658,19 @@ function renderForm(page,e){
       if(!isDoiItem()) return;
       const d=normalizeDoi(it.relatedItemIdentifier);
       st.innerHTML=doiStatusHtml(null); chk.disabled=true;
-      checkDoi(d).then(r=>{ doiCheckCache.set(d.toLowerCase(),r); chk.disabled=false; showStatus(); });
+      checkDoi(d).then(r=>{ doiCheckCache.set(d.toLowerCase(),r); chk.disabled=false; showStatus(); renderDoiFindings(); });
     });
     chk.type="button"; chk.title="Ask doi.org whether this DOI is registered";
     const open=mkBtn("Open ↗","ghost small ro-ok",()=>{ if(isDoiItem()) window.open("https://doi.org/"+normalizeDoi(it.relatedItemIdentifier),"_blank","noopener"); });
     open.type="button"; open.title="Open this DOI at doi.org";
-    idInp.addEventListener("input",showStatus);
+    idInp.addEventListener("input",()=>{ showStatus(); renderDoiFindings(); });
     const idRow=document.createElement("div"); idRow.style.display="flex"; idRow.style.gap="4px"; idRow.style.alignItems="center";
     idRow.append(idInp,chk,open);
     const idCell=document.createElement("div"); idCell.append(idRow,st);
     showStatus();
     g2(g,"Identifier",idCell);
-    g2(g,"Identifier type",sel(it,"relatedItemIdentifierType",ENUMS.relatedIdentifierType));
+    const typeSel=sel(it,"relatedItemIdentifierType",ENUMS.relatedIdentifierType); typeSel.addEventListener("change",renderDoiFindings);
+    g2(g,"Identifier type",typeSel);
     g2(g,"Relation type",sel(it,"relationType",ENUMS.relationType));
     g2(g,"Item type",sel(it,"relatedItemType",ENUMS.resourceTypeGeneral));
     it.titles=it.titles||[""];
@@ -2721,6 +2746,8 @@ function renderForm(page,e){
   if(errs.length===0) box.innerHTML+='<div class="val-ok">✓ Valid against CIEmetaDigitalProduct v4 schema</div>';
   else box.innerHTML+='<ul class="val-list">'+errs.map(x=>`<li class="e">${esc(x)}</li>`).join("")+'</ul>';
   page.appendChild(box);
+  const doiBox=document.createElement("div"); doiBox.id="doiFindings"; box.appendChild(doiBox);
+  renderDoiFindings(doiBox);
 }
 
 function renderJson(page,e){
@@ -3306,6 +3333,7 @@ function openRelatedDoiDialog(){
     checkDois(rows.map(r=>r.doi),null,4,(d,res,done)=>{
       doiCheckCache.set(d.toLowerCase(),res);
       cells.get(d).innerHTML=doiStatusHtml(res);
+      renderDoiFindings();
       sum.textContent=`Checked ${done} of ${rows.length}...`;
     }).then(res=>{
       const n=s=>[...res.values()].filter(x=>x.state===s).length;
@@ -4093,7 +4121,9 @@ function openHelpDialog(){
       <li><b>+ New entry</b>, <b>Domains…</b>, <b>Edit defaults…</b>, <b>Export metadata-files…</b>.</li>
       <li><b>Check related DOIs…</b> - asks doi.org whether every related-item DOI in the database
         is registered and shows where each resolves to. Read-only. In the Form tab each related item
-        has its own <b>Check</b> and <b>Open ↗</b> buttons, which also work on a published entry.</li>
+        has its own <b>Check</b> and <b>Open ↗</b> buttons, which also work on a published entry.
+        A DOI that is not DOI-shaped, or that a check found not registered, is also listed in the
+        validation summary at the end of the Form tab.</li>
       <li><b>? Help</b> — this dialog.</li>
     </ul>
 

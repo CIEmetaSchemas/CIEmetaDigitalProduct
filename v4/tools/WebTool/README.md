@@ -398,6 +398,11 @@ made only when a check is pressed; nothing is written to the database.
   database once and lists *registered* (with the URL it resolves to), *not found*,
   *invalid* (not of the form `10.<prefix>/<suffix>`) or *could not check* (doi.org not
   reachable). The entry count links to the list, filtered by that related publication.
+- **Validation summary** (end of the Form tab) - lists a related-item DOI as an error when
+  it is not DOI-shaped (known offline, always shown) or when a check found it *not
+  registered*, and as a warning when it *could not be checked*. DOIs not checked yet get a
+  one-line hint instead. The summary updates as soon as a check finishes or an identifier
+  is edited; it never goes online by itself.
 
 DOIs are compared case-insensitively, as DOIs are. *Registered* means doi.org knows the
 handle; it does not test whether the landing page itself loads. For the whole database
@@ -592,8 +597,9 @@ usage or self-test error.
 
 Nothing is reimplemented: `normalizeDoi`, `classifyDoiResponse`, `checkDoi`, `checkDois`
 and `relatedDoiIndex` are lifted verbatim out of `CIEmetaDB.html`, so the script and the
-dialog cannot disagree. Offline self-tests T1-T6 feed the lifted code canned doi.org
-replies through a stub `fetch` and abort the run before any request if they fail.
+dialog cannot disagree. Offline self-tests T1-T7 feed the lifted code canned doi.org
+replies through a stub `fetch` and abort the run before any request if they fail; T7 pins
+`relatedDoiFindings`, the function behind the Form tab's validation summary.
 
 ## Compare an entry with an external metadata file
 
