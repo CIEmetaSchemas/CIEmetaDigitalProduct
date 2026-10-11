@@ -67,6 +67,15 @@
   .doi-cell{font-family:Consolas,monospace;font-size:11.5px;color:var(--muted)}
   a.doi-link{color:var(--cie-sec1);text-decoration:none;border-bottom:1px dotted var(--cie-sec2)}
   a.doi-link:hover{color:var(--cie-main);border-bottom-style:solid}
+  /* related-item DOI check: status text in the Form tab and the "Check related DOIs" dialog */
+  .doi-st{font-size:12px;margin-top:3px;word-break:break-all}
+  .doi-st .ok{color:var(--ok);font-weight:600}
+  .doi-st .bad{color:var(--err);font-weight:600}
+  .doi-st .warn{color:var(--warn);font-weight:600}
+  table.doi-check{width:100%;border-collapse:collapse;font-size:12.5px}
+  table.doi-check th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);padding:5px 8px;border-bottom:1px solid var(--line)}
+  table.doi-check td{padding:5px 8px;border-bottom:1px solid #eef2f8;vertical-align:top}
+  table.doi-check td:first-child{white-space:nowrap}
   .chip{display:inline-block;font-size:10.5px;padding:1px 7px;border-radius:10px;background:var(--cie-sec3);color:#0a2a52;margin:1px 3px 1px 0}
   .chip.dom{background:#e3ecfb;border:1px solid var(--cie-sec2)}
   .chip.rev{background:#eeece6;border:1px solid #d6d2c7;color:#6b665a}
@@ -170,6 +179,7 @@
   <button id="btnDomains" class="ghost">Domains&hellip;</button>
   <button id="btnUnits" class="ghost" title="Manage the unit vocabulary: display values and their BIPM SI Reference Point PIDs">Units&hellip;</button>
   <button id="btnQuantities" class="ghost" title="Manage the quantity vocabulary: display values and their CIE e-ILV PIDs">Quantities&hellip;</button>
+  <button id="btnRelatedDois" class="ghost" title="Ask doi.org whether every related-item DOI in the database is registered (read-only)">Check related DOIs&hellip;</button>
   <button id="btnDefaults" class="ghost">Edit defaults&hellip;</button>
   <button id="btnExportDataCite" class="ghost" title="Export all entries as *.csv_metadata.json files">Export metadata-files&hellip;</button>
   <button id="btnHelp" class="ghost" title="Help &amp; information">? Help</button>
@@ -2165,6 +2175,83 @@ function refreshPublicationFilter(){
     opts.map(([k,l])=>`<option value="${esc(k)}">${esc(l)}</option>`).join("");
   sel.value=cur; // preserved if still present; otherwise browser resets to "" (All)
 }
+
+/* ============================================================================
+   related-item DOI check
+   Asks the DOI Handle API whether a related item's DOI is registered. The API is neutral
+   to the registration agency (DataCite and Crossref DOIs alike) and sends CORS headers, so
+   it works from file://. responseCode 1 = registered, 100 = handle not found. This is the
+   tool's only network access, made only when a check is pressed, and nothing is written to
+   the database. checks/check_related_dois.js lifts these functions verbatim.
+   ==========================================================================*/
+const DOI_API="https://doi.org/api/handles/";
+/* "https://doi.org/10.x/y", "doi:10.x/y" and " 10.x/y " all become "10.x/y" */
+function normalizeDoi(s){
+  return String(s==null?"":s).trim().replace(/^https?:\/\/(dx\.|www\.)?doi\.org\//i,"").replace(/^doi:\s*/i,"").trim();
+}
+function isDoiSyntax(d){ return /^10\.\d{4,9}\/\S+$/.test(d); }
+/* each path segment encoded on its own: a DOI suffix may itself contain "/", "#" or "?" */
+function doiApiUrl(d){ return DOI_API+d.split("/").map(encodeURIComponent).join("/")+"?type=URL"; }
+/* {state, target, message} from a Handle API reply. state: "exists" (registered; target is the
+   URL the DOI resolves to), "missing" (not registered) or "error" (the reply settles nothing).
+   responseCode 200 means the handle exists but has no URL value. */
+function classifyDoiResponse(httpStatus, body){
+  const rc=body&&typeof body==="object"?body.responseCode:undefined;
+  if(httpStatus===200 && (rc===1||rc===200)){
+    const url=((body.values)||[]).find(v=>v&&v.type==="URL");
+    return {state:"exists", target:(url&&url.data&&url.data.value)||"", message:""};
+  }
+  if(httpStatus===404 || rc===100) return {state:"missing", target:"", message:"not registered (doi.org: handle not found)"};
+  return {state:"error", target:"", message:"unexpected reply: HTTP "+httpStatus+(rc!==undefined?", responseCode "+rc:"")};
+}
+/* Promise of {doi, state, target, message}; never rejects. state "invalid" when the identifier is
+   not DOI-shaped (no request is made), "error" when doi.org cannot be reached. */
+function checkDoi(doi, fetchImpl){
+  const d=normalizeDoi(doi);
+  if(!isDoiSyntax(d)) return Promise.resolve({doi:d, state:"invalid", target:"", message:"not a DOI (expected 10.<prefix>/<suffix>)"});
+  return Promise.resolve().then(()=>(fetchImpl||fetch)(doiApiUrl(d)))
+    .then(r=>r.json().catch(()=>null).then(body=>Object.assign({doi:d}, classifyDoiResponse(r.status, body))))
+    .catch(err=>({doi:d, state:"error", target:"", message:"doi.org not reachable: "+((err&&err.message)||err)}));
+}
+/* check several DOIs with at most `concurrency` requests in flight. onResult(doi, result, done)
+   reports progress. Promise of Map doi -> result. */
+function checkDois(dois, fetchImpl, concurrency, onResult){
+  const queue=[...new Set(dois)], out=new Map();
+  const worker=()=>{
+    const d=queue.shift(); if(d===undefined) return Promise.resolve();
+    return checkDoi(d, fetchImpl).then(r=>{ out.set(d,r); if(onResult) onResult(d,r,out.size); }).then(worker);
+  };
+  const n=Math.max(1, Math.min(concurrency||4, queue.length));
+  return Promise.all(Array.from({length:n}, ()=>worker())).then(()=>out);
+}
+/* related-item DOIs across entries, merged case-insensitively (as DOIs are): Map lowercase DOI ->
+   {doi, refs:[{entryId, title, identifier, relationType}]}. identifier is the value
+   as stored, which is what the related-publication filter is keyed by. */
+function relatedDoiIndex(entries){
+  const m=new Map();
+  for(const e of entries||[]) for(const it of (e.payload&&e.payload.relatedItems)||[]){
+    if(it.relatedItemIdentifierType!=="DOI" || !it.relatedItemIdentifier) continue;
+    const doi=normalizeDoi(it.relatedItemIdentifier), key=doi.toLowerCase();
+    if(!m.has(key)) m.set(key,{doi, refs:[]});
+    m.get(key).refs.push({entryId:e.entryId, title:entryTitle(e), identifier:it.relatedItemIdentifier, relationType:it.relationType||""});
+  }
+  return m;
+}
+/* doi.org's answers for this session, keyed by lowercase DOI, so re-rendering does not re-ask */
+const doiCheckCache=new Map();
+/* status markup for a checkDoi() result; null means the check is still running */
+function doiStatusHtml(r){
+  if(!r) return '<span class="hint">checking&hellip;</span>';
+  if(r.state==="exists"){
+    const t=r.target;
+    const link=!t?"":/^https?:\/\//i.test(t)
+      ? ` &rarr; <a class="doi-link" href="${esc(t)}" target="_blank" rel="noopener noreferrer">${esc(t)}</a>`
+      : ` &rarr; ${esc(t)}`;
+    return '<span class="ok">&#10003; registered</span>'+link;
+  }
+  if(r.state==="error") return `<span class="warn">&#9888; could not check</span> ${esc(r.message)}`;
+  return `<span class="bad">&#10007; ${r.state==="invalid"?"invalid":"not found"}</span> ${esc(r.message)}`;
+}
 /* DOIs must be unique: map of doi -> [entries] for any DOI used more than once.
    A published entry and its open revision legitimately share a DOI while the revision is
    being prepared, so that pair is exempt (see isRevisionPair). */
@@ -2358,11 +2445,12 @@ function renderDetail(){
      Envelope fields (domains, DOI landing page) are not part of the versioned payload — they never
      mint a revision or change status — so they stay editable and are excluded here via .envelope.
      Validation and History stay interactive too; they do not change the payload. The action bar is
-     unaffected, so Duplicate/Export/Delete still work. */
+     unaffected, so Duplicate/Export/Delete still work. Buttons marked ro-ok only read (e.g. the
+     related-item DOI Check / Open) and stay enabled as well. */
   if(locked && (activeTab==="form"||activeTab==="json")){
     page.classList.add("ro");            // greys legends/labels of the non-envelope fieldsets
     page.querySelectorAll("input,select,textarea,button").forEach(n=>{
-      if(!n.closest(".envelope")) n.disabled=true;
+      if(!n.closest(".envelope") && !n.classList.contains("ro-ok")) n.disabled=true;
     });
   }
   /* a revision must keep its parent's DOI: changing it would break the pair and silently
@@ -2629,7 +2717,27 @@ function renderForm(page,e){
   // relatedItems
   p.relatedItems=p.relatedItems||[];
   arraySection(page,"Related items",p.relatedItems,(g,it)=>{
-    g2(g,"Identifier",inp(it,"relatedItemIdentifier",{deleteIfEmpty:true}));
+    // Check / Open act on the stored value and change nothing, so they stay enabled on a
+    // published entry (class ro-ok); doi.org's answer shows below the identifier
+    const idInp=inp(it,"relatedItemIdentifier",{deleteIfEmpty:true}); idInp.style.flex="1"; idInp.style.minWidth="0";
+    const st=document.createElement("div"); st.className="doi-st";
+    const showStatus=()=>{ const r=doiCheckCache.get(normalizeDoi(it.relatedItemIdentifier).toLowerCase()); st.innerHTML=r?doiStatusHtml(r):""; };
+    const isDoiItem=()=>{ if(it.relatedItemIdentifierType==="DOI" && normalizeDoi(it.relatedItemIdentifier)) return true; toast("Set a DOI identifier first","warn"); return false; };
+    const chk=mkBtn("Check","ghost small ro-ok",()=>{
+      if(!isDoiItem()) return;
+      const d=normalizeDoi(it.relatedItemIdentifier);
+      st.innerHTML=doiStatusHtml(null); chk.disabled=true;
+      checkDoi(d).then(r=>{ doiCheckCache.set(d.toLowerCase(),r); chk.disabled=false; showStatus(); });
+    });
+    chk.type="button"; chk.title="Ask doi.org whether this DOI is registered";
+    const open=mkBtn("Open ↗","ghost small ro-ok",()=>{ if(isDoiItem()) window.open("https://doi.org/"+normalizeDoi(it.relatedItemIdentifier),"_blank","noopener"); });
+    open.type="button"; open.title="Open this DOI at doi.org";
+    idInp.addEventListener("input",showStatus);
+    const idRow=document.createElement("div"); idRow.style.display="flex"; idRow.style.gap="4px"; idRow.style.alignItems="center";
+    idRow.append(idInp,chk,open);
+    const idCell=document.createElement("div"); idCell.append(idRow,st);
+    showStatus();
+    g2(g,"Identifier",idCell);
     g2(g,"Identifier type",sel(it,"relatedItemIdentifierType",ENUMS.relatedIdentifierType));
     g2(g,"Relation type",sel(it,"relationType",ENUMS.relationType));
     g2(g,"Item type",sel(it,"relatedItemType",ENUMS.resourceTypeGeneral));
@@ -3314,6 +3422,56 @@ function openVocabDialog(type){
     persist(); closeModal(); renderDetail(); toast(label+" vocabulary updated","ok");
   });
   modal("Manage "+label,body,[mkBtn("Cancel","ghost",closeModal),save]);
+}
+
+/* every distinct related-item DOI in the database, each asked of doi.org once. Read-only. */
+function openRelatedDoiDialog(){
+  if(!DB) return;
+  const rows=[...relatedDoiIndex(DB.entries).values()].sort((a,b)=>a.doi.toLowerCase()<b.doi.toLowerCase()?-1:1);
+  const body=document.createElement("div");
+  const sum=document.createElement("p"); sum.className="hint"; sum.style.margin="0 0 8px"; body.appendChild(sum);
+  if(!rows.length){
+    sum.textContent="No related item in this database has a DOI identifier.";
+    modal("Check related DOIs",body,[mkBtn("Close","",closeModal)]); return;
+  }
+  const tbl=document.createElement("table"); tbl.className="doi-check";
+  tbl.innerHTML="<thead><tr><th>DOI</th><th>Status</th><th>Referenced by</th></tr></thead>";
+  const tb=document.createElement("tbody"); tbl.appendChild(tb); body.appendChild(tbl);
+  const cells=new Map();
+  for(const r of rows){
+    const tr=document.createElement("tr");
+    const tdDoi=document.createElement("td");
+    tdDoi.innerHTML=`<a class="mono doi-link" href="https://doi.org/${esc(r.doi)}" target="_blank" rel="noopener noreferrer">${esc(r.doi)}</a>`;
+    const tdSt=document.createElement("td"); tdSt.className="doi-st";
+    const tdRef=document.createElement("td");
+    const a=document.createElement("a"); a.href="#";
+    a.textContent=`${r.refs.length} entr${r.refs.length===1?"y":"ies"}`;
+    a.title="Show these entries in the list:\n"+r.refs.map(x=>`${x.title} (${x.relationType})`).join("\n");
+    a.onclick=(ev)=>{ ev.preventDefault(); refreshPublicationFilter(); el("filterPublication").value=r.refs[0].identifier; renderList(); closeModal(); };
+    tdRef.appendChild(a);
+    tr.append(tdDoi,tdSt,tdRef); tb.appendChild(tr);
+    cells.set(r.doi,tdSt);
+  }
+  const again=mkBtn("Check again","ghost",()=>run());
+  const run=()=>{
+    again.disabled=true;
+    cells.forEach(td=>{ td.innerHTML=doiStatusHtml(null); });
+    sum.textContent=`Asking doi.org about ${rows.length} DOI${rows.length===1?"":"s"}...`;
+    checkDois(rows.map(r=>r.doi),null,4,(d,res,done)=>{
+      doiCheckCache.set(d.toLowerCase(),res);
+      cells.get(d).innerHTML=doiStatusHtml(res);
+      sum.textContent=`Checked ${done} of ${rows.length}...`;
+    }).then(res=>{
+      const n=s=>[...res.values()].filter(x=>x.state===s).length;
+      const bad=n("missing")+n("invalid"), err=n("error");
+      sum.innerHTML=`<b>${n("exists")}</b> of ${rows.length} related-item DOIs registered`
+        +(bad?`, <b style="color:var(--err)">${bad} not found or invalid</b>`:"")
+        +(err?`, <b style="color:var(--warn)">${err} could not be checked</b>`:"")+".";
+      again.disabled=false;
+    });
+  };
+  modal("Check related DOIs",body,[again,mkBtn("Close","",closeModal)]);
+  run();
 }
 
 function openDefaultsDialog(){
@@ -4027,7 +4185,7 @@ function pickFile(accept, cb){
 /* enable/disable toolbar actions that require an open database */
 function updateToolbarState(){
   const hasDb = !!DB;
-  ["btnSave","btnSaveAs","btnDbInfo","btnNewEntry","btnDomains","btnUnits","btnQuantities","btnDefaults","btnExportDataCite","btnImport"]
+  ["btnSave","btnSaveAs","btnDbInfo","btnNewEntry","btnDomains","btnUnits","btnQuantities","btnRelatedDois","btnDefaults","btnExportDataCite","btnImport"]
     .forEach(id=>{ const b=el(id); if(b) b.disabled=!hasDb; });
 }
 /* true when the open DB has changes not yet written to its file (baseHash drifted
@@ -4077,8 +4235,8 @@ function openHelpDialog(){
   body.className="helpdoc";
   body.innerHTML=`
     <p style="margin-top:0">CIE Metadatabase web tool — a self-contained, offline curator for
-      <b>CIEmetaDigitalProduct</b> (DataCite v4) dataset metadata. No server, no network calls,
-      no external dependencies. Interface v${esc(APP.VERSION)} · CIE schema v${APP.CIE_SCHEMA_VERSION}.</p>
+      <b>CIEmetaDigitalProduct</b> (DataCite v4) dataset metadata. No server and no external dependencies; the only network access is the
+      optional related-item DOI check, which asks doi.org. Interface v${esc(APP.VERSION)} · CIE schema v${APP.CIE_SCHEMA_VERSION}.</p>
 
     <h4>Toolbar</h4>
     <ul>
@@ -4087,6 +4245,9 @@ function openHelpDialog(){
       <li><b>Import / Merge…</b> — reconcile another database or import individual
         <code>*.csv_metadata.json</code> files, with per-entry conflict resolution and DOI checks.</li>
       <li><b>+ New entry</b>, <b>Domains…</b>, <b>Edit defaults…</b>, <b>Export metadata-files…</b>.</li>
+      <li><b>Check related DOIs…</b> - asks doi.org whether every related-item DOI in the database
+        is registered and shows where each resolves to. Read-only. In the Form tab each related item
+        has its own <b>Check</b> and <b>Open ↗</b> buttons, which also work on a published entry.</li>
       <li><b>? Help</b> — this dialog.</li>
     </ul>
 
@@ -4262,6 +4423,7 @@ function wire(){
   el("btnDomains").onclick=openDomainsDialog;
   el("btnUnits").onclick=()=>openVocabDialog("units");
   el("btnQuantities").onclick=()=>openVocabDialog("quantities");
+  el("btnRelatedDois").onclick=openRelatedDoiDialog;
   el("btnDefaults").onclick=()=>{ if(!DB) return; openDefaultsDialog(); };
   el("btnExportDataCite").onclick=()=>{ if(DB&&DB.entries.length) exportDataCiteFiles(DB.entries); else toast("No entries to export"); };
   el("btnHelp").onclick=openHelpDialog;
