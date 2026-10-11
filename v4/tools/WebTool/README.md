@@ -421,10 +421,12 @@ from the command line, see `checks/check_related_dois.js` below.
 Each data-table entry's **Column headers** (Form tab → *Data table info*) can be
 filled in one at a time, or in bulk via the paste box shown above the list:
 
-- Prepare **7 rows** — Title, Quantity, Unit, Description, Wavelength first,
-  Wavelength last, Wavelength step — with **one column per data column**,
-  column-for-column with the CSV. A leading label column (e.g. "Title" in
-  column A) is optional and auto-detected and stripped.
+- Prepare **7 rows** (Title, Quantity, Unit, Description, Wavelength first,
+  Wavelength last, Wavelength step) with **one column per data column**,
+  column-for-column with the CSV. Four optional rows may follow (Quantity PID,
+  Unit PID, Quantity symbol, Quantity symbol (LaTeX)); only the wavelength rows
+  are read as numbers. A leading label column (e.g. "Title" in column A) is
+  optional and auto-detected and stripped.
 - Copy that range in Excel, click the paste box and press **Ctrl+V**. This
   **replaces the whole Column headers list** (with a confirmation dialog if it
   wasn't already empty).
@@ -434,6 +436,28 @@ filled in one at a time, or in bulk via the paste box shown above the list:
 - Each column-header box is labelled **Column N** so a long list (e.g. 100
   columns, as in some CIE colour-fidelity tables) stays legible while
   scrolling.
+
+## Units, quantities and PIDs (schema 4.2)
+
+In each column header, **Quantity** and **Unit** are dropdowns fed by the
+database's vocabularies (`vocabularies.units` / `vocabularies.quantities`),
+edited with **Units…** and **Quantities…** in the toolbar. New databases start
+from `DEFAULT_UNITS` / `DEFAULT_QUANTITIES` in `CIEmetaDB.html`, which follow
+`v4/docs/INTEROPERABILITY.md` section 13.
+
+- Choosing a known value fills `unitPID` / `quantityPID` from the vocabulary;
+  **Open ↗** opens the PID. **? Build PID…** opens the BIPM unit expression
+  parser for compound units. Choosing *(other)* or a value without a PID clears
+  the PID field.
+- **Quantity PIDs are held back** until CIE agrees on the mapping: the quantity
+  vocabulary carries the names with empty PIDs, and the databases carry no
+  `quantityPID`. The candidates and their review are in `checks/PID_REPORT.md`.
+- The validation summary at the end of the Form tab warns about a missing
+  `unitPID` / `quantityPID` only when the vocabulary has one for that value.
+- `quantitySymbol` / `quantitySymbolLatex` hold the symbol of the *quantity*
+  (`x̄(λ)`, `\bar{x}(\lambda)`); the unit symbol is the `unit` field.
+- The PID **Open ↗** buttons only read, so they stay enabled on a published
+  entry.
 
 ## New entry from an Excel workbook (.xlsx)
 

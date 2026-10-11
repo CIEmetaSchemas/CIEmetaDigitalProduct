@@ -4,7 +4,7 @@ A short, task-oriented guide to `CIEmetaDB.html` for curators.
 For the complete reference see [`README.md`](README.md); the **? Help** button in the
 toolbar gives the same summary inside the application.
 
-Applies to **interface version 1.10.0**.
+Applies to **interface version 1.12.0** (CIE schema 4.2).
 
 ---
 
@@ -29,7 +29,7 @@ Applies to **interface version 1.10.0**.
 
 | Area | What it is |
 |---|---|
-| **Toolbar** (top) | Database-wide actions: open, save, import/merge, new entry, domains, check related DOIs, defaults, ⓘ DB info, ? Help. The current file name and a **● unsaved** marker sit at the right-hand end. |
+| **Toolbar** (top) | Database-wide actions: open, save, import/merge, new entry, domains, units, quantities, check related DOIs, defaults, ⓘ DB info, ? Help. The current file name and a **● unsaved** marker sit at the right-hand end. |
 | **List** (left) | All entries, with search, filters, sorting and status/DOI badges. A counter shows *Showing 12 of 36 entries (filtered)*. |
 | **Editor** (right) | The selected entry, in four tabs: **Form**, **JSON**, **Validation**, **History**, plus an action bar above them. |
 
@@ -119,11 +119,25 @@ Ready-made examples: `examples/example_spectral_wavelength.xlsx`,
 
 In **Form → Data table info**, above the column list, is a paste box.
 
-- Prepare the same **7 rows** as above, one column per data column. A leading label
-  column is optional and stripped automatically.
+- Prepare the same **7 rows** as above, one column per data column. Four more rows may
+  follow: **Quantity PID, Unit PID, Quantity symbol, Quantity symbol (LaTeX)**. A leading
+  label column is optional and stripped automatically.
 - Copy in Excel, click the box, press **Ctrl+V**. This **replaces the whole list**
   (with a confirmation if it wasn't empty).
 - **Copy current as text** does the reverse, for editing in Excel and pasting back.
+
+### Units, quantities and their PIDs
+
+In each column header, **Quantity** and **Unit** are dropdowns fed by the database's
+vocabularies, which you maintain with **Units…** and **Quantities…** in the toolbar.
+
+- Picking a known unit fills its **Unit PID**, a permanent identifier from the BIPM SI
+  Digital Framework (e.g. `nm` → `…/SI/units/nanometre`); **Open ↗** opens it. For a
+  compound unit, the **? Build PID…** link opens the BIPM unit expression parser.
+- **Quantity PIDs are on hold** until CIE agrees on them, so picking a quantity fills no
+  PID for now, and the validation summary does not ask for one.
+- **Quantity symbol (Unicode)** and **(LaTeX)** hold the symbol of the *quantity*, e.g.
+  `x̄(λ)` and `\bar{x}(\lambda)`, not of the unit; the unit symbol is the **Unit** field.
 
 ## 6. DOI, landing page and related items
 
@@ -220,6 +234,7 @@ at <https://data.crossref.org/reports/parser.html>.
 | **ⓘ DB info** | Database title and description (editable), plus entry count, id and last-modified stamp. |
 | **Edit defaults…** | Values auto-filled into new entries (publisher, language, creator, resource type, format, rights, interpolation/extrapolation/data quality) **and** the Crossref deposit-header defaults. |
 | **Domains…** | The catalogue of CIE activity domains (D1-D8 by default) you can assign per entry. |
+| **Units…** / **Quantities…** | The vocabularies behind the Unit and Quantity dropdowns: each value with its PID (quantity PIDs are empty while under discussion). |
 
 ## 12. Good to know
 

@@ -1,5 +1,11 @@
 # Unit and quantity PID report
 
+> **Status.** Unit PIDs are applied. The quantity PIDs reviewed below have been **held back**
+> pending CIE agreement: the databases no longer carry `quantityPID`, and the WebTool's quantity
+> vocabulary has the names with empty PIDs. This report is the basis for that discussion; the
+> field names `symbol` / `symbolLatex` mentioned in older text are now `quantitySymbol` /
+> `quantitySymbolLatex`.
+
 Sanity check of `unitPID` and `quantityPID` in `CIEmetaDBdataset.json` as on branch
 `feature/interop-phase2` (dataset last changed in `b7802bc feat(data): annotate DB entries with
 quantityPID and unitPID (schema v4.2)`). Checked 2026-10-11. Read-only: no data was changed.

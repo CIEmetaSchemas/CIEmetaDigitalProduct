@@ -383,6 +383,13 @@ Note the distinction from the DataCite `Version` field (property 15 above): `Ver
 
 
 
+## Schema versioning
+
+- **Major version** (`schemaVersion` 3, 4, 5, ...): any change that can make an existing record invalid or change the meaning of a field, such as removing or renaming a field, a new required field, narrowing what is accepted, or a new `schemaURL`. Each major version has its own folder (`v3/`, `v4/`) and should get its own schema DOI (see defect 8 in `INTEROPERABILITY.md`).
+- **Minor version** (4.1, 4.2, ...): additive changes only, such as new optional fields, widened value sets and editorial corrections. Every existing record stays valid, `schemaVersion` keeps its integer value, and the schema file in the folder is updated in place. The exact schema file of each minor version is preserved by a git tag `schema-v<major>.<minor>` (e.g. `schema-v4.1`, `schema-v4.2`). Version 4.1 narrowed `validationType` as a minor change only because every published record was already within the list; that is the exception, not the rule.
+- **Vocabulary values are data, not schema.** Changing the unit or quantity PID mapping (`INTEROPERABILITY.md` section 13) needs no new schema version, only new metadata revisions of the records concerned (CIE 3).
+- **Candidates for version 5** (not scheduled): a version-specific schema DOI (defect 8); `unit` as a strict SI/UCUM unit symbol (renamed `unitSymbol`, `1` instead of `dimensionless`); required `unitPID` / `quantityPID`; a closed subject list; possibly `additionalProperties: false`; alignment with a newer DataCite kernel.
+
 ## Version history
 
 Version 4.1 - schema file corrections:
@@ -398,9 +405,11 @@ Version 4.2 - semantic annotation fields (strictly additive; schemaVersion stays
 - Four optional fields added to `datatableInfo.columnHeaders` items:
   - `unitPID` (CIE 2.4.8, Recommended): permanent URI identifying the column unit, from the BIPM SI Reference Point or another authoritative vocabulary.
   - `quantityPID` (CIE 2.4.9, Recommended): permanent URI identifying the column quantity, from the CIE e-ILV or BIPM quantities knowledge base.
-  - `quantitySymbol` (CIE 2.4.10, Optional): Unicode symbol of the quantity (not of the unit) (e.g. `x̄(λ)`), distinct from `title`.
+  - `quantitySymbol` (CIE 2.4.10, Optional): Unicode symbol of the quantity, not of the unit (e.g. `x̄(λ)`), distinct from `title`.
   - `quantitySymbolLatex` (CIE 2.4.11, Optional): LaTeX representation of the quantity symbol (e.g. `\bar{x}(\lambda)`).
 - The normative mapping table covering all units and quantities in the current published corpus is in `v4/docs/INTEROPERABILITY.md` section 13.
+- Unit PIDs are applied. `quantityPID` values are held back until CIE agrees on the quantity mapping; the candidates and their review are in `v4/tools/WebTool/checks/PID_REPORT.md`. The field itself is part of 4.2, so the values follow as metadata revisions without a schema change.
+- Git tags: `schema-v4.2` for this version, `schema-v4.1` for the previous one.
 - The WebTool column-header editor now provides controlled dropdowns for `quantity` and `unit` that auto-populate `quantityPID` and `unitPID` for known values; a helper link opens the BIPM unit expression parser for compound units.
 
 Version 4.1:
