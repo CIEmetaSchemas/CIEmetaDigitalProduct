@@ -48,7 +48,7 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), "ciemetadb-selftest-"));
    lift the tool's code
    ==========================================================================*/
 
-const CONSTS = ["SHA_K", "_enc", "DEFAULT_DOMAINS", "DEFAULT_VALUES"];
+const CONSTS = ["SHA_K", "_enc", "DEFAULT_DOMAINS", "DEFAULT_VALUES", "COLUMN_HEADER_FIELD_LABELS", "COLUMN_HEADER_FIELD_KEYS"];
 const LETS = ["migrationRepairs", "editMeta", "editDirty"];
 const FUNCTIONS = [
   // hashing and patching
@@ -63,6 +63,8 @@ const FUNCTIONS = [
   "metaChanged", "resetEditMeta", "saveEnvelope",
   // migration
   "migrateStatuses", "migrateDb",
+  // column-header paste and copy (Form tab paste box, New entry from .xlsx)
+  "parseColumnHeaderPaste", "columnHeadersToTsv",
 ];
 
 /* A declaration runs from its own line to the next line that starts one, all of these being at
@@ -458,6 +460,51 @@ suite("4. revision pair lifecycle");
      target.contentHash === snapshot.contentHash,
      "and leaves rev, history, status, payload and contentHash untouched");
   api.setDB(null);
+}
+
+/* ============================================================================
+   5. column-header paste and copy
+
+   The Form tab's paste box and New entry from .xlsx both go through parseColumnHeaderPaste:
+   the .xlsx path always hands it the 7 header rows, the paste box takes 7 to 11. When schema
+   4.2 grew the field list to 11 the parser still cut its input to 7 rows and threw, so both
+   paths are pinned here, together with the Copy current as text round trip.
+   ==========================================================================*/
+
+suite("5. column-header paste and copy");
+{
+  const tsv = (rows) => rows.map((r) => r.join("\t")).join("\n");
+  const seven = [
+    ["x_bar(lambda)", "y_bar(lambda)"],
+    ["colour-matching function", "colour-matching function"],
+    ["dimensionless", "dimensionless"],
+    ["", "CIE 1931"],
+    ["360", ":unap"],
+    ["830", ":unap"],
+    ["1", ":unap"],
+  ];
+  const a = api.parseColumnHeaderPaste(tsv(seven));
+  ok(Array.isArray(a) && a.length === 2, "a 7-row block parses (the .xlsx header rows, older workbooks)");
+  ok(!!a && a[0].wavelength_first === 360 && a[0].wavelength_step === 1 && a[1].wavelength_step === ":unap" &&
+     a[1].description === "CIE 1931" && !("description" in a[0]),
+     "wavelengths become numbers or sentinels; an empty description is left out");
+
+  const eleven = seven.concat([
+    ["https://cie.co.at/eilvterm/17-23-039", ""],
+    ["https://si-digital-framework.org/SI/units/one", "https://si-digital-framework.org/SI/units/one"],
+    ["x̄(λ)", "ȳ(λ)"],
+    ["\\bar{x}(\\lambda)", ""],
+  ]);
+  const b = api.parseColumnHeaderPaste(tsv(eleven));
+  ok(!!b && b[0].quantityPID === "https://cie.co.at/eilvterm/17-23-039" &&
+     b[1].unitPID === "https://si-digital-framework.org/SI/units/one" &&
+     b[0].quantitySymbol === "x̄(λ)" && b[0].quantitySymbolLatex === "\\bar{x}(\\lambda)" &&
+     !("quantityPID" in b[1]) && !("quantitySymbolLatex" in b[1]),
+     "rows 8-11 are read as text (PIDs, quantity symbols); empty cells are left out");
+
+  const round = api.parseColumnHeaderPaste(api.columnHeadersToTsv(b));
+  ok(JSON.stringify(round) === JSON.stringify(b), "Copy current as text pastes back unchanged (labelled 11-row block)");
+  ok(api.parseColumnHeaderPaste(tsv(seven.slice(0, 6))) === null, "fewer than 7 rows is rejected");
 }
 
 /* ============================================================================

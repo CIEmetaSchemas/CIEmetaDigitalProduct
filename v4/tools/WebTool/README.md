@@ -161,10 +161,11 @@ cannot reach are exactly the ones that go wrong silently:
 state, a legacy draft of the kind the two-state model stored, a revision pair — and
 drives the tool's **own** functions over them, lifted from `CIEmetaDB.html` the same way
 `db_integrity.js` lifts them, with `DB` supplied and the four UI calls `saveEnvelope()`
-makes stubbed out. 78 checks in four groups: the lifted primitives, `migrateDb`,
+makes stubbed out. 83 checks in five groups: the lifted primitives, `migrateDb`,
 `db_integrity`'s invariants (including that a legitimate revision pair passes and that
-`--fix` is not blocked by something it cannot repair), and the full pair lifecycle —
-start, edit, publish, discard, envelope save.
+`--fix` is not blocked by something it cannot repair), the full pair lifecycle (start,
+edit, publish, discard, envelope save), and the column-header paste and copy behind the
+Form tab's paste box and **New entry from .xlsx** (7- and 11-row blocks, the round trip).
 
 The fixtures are read from the shipped databases with their **open revisions removed**:
 the suites start their own pair on a published entry and assume it has none yet, and a
