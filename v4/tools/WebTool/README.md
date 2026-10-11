@@ -163,11 +163,13 @@ cannot reach are exactly the ones that go wrong silently:
 state, a legacy draft of the kind the two-state model stored, a revision pair — and
 drives the tool's **own** functions over them, lifted from `CIEmetaDB.html` the same way
 `db_integrity.js` lifts them, with `DB` supplied and the four UI calls `saveEnvelope()`
-makes stubbed out. 83 checks in five groups: the lifted primitives, `migrateDb`,
+makes stubbed out. 86 checks in six groups: the lifted primitives, `migrateDb`,
 `db_integrity`'s invariants (including that a legitimate revision pair passes and that
 `--fix` is not blocked by something it cannot repair), the full pair lifecycle (start,
-edit, publish, discard, envelope save), and the column-header paste and copy behind the
-Form tab's paste box and **New entry from .xlsx** (7- and 11-row blocks, the round trip).
+edit, publish, discard, envelope save), the column-header paste and copy behind the
+Form tab's paste box and **New entry from .xlsx** (7- and 11-row blocks, the round trip),
+and the Crossref relation mapping (every schema `relationType` mapped or documented as
+having no Crossref equivalent).
 
 The fixtures are read from the shipped databases with their **open revisions removed**:
 the suites start their own pair on a published entry and assume it has none yet, and a
@@ -772,10 +774,13 @@ register the DOI. The file is named `<dataset>(<YYYYMMDDHHMMSS>).xml`.
 - **Related items** are emitted under the Crossref relations `<program>`, mapping each
   DataCite `relationType` to the correct `inter_work_relation` / `intra_work_relation`
   (e.g. `IsPartOf`, `IsReferencedBy`, `IsDerivedFrom` → inter; `IsVersionOf`,
-  `IsIdenticalTo` → intra). Relations with **no Crossref equivalent** (`IsDescribedBy`,
-  `Describes`, `HasMetadata`, `IsMetadataFor`, `IsPublishedIn`) are **skipped and
-  reported** in a message so the file still generates. The mapping table lives in
-  `CIEmetaDB.html` (`CROSSREF_RELATION_MAP`) and is easy to adjust.
+  `IsIdenticalTo`, and since schema 4.3 `HasTranslation` / `IsTranslationOf` → intra).
+  Relations with **no Crossref equivalent** (`IsDescribedBy`, `Describes`,
+  `HasMetadata`, `IsMetadataFor`, `IsPublishedIn`, and the DataCite 4.5 / 4.7 values
+  `Collects`, `IsCollectedBy`, `Other`) are **skipped and reported** in a message so the
+  file still generates. The mapping table lives in `CIEmetaDB.html`
+  (`CROSSREF_RELATION_MAP`); `checks/selftest.js` fails if a `relationType` is neither
+  mapped nor in this list.
 - If the entry has no **DOI landing page**, you are prompted for it first (and it is
   saved on the entry).
 

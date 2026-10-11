@@ -48,7 +48,8 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), "ciemetadb-selftest-"));
    lift the tool's code
    ==========================================================================*/
 
-const CONSTS = ["SHA_K", "_enc", "DEFAULT_DOMAINS", "DEFAULT_VALUES", "COLUMN_HEADER_FIELD_LABELS", "COLUMN_HEADER_FIELD_KEYS"];
+const CONSTS = ["SHA_K", "_enc", "DEFAULT_DOMAINS", "DEFAULT_VALUES", "COLUMN_HEADER_FIELD_LABELS", "COLUMN_HEADER_FIELD_KEYS",
+  "CROSSREF_RELATION_MAP"];
 const LETS = ["migrationRepairs", "editMeta", "editDirty"];
 const FUNCTIONS = [
   // hashing and patching
@@ -117,7 +118,7 @@ function liftDeclarations() {
     "({" +
     FUNCTIONS.join(",") +
     ", setDB:(v)=>{DB=v;}, getDB:()=>DB, migrationRepairs:()=>migrationRepairs," +
-    " setEditMeta:(v)=>{editMeta=v;}})";
+    " setEditMeta:(v)=>{editMeta=v;}, crossrefRelationMap:()=>CROSSREF_RELATION_MAP})";
 
   return vm.runInNewContext(preamble + source + "\n" + exports, {
     TextEncoder, JSON, Object, Array, String, Number, Math, Uint8Array, Uint32Array, Date,
@@ -505,6 +506,30 @@ suite("5. column-header paste and copy");
   const round = api.parseColumnHeaderPaste(api.columnHeadersToTsv(b));
   ok(JSON.stringify(round) === JSON.stringify(b), "Copy current as text pastes back unchanged (labelled 11-row block)");
   ok(api.parseColumnHeaderPaste(tsv(seven.slice(0, 6))) === null, "fewer than 7 rows is rejected");
+}
+
+/* ============================================================================
+   6. Crossref relation mapping
+
+   Every relationType the schema allows must either map to a Crossref relation or be one of the
+   values documented as having no Crossref equivalent, so that a relationType added to the schema
+   (as DataCite 4.5 to 4.7 did) cannot silently drop out of a Crossref deposit.
+   ==========================================================================*/
+
+suite("6. Crossref relation mapping");
+{
+  const schemaFile = path.join(TOOL_DIR, "..", "..", "schema", "CIEmetaDigitalProduct_schema_04.json");
+  const relationTypes = JSON.parse(fs.readFileSync(schemaFile, "utf8")).definitions.relationType.enum;
+  const map = api.crossrefRelationMap();
+  const NO_EQUIVALENT = ["IsDescribedBy", "Describes", "HasMetadata", "IsMetadataFor", "IsPublishedIn", "Collects", "IsCollectedBy", "Other"];
+  const orphans = relationTypes.filter((r) => !map[r] && !NO_EQUIVALENT.includes(r));
+  ok(orphans.length === 0,
+     "every relationType is mapped or documented as having no Crossref equivalent" + (orphans.length ? ` (orphans: ${orphans.join(", ")})` : ""));
+  const stale = Object.keys(map).concat(NO_EQUIVALENT).filter((r) => !relationTypes.includes(r));
+  ok(stale.length === 0, "the mapping names no relationType the schema lacks" + (stale.length ? ` (${stale.join(", ")})` : ""));
+  ok(!!map.HasTranslation && map.HasTranslation.type === "hasTranslation" && map.HasTranslation.work === "intra" &&
+     !!map.IsTranslationOf && map.IsTranslationOf.type === "isTranslationOf" && map.IsTranslationOf.work === "intra",
+     "HasTranslation / IsTranslationOf map to Crossref intra-work hasTranslation / isTranslationOf (DataCite 4.6)");
 }
 
 /* ============================================================================

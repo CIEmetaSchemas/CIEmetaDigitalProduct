@@ -2,7 +2,7 @@
 
 Version 4.2
 
-The CIEmetaDigitalProduct meta schema is based on the most recent version of the DataCite schema (https://schema.datacite.org/meta/kernel-4.4/ ) . Additional, CIE relevant fields are defined as outlined below. The JSON schema description can be found here: https://doi.org/10.25039/CIE.SC.4taqevcd .
+The CIEmetaDigitalProduct meta schema is based on the DataCite schema: its structure follows kernel 4.4 (https://schema.datacite.org/meta/kernel-4.4/ ), and since schema version 4.3 its controlled lists follow kernel 4.7 (https://schema.datacite.org/meta/kernel-4.7/ ). Additional, CIE relevant fields are defined as outlined below. The JSON schema description can be found here: https://doi.org/10.25039/CIE.SC.4taqevcd .
 To validate your JSON metadatafile with the schema definition you may want to use: https://www.jsonschemavalidator.net/ 
 
 ## Datacite fields
@@ -190,6 +190,7 @@ is usually "Report", "Standard", or "Dataset"
 20.b relationType
 the relation to the relatedItem can be specified, typically:
 IsSupplementTo, IsSupplementedBy, HasVersion, IsVersionOf, IsNewVersionOf, IsPreviousVersionOf IsPartOf, HasPart, IsPublishedIn, IsReferencedBy, References, IsVariantFormOf, IsOriginalFormOf, IsIdenticalTo, IsDerivedFrom, IsSourceOf, IsRequiredBy Requires. 
+For a translated dataset (DOI with a language suffix, see the WebTool README) use HasTranslation / IsTranslationOf (since schema 4.3). With relationType Other, describe the relation in the optional relationTypeInformation.
 
 20.1 relatedItemIdentifier
 Typically the DOI is given, i.e. "10.25039/CIE.DS.ukaymjdn"
@@ -388,7 +389,8 @@ Note the distinction from the DataCite `Version` field (property 15 above): `Ver
 - **Major version** (`schemaVersion` 3, 4, 5, ...): any change that can make an existing record invalid or change the meaning of a field, such as removing or renaming a field, a new required field, narrowing what is accepted, or a new `schemaURL`. Each major version has its own folder (`v3/`, `v4/`) and should get its own schema DOI (see defect 8 in `INTEROPERABILITY.md`).
 - **Minor version** (4.1, 4.2, ...): additive changes only, such as new optional fields, widened value sets and editorial corrections. Every existing record stays valid, `schemaVersion` keeps its integer value, and the schema file in the folder is updated in place. The exact schema file of each minor version is preserved by a git tag `schema-v<major>.<minor>` (e.g. `schema-v4.1`, `schema-v4.2`). Version 4.1 narrowed `validationType` as a minor change only because every published record was already within the list; that is the exception, not the rule.
 - **Vocabulary values are data, not schema.** Changing the unit or quantity PID mapping (`INTEROPERABILITY.md` section 13) needs no new schema version, only new metadata revisions of the records concerned (CIE 3).
-- **Candidates for version 5** (not scheduled): a version-specific schema DOI (defect 8); `unit` as a strict SI/UCUM unit symbol (renamed `unitSymbol`, `1` instead of `dimensionless`); required `unitPID` / `quantityPID`; a closed subject list; possibly `additionalProperties: false`; alignment with a newer DataCite kernel.
+- **Candidates for version 5** (not scheduled): a version-specific schema DOI (defect 8); `unit` as a strict SI/UCUM unit symbol (renamed `unitSymbol`, `1` instead of `dimensionless`); required `unitPID` / `quantityPID`; a closed subject list; possibly `additionalProperties: false`.
+- **Candidates for a later minor version** (additive, not scheduled): `publisher` as an object with `publisherIdentifier` (DataCite 4.5; CIE ROR `https://ror.org/05w2j5k62`) besides the plain string; the full DataCite `relatedItem` sub-properties (creators, volume, issue, pages).
 
 ## Version history
 
@@ -411,6 +413,16 @@ Version 4.2 - semantic annotation fields (strictly additive; schemaVersion stays
 - Unit PIDs are applied. `quantityPID` values are held back until CIE agrees on the quantity mapping; the candidates and their review are in `v4/tools/WebTool/checks/PID_REPORT.md`. The field itself is part of 4.2, so the values follow as metadata revisions without a schema change.
 - Git tags: `schema-v4.2` for this version, `schema-v4.1` for the previous one.
 - The WebTool column-header editor now provides controlled dropdowns for `quantity` and `unit` that auto-populate `quantityPID` and `unitPID` for known values; a helper link opens the BIPM unit expression parser for compound units.
+
+Version 4.3 - controlled lists aligned with DataCite 4.7 (strictly additive; schemaVersion stays 4, schema DOI unchanged, all existing records remain valid):
+- `resourceTypeGeneral`: Instrument, StudyRegistration (DataCite 4.5); Award, Project (4.6); Poster, Presentation (4.7); and `BookChapter`, the correct spelling of the DataCite value. The misspelling `Bookchapter` stays accepted so that no record can become invalid, but it is deprecated and the WebTool no longer offers it.
+- `relationType`: Collects, IsCollectedBy (4.5); HasTranslation, IsTranslationOf (4.6), for translated datasets; Other (4.7).
+- `relatedIdentifierType`: CSTR, RRID (4.6); RAiD, SWHID (4.7).
+- `contributorType`: Translator (4.6). `dateType`: Coverage (4.6).
+- `relationTypeInformation` (DataCite 4.7, optional) on `relatedIdentifiers` and `relatedItems` items: free text, recommended with relationType Other.
+- Not adopted: the DataCite 4.5 `publisher` identifier and the full `relatedItem` sub-properties (see Schema versioning). DataCite publishes no JSON Schema after 4.3, so the lists were taken from the kernel 4.7 documentation.
+- Crossref export: HasTranslation / IsTranslationOf map to the Crossref intra-work relations hasTranslation / isTranslationOf; Collects, IsCollectedBy and Other have no Crossref equivalent and are skipped and reported.
+- Git tag: `schema-v4.3`.
 
 Version 4.1:
 - Optional field `metadataRevision` added (see CIE 3 above). It is the revision of the JSON metadata file itself:

@@ -4,7 +4,7 @@ A short, task-oriented guide to `CIEmetaDB.html` for curators.
 For the complete reference see [`README.md`](README.md); the **? Help** button in the
 toolbar gives the same summary inside the application.
 
-Applies to **interface version 1.13.0** (CIE schema 4.2).
+Applies to **interface version 1.14.0** (CIE schema 4.3).
 
 ---
 
