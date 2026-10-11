@@ -1,6 +1,6 @@
 # Related-item DOI report
 
-Generated 2026-10-11T15:01:16Z by `check_related_dois.js` over `CIEmetaDBdataset.json`.
+Generated 2026-10-11T15:16:13Z by `check_related_dois.js` over `CIEmetaDBdataset.json`.
 
 Every distinct `relatedItems[].relatedItemIdentifier` of type DOI, resolved once through the DOI Handle API (`https://doi.org/api/handles/<doi>`), using the functions lifted verbatim from `CIEmetaDB.html` that also drive the tool's **Check related DOIs** dialog. DOIs are compared case-insensitively. *Registered* means doi.org knows the handle; it says nothing about whether the landing page itself is reachable.
 

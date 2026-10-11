@@ -22,7 +22,7 @@ including the link to the Crossref deposit validator.
 | `CIEmetaDB_starter_short.json` | Nine-record subset of the starter database for quick testing, including two entries at revision 2 so the history views have something to show. |
 | `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text), plus three `*.csv` data files with their `*_metadata_v2.json` payloads for trying out metadata-file import and CSV validation. |
 | `sync_schema.py` | Keeps the schema embedded in `CIEmetaDB.html` identical to the schema file. See below. |
-| `checks/` | Every command-line check, with the reports two of them write. `db_integrity.js` (derived fields of a database — hashes and history), `selftest.js` (the tool's own migration and revision-pair code), `validate_published.js` (each CSV against its metadata) `compare_published.js` (each database entry against its published metadata file) and `check_related_dois.js` (each related-item DOI against doi.org). All five read `CIEmetaDB.html` and the databases from this folder; see below. |
+| `checks/` | Every command-line check, with the reports two of them write. `db_integrity.js` (derived fields of a database: hashes and history), `selftest.js` (the tool's own migration and revision-pair code), `validate_published.js` (each CSV against its metadata) `compare_published.js` (each database entry against its published metadata file) and `check_related_dois.js` (each related-item DOI against doi.org). All five read `CIEmetaDB.html` and the databases from this folder; see below. |
 | `README.md` | This file. |
 
 The metadata payload of each entry conforms to

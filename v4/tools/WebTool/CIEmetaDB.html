@@ -2174,7 +2174,7 @@ function checkDois(dois, fetchImpl, concurrency, onResult){
   return Promise.all(Array.from({length:n}, ()=>worker())).then(()=>out);
 }
 /* related-item DOIs across entries, merged case-insensitively (as DOIs are): Map lowercase DOI ->
-   {doi, refs:[{entryId, title, identifier, relationType, itemTitle}]}. identifier is the value
+   {doi, refs:[{entryId, title, identifier, relationType}]}. identifier is the value
    as stored, which is what the related-publication filter is keyed by. */
 function relatedDoiIndex(entries){
   const m=new Map();
@@ -2182,8 +2182,7 @@ function relatedDoiIndex(entries){
     if(it.relatedItemIdentifierType!=="DOI" || !it.relatedItemIdentifier) continue;
     const doi=normalizeDoi(it.relatedItemIdentifier), key=doi.toLowerCase();
     if(!m.has(key)) m.set(key,{doi, refs:[]});
-    m.get(key).refs.push({entryId:e.entryId, title:entryTitle(e), identifier:it.relatedItemIdentifier,
-      relationType:it.relationType||"", itemTitle:(it.titles&&it.titles[0])||""});
+    m.get(key).refs.push({entryId:e.entryId, title:entryTitle(e), identifier:it.relatedItemIdentifier, relationType:it.relationType||""});
   }
   return m;
 }
