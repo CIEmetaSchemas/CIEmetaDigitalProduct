@@ -1241,8 +1241,11 @@ const APP = {
   LS_USER: "ciemetadb.user"
 };
 
-/* Default interoperability vocabularies — normative mapping from unit/quantity strings to PIDs.
+/* Default interoperability vocabularies: mapping from unit/quantity strings to PIDs.
    Source: v4/docs/INTEROPERABILITY.md section 13 (schema version 4.2).
+   Quantity PIDs are held back (pid "") until CIE agrees on them; the candidates are in
+   tools/WebTool/checks/PID_REPORT.md. An empty pid still offers the quantity name in the
+   dropdown but writes no quantityPID (see comboInp).
    Stored in db.vocabularies at runtime and editable via the Units… / Quantities… toolbar buttons.
    These constants seed new databases and act as fallback when an existing DB lacks db.vocabularies. */
 const DEFAULT_UNITS = [
@@ -1251,19 +1254,19 @@ const DEFAULT_UNITS = [
   {value:"lm/W",          pid:"https://si-digital-framework.org/SI/units/lumen.watt-1"}
 ];
 const DEFAULT_QUANTITIES = [
-  {value:"wavelength",                        pid:"https://cie.co.at/eilvterm/17-21-025"},
-  {value:"spectral distribution",             pid:"https://cie.co.at/eilvterm/17-21-029"},
-  {value:"spectral radiance factor",          pid:"https://cie.co.at/eilvterm/17-24-075"},
-  {value:"chromaticity coordinates",          pid:"https://cie.co.at/eilvterm/17-23-053"},
-  {value:"spectral chromaticity coordinates", pid:"https://cie.co.at/eilvterm/17-23-055"},
-  {value:"colour-matching function",          pid:"https://cie.co.at/eilvterm/17-23-039"},
-  {value:"CIE colour-matching functions",     pid:"https://cie.co.at/eilvterm/17-23-047"},
-  {value:"spectral tristimulus values",       pid:"https://cie.co.at/eilvterm/17-23-038"},
-  {value:"spectral sensitivity",             pid:"https://cie.co.at/eilvterm/17-25-063"},
-  {value:"action spectra",                    pid:"https://cie.co.at/eilvterm/17-26-027"},
-  {value:"spectral luminous efficiency",      pid:"https://cie.co.at/eilvterm/17-21-035"},
-  {value:"luminous efficiency",               pid:"https://cie.co.at/eilvterm/17-21-094"},
-  {value:"maximum luminous efficacy",         pid:"https://cie.co.at/eilvterm/17-21-092"}
+  {value:"wavelength",                        pid:""},
+  {value:"spectral distribution",             pid:""},
+  {value:"spectral radiance factor",          pid:""},
+  {value:"chromaticity coordinates",          pid:""},
+  {value:"spectral chromaticity coordinates", pid:""},
+  {value:"colour-matching function",          pid:""},
+  {value:"CIE colour-matching functions",     pid:""},
+  {value:"spectral tristimulus values",       pid:""},
+  {value:"spectral sensitivity",             pid:""},
+  {value:"action spectra",                    pid:""},
+  {value:"spectral luminous efficiency",      pid:""},
+  {value:"luminous efficiency",               pid:""},
+  {value:"maximum luminous efficacy",         pid:""}
 ];
 function getVocab(type){
   return (DB && DB.vocabularies && DB.vocabularies[type]) ||
@@ -2868,10 +2871,12 @@ function renderForm(page,e){
   if(errs.length===0) box.innerHTML+='<div class="val-ok">✓ Valid against CIEmetaDigitalProduct v4 schema</div>';
   else box.innerHTML+='<ul class="val-list">'+errs.map(x=>`<li class="e">${esc(x)}</li>`).join("")+'</ul>';
   const pidWarns=[];
+  const vocabPid=(type,value)=>{ const v=getVocab(type).find(x=>x.value===value); return (v&&v.pid)||""; };
   (p.datatableInfo&&p.datatableInfo.columnHeaders||[]).forEach((ch,i)=>{
     const col="Column "+(i+1)+" ("+esc(ch.title||"untitled")+")";
-    if(!ch.quantityPID) pidWarns.push(col+": quantityPID missing (Recommended, CIE 2.4.9)");
-    if(!ch.unitPID)     pidWarns.push(col+": unitPID missing (Recommended, CIE 2.4.8)");
+    // a PID is expected only where the vocabulary has one for the column's quantity / unit
+    if(!ch.quantityPID && vocabPid("quantities",ch.quantity)) pidWarns.push(col+": quantityPID missing, the vocabulary has one for \""+esc(ch.quantity)+"\" (Recommended, CIE 2.4.9)");
+    if(!ch.unitPID && vocabPid("units",ch.unit))               pidWarns.push(col+": unitPID missing, the vocabulary has one for \""+esc(ch.unit)+"\" (Recommended, CIE 2.4.8)");
   });
   if(pidWarns.length) box.innerHTML+='<ul class="val-list">'+pidWarns.map(w=>`<li class="w">${w}</li>`).join("")+'</ul>';
   page.appendChild(box);

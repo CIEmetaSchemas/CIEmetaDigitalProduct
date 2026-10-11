@@ -4,10 +4,10 @@
   "dbId": "4cd12818-04ed-4654-b9f7-dbf622b029d1",
   "title": "CIE data-table metadatabase",
   "description": "Curated CIEmetaDigitalProduct metadata for the CIE published data tables (https://cie.co.at/data-tables).",
-  "baseHash": "72769e20427e634bad1d41456cde61341ce2e02794605b5c113f18317368bf86",
-  "generatedAt": "2026-08-07T18:07:34.307Z",
-  "lastModifiedDate": "2026-08-07T18:07:34.307Z",
-  "lastModifiedBy": "peter.blattner@metas.ch",
+  "baseHash": "88371f9fdd02630eef327da6fb1a6ee7eff4c7492536eec92bb4e32b8e4516ac",
+  "generatedAt": "2026-10-11T19:06:58.702Z",
+  "lastModifiedDate": "2026-10-11T19:06:58.702Z",
+  "lastModifiedBy": "Peter Blattner",
   "domains": [
     {
       "code": "D1",
@@ -503,7 +503,7 @@
     {
       "entryId": "dd141f8a-31b5-41cc-bf57-7eef4504829a-rev",
       "rev": 2,
-      "contentHash": "ff286a027d4e4fe1a6cc0682dff8377e0e34f541448c8f47d2029b060ed6c64f",
+      "contentHash": "17b45def75e420890c837fe86acd0a3ffe40aece8bdfb5ad819be003fffe737e",
       "status": "review",
       "domains": [
         "D1"
@@ -512,8 +512,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.662Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -618,7 +618,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -1339,7 +1338,7 @@
     {
       "entryId": "ef380a5a-482c-4318-84c9-902095e2d306-rev",
       "rev": 2,
-      "contentHash": "6171e4f436703186c85239c5df85347a061a6b3d1a1f374812cfebd5113d82cf",
+      "contentHash": "c47223ecaf6d7bb735a8c9cc6075307099f56689b55a4fd9e74386ba8ce9cf8b",
       "status": "review",
       "domains": [
         "D2"
@@ -1348,8 +1347,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.666Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -1441,7 +1440,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -1451,7 +1449,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -2191,7 +2188,7 @@
     {
       "entryId": "1668e71d-7473-44e5-9481-82b9d4dd2fee-rev",
       "rev": 1,
-      "contentHash": "ea6e3fe5d24ba5aeda243ec20cb003d7dd2cd12da8d33efbbdce1af5023a9b9d",
+      "contentHash": "3357d47bb04b1d925d2eec0863574fb2d6a03850608cbc40b69bf6efd53a6342",
       "status": "review",
       "domains": [
         "D1",
@@ -2203,8 +2200,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.667Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -2306,7 +2303,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -2317,7 +2313,6 @@
               "wavelength_first": 390,
               "wavelength_last": 615,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-26-027",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -2328,7 +2323,6 @@
               "wavelength_first": 390,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-26-027",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -2339,7 +2333,6 @@
               "wavelength_first": 390,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-26-027",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -2350,7 +2343,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-26-027",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -2361,7 +2353,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-26-027",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -3104,7 +3095,7 @@
     {
       "entryId": "ef65a1df-6316-4826-9242-71ea739c0f48-rev",
       "rev": 1,
-      "contentHash": "5de13ea7ff2a39842ef06809ebf03b3aac43b8f34c13151131d20b01e3c5455d",
+      "contentHash": "7c09d7d1dc2a7adf80a8ddf902259ce7abb0ec68dd982b11e2e8253bea2e2cad",
       "status": "review",
       "domains": [
         "D1",
@@ -3114,8 +3105,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.668Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -3231,7 +3222,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -3241,7 +3231,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-053",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -3251,7 +3240,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-053",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -3261,7 +3249,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-053",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -4041,7 +4028,7 @@
     {
       "entryId": "d7be1e15-2afd-4347-b9d9-7645fb317ec1-rev",
       "rev": 2,
-      "contentHash": "2b5ab543903574ca0e049d7ffedd1172930f19208540a16815c3138a6c125c25",
+      "contentHash": "9271a0e718bf90857cbb8473c7c0ada981b0bc5e386e3938014300f0f9084ed1",
       "status": "review",
       "domains": [
         "D1"
@@ -4050,8 +4037,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.668Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -4153,7 +4140,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -4163,7 +4149,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-053",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -4173,7 +4158,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-053",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -4183,7 +4167,6 @@
               "wavelength_first": 360,
               "wavelength_last": 559,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-053",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -4917,7 +4900,7 @@
     {
       "entryId": "9c52ccc2-5438-428a-ad9d-27efd4e9fa37-rev",
       "rev": 1,
-      "contentHash": "c2377fece242ddf153e36b443aa39ab41047c1a2e490a72b82374c8483c18c01",
+      "contentHash": "5b0843eb966109e3c31a884f9c6705d2307f27bb92c7c10ad5fe83ee3488cb84",
       "status": "review",
       "domains": [
         "D1"
@@ -4926,8 +4909,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.669Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -5029,7 +5012,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -5039,7 +5021,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-094",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -5757,7 +5738,7 @@
     {
       "entryId": "7d8e5446-fab6-4c64-8e3a-c01b5c93bef9-rev",
       "rev": 2,
-      "contentHash": "46b6a284a4c38ea78cfc8309723467fc47cca7abc9aed2635f0b76717177f796",
+      "contentHash": "6ae2390380f120d3942ce56b50b16ae7cceb9607f4a68c192efe56a82452b712",
       "status": "review",
       "domains": [
         "D1"
@@ -5766,8 +5747,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.669Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -5869,7 +5850,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -5879,7 +5859,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-094",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -6629,7 +6608,7 @@
     {
       "entryId": "4d6fc561-cab2-458b-9d09-af87ee92faaa-rev",
       "rev": 1,
-      "contentHash": "6389739ad9229f247f52b4d933943caeb8f1ad69f4b08957ab0ba845d592d17a",
+      "contentHash": "f46aafc1595bd5df74fdc67b3d97d0f5c8fea3e27e08e6523eacda0c5ed9d363",
       "status": "review",
       "domains": [
         "D1"
@@ -6638,8 +6617,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.670Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -6741,7 +6720,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -6751,7 +6729,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-038",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -6761,7 +6738,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-038",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -6771,7 +6747,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-038",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -7464,7 +7439,7 @@
     {
       "entryId": "3a2166a3-91ec-4b93-bd27-88d6ba1170d7-rev",
       "rev": 1,
-      "contentHash": "a3ed73c25533c64b6933108a2d8e174dcc77a7dd26477adc8378784ed7593b6a",
+      "contentHash": "75d531d6fb0b64104e73ce89930b5460a58ab04a4eca56429cc7b923199c47ca",
       "status": "review",
       "domains": [
         "D1"
@@ -7473,8 +7448,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.670Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -7576,7 +7551,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -7586,7 +7560,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-038",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -7596,7 +7569,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-038",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -7606,7 +7578,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-038",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -8301,7 +8272,7 @@
     {
       "entryId": "9afa2e4c-4812-45e2-b546-2b7d6ca39496-rev",
       "rev": 2,
-      "contentHash": "19843a6283354acf05d3794547399f78a4bb55b588191554556d50d8f91104c3",
+      "contentHash": "c71be14a2361a1ed2d97999bea37dda60c5f37f548dd36afff77114dd2d42a98",
       "status": "review",
       "domains": [
         "D1"
@@ -8310,8 +8281,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.671Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -8416,7 +8387,6 @@
               "wavelength_first": 300,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -8426,7 +8396,6 @@
               "wavelength_first": 300,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -9108,7 +9077,7 @@
     {
       "entryId": "02fa7b50-31e1-418a-b345-750f0af013ee-rev",
       "rev": 1,
-      "contentHash": "86f3409f931e7a784eb624ec2856ed462b861ca78700135f80001b5fa0c88381",
+      "contentHash": "39de20975228bb19a650efab0426683712cc375441327564b37830db618f64d4",
       "status": "review",
       "domains": [
         "D1"
@@ -9116,9 +9085,9 @@
       "audit": {
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
-        "modifiedBy": "peter.blattner@metas.ch",
-        "modifiedDate": "2026-08-07T18:05:42.100Z",
-        "modifiedComment": ""
+        "modifiedBy": "Peter Blattner",
+        "modifiedDate": "2026-10-11T19:06:58.672Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -9223,8 +9192,7 @@
               "wavelength_first": 300,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "unitPID": "https://si-digital-framework.org/SI/units/nanometre",
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025"
+              "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
               "title": "CIE Illuminant D55",
@@ -9233,7 +9201,6 @@
               "wavelength_first": 300,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -9915,7 +9882,7 @@
     {
       "entryId": "0f13447e-9229-4279-be5b-539910ef4bb7-rev",
       "rev": 2,
-      "contentHash": "3774e96ecb0fc00f6628f8e257919a8f9e960a1179596b6f557d46153d19881b",
+      "contentHash": "c9b20f7b192f7396dc806eed0d3e45eed69f05af595efc15082f4bbf04df424e",
       "status": "review",
       "domains": [
         "D1"
@@ -9923,9 +9890,9 @@
       "audit": {
         "createdBy": "Peter Blattner",
         "createdDate": "2024-09-20T08:00:00.000Z",
-        "modifiedBy": "peter.blattner@metas.ch",
-        "modifiedDate": "2026-08-07T18:06:01.570Z",
-        "modifiedComment": ""
+        "modifiedBy": "Peter Blattner",
+        "modifiedDate": "2026-10-11T19:06:58.672Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -10030,8 +9997,7 @@
               "wavelength_first": 300,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "unitPID": "https://si-digital-framework.org/SI/units/nanometre",
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025"
+              "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
               "title": "CIE Illuminant D75",
@@ -10040,7 +10006,6 @@
               "wavelength_first": 300,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -10815,7 +10780,7 @@
     {
       "entryId": "71689b69-76d2-430b-afe6-fce220a9cf38-rev",
       "rev": 2,
-      "contentHash": "55a25030684bf5a219dd4930e25329c639702d0c34ceec4ddfc3810847cfd56e",
+      "contentHash": "e478f19b49671f6fbca4dfd195c3e761dccba59a8d99c9f7f3ee814a2379bfb3",
       "status": "review",
       "domains": [
         "D1"
@@ -10824,8 +10789,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.673Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -10930,7 +10895,6 @@
               "wavelength_first": 300,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -12171,7 +12135,7 @@
     {
       "entryId": "09a4ebd0-cbc4-47aa-802f-f9998a82b765-rev",
       "rev": 1,
-      "contentHash": "c4e9208e9b7b9b7559d7770a4af03593d4226a00a298f4a46feccd63bb543668",
+      "contentHash": "c230859d7988ac5d899a4508ef17ec00250cb77fa8977de54f283a06c2295df9",
       "status": "review",
       "domains": [
         "D1"
@@ -12180,8 +12144,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.674Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -12290,7 +12254,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -12301,7 +12264,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12312,7 +12274,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12323,7 +12284,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12334,7 +12294,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12345,7 +12304,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12356,7 +12314,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12367,7 +12324,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12378,7 +12334,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12389,7 +12344,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12400,7 +12354,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12411,7 +12364,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12422,7 +12374,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12433,7 +12384,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12444,7 +12394,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12455,7 +12404,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12466,7 +12414,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12477,7 +12424,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12488,7 +12434,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12499,7 +12444,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12510,7 +12454,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12521,7 +12464,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12532,7 +12474,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12543,7 +12484,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12554,7 +12494,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12565,7 +12504,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12576,7 +12514,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -12587,7 +12524,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -13968,7 +13904,7 @@
     {
       "entryId": "60ae9dea-8473-4ee0-b2a6-fd8c9b01ca7d-rev",
       "rev": 1,
-      "contentHash": "fbfbcbbdbd4c2944a76d805bd1bf0af11fe9ca79e1dfe421bbfb76eeae7b9f9a",
+      "contentHash": "2530f3da462e36a0c2b9d0aae2a682d5175b03b91f304f179be8813da7cef71f",
       "status": "review",
       "domains": [
         "D1"
@@ -13977,8 +13913,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.675Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -14087,7 +14023,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -14098,7 +14033,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14109,7 +14043,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14120,7 +14053,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14131,7 +14063,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14142,7 +14073,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14153,7 +14083,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14164,7 +14093,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14175,7 +14103,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14186,7 +14113,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14197,7 +14123,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14208,7 +14133,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14219,7 +14143,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14230,7 +14153,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14241,7 +14163,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14252,7 +14173,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14263,7 +14183,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14274,7 +14193,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14285,7 +14203,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14296,7 +14213,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14307,7 +14223,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14318,7 +14233,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14329,7 +14243,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14340,7 +14253,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14351,7 +14263,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14362,7 +14273,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14373,7 +14283,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -14384,7 +14293,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -15384,7 +15292,7 @@
     {
       "entryId": "7a4b58c2-3d2e-42f3-9203-c386f9be89cd-rev",
       "rev": 2,
-      "contentHash": "40741d6933caebd06253ec445614fb98d4e36528147e41576616424fed47ef8c",
+      "contentHash": "8642fa15bea74b626c3f2084343914fc0430ff09bcc230e338815fcf70e6ba13",
       "status": "review",
       "domains": [
         "D1"
@@ -15393,8 +15301,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.676Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -15499,7 +15407,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -15510,7 +15417,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -15521,7 +15427,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -15532,7 +15437,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -15543,7 +15447,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -15554,7 +15457,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -16261,7 +16163,7 @@
     {
       "entryId": "f4bb3fee-99e2-4d54-a315-31a5114f7ef1-rev",
       "rev": 1,
-      "contentHash": "acb35f3bbac658aabbdf4bc3168fc9a33e40339e5a2b6b8114474f81823ae011",
+      "contentHash": "192a803c4cfe034ddb6c4a4a7d9476c0761a67119d36141e1c1981602f4a401a",
       "status": "review",
       "domains": [
         "D1"
@@ -16270,8 +16172,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.676Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -16370,7 +16272,6 @@
               "wavelength_first": 300,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -16380,7 +16281,6 @@
               "wavelength_first": 300,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -17044,7 +16944,7 @@
     {
       "entryId": "6c7d55ee-5743-4b92-9a21-4f7c034f6f85-rev",
       "rev": 2,
-      "contentHash": "31d24eb6aaa2a5c1a48e364baf9da053630fb3a80d023a00f28824827b62b2bc",
+      "contentHash": "415da43bdb87d5550caa51a631888a335748e2628b91f08d4e03bdf4882cbb77",
       "status": "review",
       "domains": [
         "D1"
@@ -17053,8 +16953,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.677Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -17153,7 +17053,6 @@
               "wavelength_first": 300,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -17163,7 +17062,6 @@
               "wavelength_first": 300,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -18013,7 +17911,7 @@
     {
       "entryId": "f82d0656-040a-4318-b4e8-4101c9461ff7-rev",
       "rev": 2,
-      "contentHash": "56f88210946058fed8e6857d75e571a3e58da1672ad14f6ea27b707d823735ae",
+      "contentHash": "b5385223f8d607bccec4087394527e08a8379a3366f64f4fd3e223fc7a18824b",
       "status": "review",
       "domains": [
         "D1"
@@ -18022,8 +17920,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.678Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -18128,7 +18026,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -18139,7 +18036,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -18150,7 +18046,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -18161,7 +18056,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -18172,7 +18066,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -18183,7 +18076,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -18194,7 +18086,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -18205,7 +18096,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -18216,7 +18106,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -18227,7 +18116,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -19128,7 +19016,7 @@
     {
       "entryId": "e49b6446-2747-4485-8a96-b34c74c3c0e9-rev",
       "rev": 1,
-      "contentHash": "066ae78ea722ea500a52b2a6a2854eedf9712e5f937b21f5713038c48ba327f6",
+      "contentHash": "41185b6d6de4120e107228205da1ecfcbea011f8c60ba3b46c8eb322a96f5443",
       "status": "review",
       "domains": [
         "D1"
@@ -19137,8 +19025,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.679Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -19243,7 +19131,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -19254,7 +19141,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -19265,7 +19151,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -19276,7 +19161,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -19287,7 +19171,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -19298,7 +19181,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -19309,7 +19191,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -19320,7 +19201,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -19331,7 +19211,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -19342,7 +19221,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -20162,7 +20040,7 @@
     {
       "entryId": "e350a9a4-c885-40b5-835e-dfea29a33a7c-rev",
       "rev": 2,
-      "contentHash": "bc4a027cbc9a55a8f6fad25b9289684b53695ee143372ceb0b13b0ce6158065e",
+      "contentHash": "04736b18c812539f70ab5f64795e9b8c5d7e9880e8b11567175ab505b943cd74",
       "status": "review",
       "domains": [
         "D1"
@@ -20170,9 +20048,9 @@
       "audit": {
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
-        "modifiedBy": "peter.blattner@metas.ch",
-        "modifiedDate": "2026-08-07T18:01:32.740Z",
-        "modifiedComment": ""
+        "modifiedBy": "Peter Blattner",
+        "modifiedDate": "2026-10-11T19:06:58.680Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -20271,7 +20149,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -21055,7 +20932,7 @@
     {
       "entryId": "e5ade036-e6ba-47cc-bf31-fb366369d050-rev",
       "rev": 1,
-      "contentHash": "4d2208d401feac76c8c1716cd73ccd440fbe16a5d22441442ed9be8d7c5f61cb",
+      "contentHash": "ea7c7d2eda067b4dd0c4805f79aad3ab4968dc19d124ad628d499616d71f721d",
       "status": "review",
       "domains": [
         "D1"
@@ -21063,9 +20940,9 @@
       "audit": {
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
-        "modifiedBy": "peter.blattner@metas.ch",
-        "modifiedDate": "2026-08-07T18:02:04.418Z",
-        "modifiedComment": ""
+        "modifiedBy": "Peter Blattner",
+        "modifiedDate": "2026-10-11T19:06:58.681Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -21164,7 +21041,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -21888,7 +21764,7 @@
     {
       "entryId": "9e3359aa-92cd-4843-8bc6-1fce79d241a5-rev",
       "rev": 1,
-      "contentHash": "d488712cc903b58cb694264ac2f14df2b312137e13ef3351ac564bab12353628",
+      "contentHash": "d4c7a2ad340fcdf29ad629f4b3572f997bdc8e5d5841c834267a5ee42e6b1115",
       "status": "review",
       "domains": [
         "D2"
@@ -21897,8 +21773,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.682Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -22011,7 +21887,6 @@
               "wavelength_first": ":unap",
               "wavelength_last": ":unap",
               "wavelength_step": ":unap",
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-092",
               "unitPID": "https://si-digital-framework.org/SI/units/lumen.watt-1"
             }
           ]
@@ -22766,7 +22641,7 @@
     {
       "entryId": "b97812bb-e5d7-4ce7-9f21-4308326929a6-rev",
       "rev": 2,
-      "contentHash": "686d3a10bd87d3c071a610f5442a758e6b13ac57d4ee4625c114343929736ac9",
+      "contentHash": "8b85129717ceac3dd70c868cc42dcdc741db36829672487d2aaf7d38ba369a61",
       "status": "review",
       "domains": [
         "D2"
@@ -22775,8 +22650,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.683Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -22878,7 +22753,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -22888,7 +22762,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-035",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -23679,7 +23552,7 @@
     {
       "entryId": "85a2057c-dce0-4232-82f4-1d2539e8664c-rev",
       "rev": 2,
-      "contentHash": "bd2c0737b48bf748c96d3b8bc7e62fd4557a8214e9c55770aea3655dff1e9e8f",
+      "contentHash": "45c986335faf446a1701819a7710a099b4bf7ab2809913158bff28bd007f33e5",
       "status": "review",
       "domains": [
         "D2"
@@ -23688,8 +23561,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.683Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -23791,7 +23664,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -23801,7 +23673,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-035",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -24558,7 +24429,7 @@
     {
       "entryId": "eed5ac4a-ebef-45a2-bcf8-1d2e7ba9511a-rev",
       "rev": 1,
-      "contentHash": "58935c372040489e8d6b6d0c4bcc44b4b4098d500686e4f210fbed8f7bc78c95",
+      "contentHash": "85c0d583e6b1bca8d61bfeba5618a13986bcbf8d1cd9c734f91a2c09c8397508",
       "status": "review",
       "domains": [
         "D1",
@@ -24568,8 +24439,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.684Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -24690,7 +24561,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -24700,7 +24570,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-035",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -25368,7 +25237,7 @@
     {
       "entryId": "48b6aefd-ecac-45d9-9f8f-b78bcc063006-rev",
       "rev": 1,
-      "contentHash": "12a01d8548ae810c861080bbc9beaf51f9981d0267072e87f2736a8c7615170d",
+      "contentHash": "7dd31443bf42b9b154e6f7be613a7b3cede74863cda1446b06985f8fdae0a114",
       "status": "review",
       "domains": [
         "D2"
@@ -25377,8 +25246,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.685Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -25485,14 +25354,12 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
               "title": "V'(lambda)",
               "unit": "dimensionless",
               "quantity": "spectral luminous efficiency",
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-035",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -26250,7 +26117,7 @@
     {
       "entryId": "91b5c255-bee7-4824-8ba5-bde671673855-rev",
       "rev": 2,
-      "contentHash": "77db9f99cc440421053f07703934fa82ea0e94df2ab55a2a470c7f17ba64ec79",
+      "contentHash": "c4766136644fa8570348710dc49e29aca8ece57e079a1edf36ffb783ccc51dee",
       "status": "review",
       "domains": [
         "D1"
@@ -26259,8 +26126,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.687Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -26362,7 +26229,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -26373,7 +26239,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-053",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -26384,7 +26249,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-053",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -26395,7 +26259,6 @@
               "wavelength_first": 390,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-053",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -27440,7 +27303,7 @@
     {
       "entryId": "2aae303c-2e93-4964-a817-487e448ac682-rev",
       "rev": 2,
-      "contentHash": "0c46abf7a8ac58bf5064187f219fa43abdaa6eacfe56e2e81df678183e0aa045",
+      "contentHash": "a3cf2338ee67cede0d54211df118437774c36ec70448a82f475815fc344e42c2",
       "status": "review",
       "domains": [
         "D1"
@@ -27449,8 +27312,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.688Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "alternateIdentifiers": [
@@ -27484,7 +27347,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -27495,7 +27357,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -27506,7 +27367,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -27517,7 +27377,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -27528,7 +27387,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -27539,7 +27397,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -27550,7 +27407,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -27561,7 +27417,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -27572,7 +27427,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -27583,7 +27437,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -27594,7 +27447,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -27605,7 +27457,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -27616,7 +27467,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -27627,7 +27477,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -27638,7 +27487,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -27649,7 +27497,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ],
@@ -28645,7 +28492,7 @@
     {
       "entryId": "05645f9a-8c38-4861-8d58-8927f940eeb0-rev",
       "rev": 2,
-      "contentHash": "792e90cbc90ba25fc2a8cd1e9b2e4a099422db310aa5aab378d1ddf89350830c",
+      "contentHash": "8adfe0b0eb317bec3a3b517f65578949df11a6fd80921b31b8598b21dce60fc2",
       "status": "review",
       "domains": [
         "D1"
@@ -28654,8 +28501,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.689Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "alternateIdentifiers": [
@@ -28689,7 +28536,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -28699,7 +28545,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -28709,7 +28554,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -28719,7 +28563,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -28729,7 +28572,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ],
@@ -29574,7 +29416,7 @@
     {
       "entryId": "e6791f20-92a5-4057-a821-ea68cfac0621-rev",
       "rev": 2,
-      "contentHash": "0f5d369d780f684112b72495f7fc465d901a84cd7f0b99a980700935a5e0447c",
+      "contentHash": "a4f841cbd435a28f551acaf97682352d894a07958a9167b057ae889dd44c1806",
       "status": "review",
       "domains": [
         "D1"
@@ -29583,8 +29425,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.689Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "alternateIdentifiers": [
@@ -29618,7 +29460,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -29628,7 +29469,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ],
@@ -32226,7 +32066,7 @@
     {
       "entryId": "6043d076-fd73-4f53-b68a-5817feb6fdd9-rev",
       "rev": 2,
-      "contentHash": "4bc8ea06be013b95eb7e6fc6c852326d972944b1a31833c4460756bfe4beb7cf",
+      "contentHash": "86bb78bb2da55659538f1b1001b3c74c358906c057cbd19275e4081d2aa08429",
       "status": "review",
       "domains": [
         "D1"
@@ -32235,8 +32075,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.696Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -32354,7 +32194,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -32365,7 +32204,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32376,7 +32214,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32387,7 +32224,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32398,7 +32234,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32409,7 +32244,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32420,7 +32254,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32431,7 +32264,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32442,7 +32274,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32453,7 +32284,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32464,7 +32294,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32475,7 +32304,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32486,7 +32314,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32497,7 +32324,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32508,7 +32334,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32519,7 +32344,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32530,7 +32354,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32541,7 +32364,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32552,7 +32374,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32563,7 +32384,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32574,7 +32394,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32585,7 +32404,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32596,7 +32414,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32607,7 +32424,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32618,7 +32434,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32629,7 +32444,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32640,7 +32454,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32651,7 +32464,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32662,7 +32474,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32673,7 +32484,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32684,7 +32494,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32695,7 +32504,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32706,7 +32514,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32717,7 +32524,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32728,7 +32534,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32739,7 +32544,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32750,7 +32554,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32761,7 +32564,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32772,7 +32574,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32783,7 +32584,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32794,7 +32594,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32805,7 +32604,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32816,7 +32614,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32827,7 +32624,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32838,7 +32634,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32849,7 +32644,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32860,7 +32654,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32871,7 +32664,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32882,7 +32674,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32893,7 +32684,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32904,7 +32694,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32915,7 +32704,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32926,7 +32714,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32937,7 +32724,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32948,7 +32734,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32959,7 +32744,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32970,7 +32754,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32981,7 +32764,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -32992,7 +32774,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33003,7 +32784,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33014,7 +32794,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33025,7 +32804,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33036,7 +32814,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33047,7 +32824,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33058,7 +32834,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33069,7 +32844,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33080,7 +32854,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33091,7 +32864,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33102,7 +32874,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33113,7 +32884,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33124,7 +32894,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33135,7 +32904,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33146,7 +32914,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33157,7 +32924,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33168,7 +32934,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33179,7 +32944,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33190,7 +32954,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33201,7 +32964,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33212,7 +32974,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33223,7 +32984,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33234,7 +32994,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33245,7 +33004,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33256,7 +33014,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33267,7 +33024,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33278,7 +33034,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33289,7 +33044,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33300,7 +33054,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33311,7 +33064,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33322,7 +33074,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33333,7 +33084,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33344,7 +33094,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33355,7 +33104,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33366,7 +33114,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33377,7 +33124,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33388,7 +33134,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33399,7 +33144,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33410,7 +33154,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33421,7 +33164,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33432,7 +33174,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -33443,7 +33184,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -36851,7 +36591,7 @@
     {
       "entryId": "a2446659-e673-4417-b297-36fbe32cf044-rev",
       "rev": 2,
-      "contentHash": "f3f9881bab40f0b633377bf53a27824cbb30454084bf1a47f75842655bce2142",
+      "contentHash": "1fed0e29d9fd4c17a37e90e5f11542e85b5d5c32756b43afa9f76e39e0db016b",
       "status": "review",
       "domains": [
         "D1"
@@ -36860,8 +36600,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.699Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -36979,7 +36719,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -36990,7 +36729,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37001,7 +36739,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37012,7 +36749,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37023,7 +36759,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37034,7 +36769,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37045,7 +36779,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37056,7 +36789,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37067,7 +36799,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37078,7 +36809,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37089,7 +36819,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37100,7 +36829,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37111,7 +36839,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37122,7 +36849,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37133,7 +36859,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37144,7 +36869,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37155,7 +36879,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37166,7 +36889,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37177,7 +36899,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37188,7 +36909,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37199,7 +36919,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37210,7 +36929,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37221,7 +36939,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37232,7 +36949,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37243,7 +36959,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37254,7 +36969,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37265,7 +36979,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37276,7 +36989,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37287,7 +36999,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37298,7 +37009,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37309,7 +37019,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37320,7 +37029,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37331,7 +37039,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37342,7 +37049,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37353,7 +37059,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37364,7 +37069,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37375,7 +37079,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37386,7 +37089,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37397,7 +37099,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37408,7 +37109,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37419,7 +37119,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37430,7 +37129,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37441,7 +37139,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37452,7 +37149,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37463,7 +37159,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37474,7 +37169,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37485,7 +37179,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37496,7 +37189,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37507,7 +37199,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37518,7 +37209,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37529,7 +37219,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37540,7 +37229,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37551,7 +37239,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37562,7 +37249,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37573,7 +37259,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37584,7 +37269,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37595,7 +37279,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37606,7 +37289,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37617,7 +37299,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37628,7 +37309,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37639,7 +37319,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37650,7 +37329,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37661,7 +37339,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37672,7 +37349,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37683,7 +37359,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37694,7 +37369,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37705,7 +37379,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37716,7 +37389,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37727,7 +37399,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37738,7 +37409,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37749,7 +37419,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37760,7 +37429,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37771,7 +37439,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37782,7 +37449,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37793,7 +37459,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37804,7 +37469,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37815,7 +37479,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37826,7 +37489,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37837,7 +37499,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37848,7 +37509,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37859,7 +37519,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37870,7 +37529,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37881,7 +37539,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37892,7 +37549,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37903,7 +37559,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37914,7 +37569,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37925,7 +37579,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37936,7 +37589,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37947,7 +37599,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37958,7 +37609,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37969,7 +37619,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37980,7 +37629,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -37991,7 +37639,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -38002,7 +37649,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -38013,7 +37659,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -38024,7 +37669,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -38035,7 +37679,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -38046,7 +37689,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -38057,7 +37699,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -38068,7 +37709,6 @@
               "wavelength_first": 380,
               "wavelength_last": 780,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -39922,7 +39562,7 @@
     {
       "entryId": "020236b1-90d5-4100-baaa-723f3e986df4-rev",
       "rev": 2,
-      "contentHash": "e153d4673804fa77b852e8b00031cdb11910812222cb8b1d2e9271bfc3dfb9b6",
+      "contentHash": "4e227922855769ad01c35c3608c979e1f973d7dd4ae59f4448387978847a4fd8",
       "status": "review",
       "domains": [
         "D1"
@@ -39931,8 +39571,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2024-09-20T08:00:00.000Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.700Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -40038,7 +39678,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -40049,7 +39688,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -40060,7 +39698,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -40071,7 +39708,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -40082,7 +39718,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -40093,7 +39728,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -40104,7 +39738,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -40115,7 +39748,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -40126,7 +39758,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -40137,7 +39768,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -40148,7 +39778,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -40159,7 +39788,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -40170,7 +39798,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -40181,7 +39808,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -40192,7 +39818,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 5,
-              "quantityPID": "https://cie.co.at/eilvterm/17-24-075",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -41066,7 +40691,7 @@
     {
       "entryId": "6eda1ee9-0ba7-4958-af18-c8b89e8418f3-rev",
       "rev": 2,
-      "contentHash": "6b31924a8ba3fa7071dfffbfec7f2cc3ad2f6be166801e390601482d3af11019",
+      "contentHash": "45e58401d148cc7f6dae42f921276a415eeed628f653304d7b457de70a239b90",
       "status": "review",
       "domains": [
         "D1"
@@ -41075,8 +40700,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.701Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -41178,7 +40803,6 @@
               "wavelength_first": 300,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -41188,7 +40812,6 @@
               "wavelength_first": 300,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -41901,7 +41524,7 @@
     {
       "entryId": "075b90f6-43e9-4016-a82b-7b48514eadbb-rev",
       "rev": 1,
-      "contentHash": "2a421d96a23282e29e4240320d1c95d06167cfe4147227dd59e4ddfdade03e95",
+      "contentHash": "c95c73daf15e606c102f0ca35cb981e6c6ceca4cb13aade22f61b9c68c0837d8",
       "status": "review",
       "domains": [
         "D1"
@@ -41910,8 +41533,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.701Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -42013,14 +41636,12 @@
               "wavelength_first": 300,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
               "title": "S_D50(lambda)",
               "unit": "dimensionless",
               "quantity": "spectral distribution",
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -42757,7 +42378,7 @@
     {
       "entryId": "94add99f-0fcf-4f00-ba99-526fa4e45f9d-rev",
       "rev": 2,
-      "contentHash": "db0878163b50bbbc7752f40875b724e680d4f989508db8ba17d54a435558d717",
+      "contentHash": "aed2847a19b19ea1e94a2332c51418a398dc6ff8280dca7fff238c4374815334",
       "status": "review",
       "domains": [
         "D1"
@@ -42766,8 +42387,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.701Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -42869,7 +42490,6 @@
               "wavelength_first": 300,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -42879,7 +42499,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-029",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -43688,7 +43307,7 @@
     {
       "entryId": "decea119-6e29-4a5c-a7fb-12310bb6c29d-rev",
       "rev": 1,
-      "contentHash": "b5cfdad451afd6efac04004073d44fcd20f13bbcb7098d06032dba20a3fcb169",
+      "contentHash": "3101b0748a9942b5755c63879080817e2d3c8af3d42221a5d0de27313f87a3c8",
       "status": "review",
       "domains": [
         "D1",
@@ -43698,8 +43317,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.702Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -43819,7 +43438,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -43829,7 +43447,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-039",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -43839,7 +43456,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-039",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -43849,7 +43465,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-039",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -44570,7 +44185,7 @@
     {
       "entryId": "16e2c9f9-4f6e-4825-9ab9-1882ba8fb9f1-rev",
       "rev": 1,
-      "contentHash": "9092e38231621781fbd24732715609a21ce30b55cffd27a3f1e9d2dd0e12e21f",
+      "contentHash": "91dc1d94b4348c013e22130b1631287a297f9df13e3b50fa0eb9e2a1ba88188b",
       "status": "review",
       "domains": [
         "D1"
@@ -44579,8 +44194,8 @@
         "createdBy": "Peter Blattner",
         "createdDate": "2026-07-21T15:36:06.376Z",
         "modifiedBy": "Peter Blattner",
-        "modifiedDate": "2026-08-07T00:00:00.000Z",
-        "modifiedComment": "Add quantityPID and unitPID to column headers (schema v4.2)"
+        "modifiedDate": "2026-10-11T19:06:58.702Z",
+        "modifiedComment": "Hold back quantityPID pending CIE agreement (schema 4.2)"
       },
       "payload": {
         "identifier": {
@@ -44687,7 +44302,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-21-025",
               "unitPID": "https://si-digital-framework.org/SI/units/nanometre"
             },
             {
@@ -44697,7 +44311,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-039",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -44707,7 +44320,6 @@
               "wavelength_first": 360,
               "wavelength_last": 830,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-039",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             },
             {
@@ -44717,7 +44329,6 @@
               "wavelength_first": 360,
               "wavelength_last": 559,
               "wavelength_step": 1,
-              "quantityPID": "https://cie.co.at/eilvterm/17-23-039",
               "unitPID": "https://si-digital-framework.org/SI/units/one"
             }
           ]
@@ -45018,55 +44629,55 @@
     "quantities": [
       {
         "value": "wavelength",
-        "pid": "https://cie.co.at/eilvterm/17-21-025"
+        "pid": ""
       },
       {
         "value": "spectral distribution",
-        "pid": "https://cie.co.at/eilvterm/17-21-029"
+        "pid": ""
       },
       {
         "value": "spectral radiance factor",
-        "pid": "https://cie.co.at/eilvterm/17-24-075"
+        "pid": ""
       },
       {
         "value": "chromaticity coordinates",
-        "pid": "https://cie.co.at/eilvterm/17-23-053"
+        "pid": ""
       },
       {
         "value": "spectral chromaticity coordinates",
-        "pid": "https://cie.co.at/eilvterm/17-23-055"
+        "pid": ""
       },
       {
         "value": "colour-matching function",
-        "pid": "https://cie.co.at/eilvterm/17-23-039"
+        "pid": ""
       },
       {
         "value": "CIE colour-matching functions",
-        "pid": "https://cie.co.at/eilvterm/17-23-047"
+        "pid": ""
       },
       {
         "value": "spectral tristimulus values",
-        "pid": "https://cie.co.at/eilvterm/17-23-038"
+        "pid": ""
       },
       {
         "value": "spectral sensitivity",
-        "pid": "https://cie.co.at/eilvterm/17-25-063"
+        "pid": ""
       },
       {
         "value": "action spectra",
-        "pid": "https://cie.co.at/eilvterm/17-26-027"
+        "pid": ""
       },
       {
         "value": "spectral luminous efficiency",
-        "pid": "https://cie.co.at/eilvterm/17-21-035"
+        "pid": ""
       },
       {
         "value": "luminous efficiency",
-        "pid": "https://cie.co.at/eilvterm/17-21-094"
+        "pid": ""
       },
       {
         "value": "maximum luminous efficacy",
-        "pid": "https://cie.co.at/eilvterm/17-21-092"
+        "pid": ""
       }
     ]
   }
