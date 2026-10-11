@@ -22,7 +22,7 @@ including the link to the Crossref deposit validator.
 | `CIEmetaDB_starter_short.json` | Nine-record subset of the starter database for quick testing, including two entries at revision 2 so the history views have something to show. |
 | `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text), plus three `*.csv` data files with their `*_metadata_v2.json` payloads for trying out metadata-file import and CSV validation. |
 | `sync_schema.py` | Keeps the schema embedded in `CIEmetaDB.html` identical to the schema file. See below. |
-| `checks/` | Every command-line check, with the reports two of them write. `db_integrity.js` (derived fields of a database — hashes and history), `selftest.js` (the tool's own migration and revision-pair code), `validate_published.js` (each CSV against its metadata) and `compare_published.js` (each database entry against its published metadata file). All four read `CIEmetaDB.html` and the databases from this folder; see below. |
+| `checks/` | Every command-line check, with the reports two of them write. `db_integrity.js` (derived fields of a database: hashes and history), `selftest.js` (the tool's own migration and revision-pair code), `validate_published.js` (each CSV against its metadata) `compare_published.js` (each database entry against its published metadata file) and `check_related_dois.js` (each related-item DOI against doi.org). All five read `CIEmetaDB.html` and the databases from this folder; see below. |
 | `README.md` | This file. |
 
 The metadata payload of each entry conforms to
@@ -383,6 +383,26 @@ recovered from a registered DOI via the Crossref REST API
 (`https://api.crossref.org/works/<doi>` → `resource.primary.URL`) or by following
 `https://doi.org/<doi>`.
 
+### Related-item DOIs
+
+The DOIs in **Related items** (`relatedItems[].relatedItemIdentifier`, type `DOI`) are
+typed by hand, so the tool can ask doi.org whether each one is actually registered. It
+uses the DOI Handle API (`https://doi.org/api/handles/<doi>`), which answers for DataCite
+and Crossref DOIs alike and works from `file://`. This is the tool's only network access,
+made only when a check is pressed; nothing is written to the database.
+
+- **Form tab** - each related item has **Check** (asks doi.org; the answer appears under
+  the identifier) and **Open ↗** (opens `https://doi.org/<doi>`). Both only read, so they
+  also work on a published entry whose payload is otherwise locked.
+- **Check related DOIs…** (toolbar) - checks every distinct related-item DOI in the
+  database once and lists *registered* (with the URL it resolves to), *not found*,
+  *invalid* (not of the form `10.<prefix>/<suffix>`) or *could not check* (doi.org not
+  reachable). The entry count links to the list, filtered by that related publication.
+
+DOIs are compared case-insensitively, as DOIs are. *Registered* means doi.org knows the
+handle; it does not test whether the landing page itself loads. For the whole database
+from the command line, see `checks/check_related_dois.js` below.
+
 ## Column headers — bulk paste from Excel
 
 Each data-table entry's **Column headers** (Form tab → *Data table info*) can be
@@ -550,6 +570,30 @@ self-test error. Only the canonical `published/` tree is presumed complete: unde
 `--dir` the tree may be a subset, so database entries with no folder there are noted
 rather than counted as failures, and — as with `validate_published.js` — the reports
 follow the tree given, so a scratch copy cannot overwrite the canonical report.
+
+## Batch related-item DOI check (`checks/check_related_dois.js`)
+
+The batch counterpart of **Check related DOIs…**, for a whole database:
+
+```
+node checks/check_related_dois.js              check CIEmetaDBdataset.json, write both reports
+node checks/check_related_dois.js FILE...      check other databases instead
+node checks/check_related_dois.js --out DIR    write the reports somewhere else
+node checks/check_related_dois.js --quiet      reports only, no per-DOI console detail
+```
+
+Each distinct related-item DOI across the databases given is resolved once at doi.org
+(four requests in flight). Unlike the other checks it needs the network, and node 18 or
+later for `fetch()`. Output goes to **`RELATED_DOI_REPORT.md`** (summary, one row per DOI
+with the URL it resolves to, and the entries referencing any DOI that failed) and
+**`RELATED_DOI_REPORT.json`**. Exit code is `0` when every DOI is registered, `1` when any
+is not found, invalid or could not be checked (the report keeps the three apart), `2` on a
+usage or self-test error.
+
+Nothing is reimplemented: `normalizeDoi`, `classifyDoiResponse`, `checkDoi`, `checkDois`
+and `relatedDoiIndex` are lifted verbatim out of `CIEmetaDB.html`, so the script and the
+dialog cannot disagree. Offline self-tests T1-T6 feed the lifted code canned doi.org
+replies through a stub `fetch` and abort the run before any request if they fail.
 
 ## Compare an entry with an external metadata file
 
