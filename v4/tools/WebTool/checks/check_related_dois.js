@@ -52,6 +52,7 @@ const FUNCTIONS = [
   "checkDoi",
   "checkDois",
   "relatedDoiIndex",
+  "relatedDoiFindings",
 ];
 
 /* A declaration runs from its own line to the next line that starts one, all of these being
@@ -198,6 +199,41 @@ async function selfTest(api) {
     "T6 relatedDoiIndex merges case variants, keeps stored identifiers",
     idx.size === 2 && tr015 && tr015.refs.length === 2 && tr015.refs[1].identifier === "10.25039/TR.015.2018" && tr015.refs[0].title === "One",
     `size ${idx.size}`
+  );
+
+  // T7 relatedDoiFindings: what the Form tab's validation summary lists for related-item DOIs
+  const cache = new Map([
+    ["10.25039/tr.015.2018", { state: "exists", target: "https://cie.co.at/x", message: "" }],
+    ["10.25039/nope", { state: "missing", target: "", message: "not registered" }],
+    ["10.25039/flaky", { state: "error", target: "", message: "doi.org not reachable: timeout" }],
+  ]);
+  const payload = {
+    relatedItems: [
+      ri("10.25039/TR.015.2018"), // 1 registered (DOIs are case-insensitive): nothing
+      ri("10.25039/nope"), // 2 not found: error
+      ri("10.25039/flaky"), // 3 could not be checked: warning
+      ri("CIE 015:2018"), // 4 not DOI-shaped: error, known offline
+      ri("10.25039/unchecked"), // 5 not checked yet: counted only
+      ri("http://example.org", "URL"), // 6 not a DOI item: ignored
+      ri("", "DOI"), // 7 empty: ignored
+    ],
+  };
+  const fnd = api.relatedDoiFindings(payload, cache);
+  const shape = fnd.findings.map((f) => f.level + ":" + f.text).join(" | ");
+  check(
+    "T7 relatedDoiFindings: not found and not DOI-shaped are errors, could-not-check a warning",
+    fnd.findings.length === 3 &&
+      fnd.findings[0].level === "e" && /^Related item 2: DOI 10\.25039\/nope is not registered at doi\.org$/.test(fnd.findings[0].text) &&
+      fnd.findings[1].level === "w" && /^Related item 3: .*could not be checked \(doi\.org not reachable: timeout\)$/.test(fnd.findings[1].text) &&
+      fnd.findings[2].level === "e" && /^Related item 4: "CIE 015:2018" is not a DOI/.test(fnd.findings[2].text),
+    shape
+  );
+  check("T7 relatedDoiFindings counts unchecked DOIs, ignores non-DOI and empty items", fnd.unchecked === 1, `unchecked ${fnd.unchecked}`);
+  const off = api.relatedDoiFindings(payload, null);
+  check(
+    "T7 with no check run, only the offline syntax error is reported",
+    off.findings.length === 1 && off.findings[0].level === "e" && off.unchecked === 4,
+    `${off.findings.length} finding(s), unchecked ${off.unchecked}`
   );
 
   return results;
