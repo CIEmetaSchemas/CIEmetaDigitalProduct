@@ -2446,7 +2446,7 @@ function renderDetail(){
      mint a revision or change status — so they stay editable and are excluded here via .envelope.
      Validation and History stay interactive too; they do not change the payload. The action bar is
      unaffected, so Duplicate/Export/Delete still work. Buttons marked ro-ok only read (e.g. the
-     related-item DOI Check / Open) and stay enabled as well. */
+     related-item DOI Check / Open, the quantity/unit PID Open) and stay enabled as well. */
   if(locked && (activeTab==="form"||activeTab==="json")){
     page.classList.add("ro");            // greys legends/labels of the non-envelope fieldsets
     page.querySelectorAll("input,select,textarea,button").forEach(n=>{
@@ -2805,14 +2805,14 @@ function renderForm(page,e){
     g2(g,"Symbol (LaTeX)",inp(it,"symbolLatex",{deleteIfEmpty:true}));
     // Quantity PID — visible, editable, with Open button
     const qpidWrap=document.createElement("div"); qpidWrap.style.display="flex"; qpidWrap.style.gap="4px"; qpidWrap.style.alignItems="center";
-    const qOpenBtn=document.createElement("button"); qOpenBtn.type="button"; qOpenBtn.className="ghost small"; qOpenBtn.title="Open quantityPID in CIE e-ILV"; qOpenBtn.textContent="Open ↗";
+    const qOpenBtn=document.createElement("button"); qOpenBtn.type="button"; qOpenBtn.className="ghost small ro-ok"; qOpenBtn.title="Open quantityPID in CIE e-ILV"; qOpenBtn.textContent="Open ↗";
     qOpenBtn.onclick=()=>{ if(it.quantityPID) window.open(it.quantityPID,"_blank"); else toast("No quantityPID set","warn"); };
     qpidWrap.appendChild(qpidInp); qpidWrap.appendChild(qOpenBtn);
     g2(g,"Quantity PID",qpidWrap);
     g2(g,"Unit",    comboInp(it,"unit",    getVocab("units"),      "unitPID",    upidInp));
     // Unit PID — visible, editable, with Open button and parser link
     const upidWrap=document.createElement("div"); upidWrap.style.display="flex"; upidWrap.style.gap="4px"; upidWrap.style.alignItems="center";
-    const uOpenBtn=document.createElement("button"); uOpenBtn.type="button"; uOpenBtn.className="ghost small"; uOpenBtn.title="Open unitPID in BIPM SI Digital Framework"; uOpenBtn.textContent="Open ↗";
+    const uOpenBtn=document.createElement("button"); uOpenBtn.type="button"; uOpenBtn.className="ghost small ro-ok"; uOpenBtn.title="Open unitPID in BIPM SI Digital Framework"; uOpenBtn.textContent="Open ↗";
     uOpenBtn.onclick=()=>{ if(it.unitPID) window.open(it.unitPID,"_blank"); else toast("No unitPID set","warn"); };
     const upidLink=document.createElement("a"); upidLink.href="https://si-digital-framework.org/SI/unitExpr"; upidLink.target="_blank"; upidLink.title="BIPM unit expression parser — build a PID for compound units"; upidLink.textContent="? Build PID…"; upidLink.className="hint"; upidLink.style.whiteSpace="nowrap";
     upidWrap.appendChild(upidInp); upidWrap.appendChild(uOpenBtn); upidWrap.appendChild(upidLink);
