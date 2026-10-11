@@ -1,6 +1,6 @@
 # Related-item DOI report
 
-Generated 2026-10-11T15:23:41Z by `check_related_dois.js` over `CIEmetaDBdataset.json`.
+Generated 2026-10-11T16:27:51Z by `check_related_dois.js` over `CIEmetaDBdataset.json`.
 
 Every distinct `relatedItems[].relatedItemIdentifier` of type DOI, resolved once through the DOI Handle API (`https://doi.org/api/handles/<doi>`), using the functions lifted verbatim from `CIEmetaDB.html` that also drive the tool's **Check related DOIs** dialog. DOIs are compared case-insensitively. *Registered* means doi.org knows the handle; it says nothing about whether the landing page itself is reachable.
 
@@ -80,3 +80,6 @@ not registered (doi.org: handle not found)
 - ✓ T5 checkDois dedupes and returns every DOI - size 2, calls 2
 - ✓ T5 checkDois on no DOIs
 - ✓ T6 relatedDoiIndex merges case variants, keeps stored identifiers - size 2
+- ✓ T7 relatedDoiFindings: not found and not DOI-shaped are errors, could-not-check a warning - e:Related item 2: DOI 10.25039/nope is not registered at doi.org \| w:Related item 3: DOI 10.25039/flaky could not be checked (doi.org not reachable: timeout) \| e:Related item 4: "CIE 015:2018" is not a DOI (expected 10.<prefix>/<suffix>)
+- ✓ T7 relatedDoiFindings counts unchecked DOIs, ignores non-DOI and empty items - unchecked 1
+- ✓ T7 with no check run, only the offline syntax error is reported - 1 finding(s), unchecked 4
