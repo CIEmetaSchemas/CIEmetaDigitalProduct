@@ -107,6 +107,10 @@
   .grid label{color:var(--muted);padding-top:6px;font-size:12.5px}
   .arr-item{border:1px solid var(--line);border-radius:7px;padding:10px;margin:8px 0;background:#fff;position:relative}
   .arr-item .rm{position:absolute;top:8px;right:8px}
+  /* the first field of an item shares its row with the Remove button above, so it stops short of
+     it instead of running underneath (column headers lead with a full-width "Column N" label
+     instead, which this does not match) */
+  .arr-grid > label:first-child + *{width:calc(100% - 72px)}
   .arr-grid{display:grid;grid-template-columns:150px 1fr;gap:6px 10px;align-items:start}
   .arr-grid label{color:var(--muted);padding-top:6px;font-size:12px}
   .add-btn{margin-top:6px}
