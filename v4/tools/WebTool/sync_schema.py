@@ -59,8 +59,9 @@ def write(path: Path, text: str) -> None:
 def lf(text: str) -> str:
     """Normalise line endings to LF.
 
-    The schema file is stored CRLF and CIEmetaDB.html LF, and the repository has
-    no .gitattributes, so line endings vary by contributor and platform. They are
+    The schema file is stored CRLF and CIEmetaDB.html LF; the repository's
+    .gitattributes keeps CIEmetaDB.html LF in every working copy, but the schema
+    file's endings still vary by contributor and platform. They are
     irrelevant to JSON.parse and to the meaning of the schema, so the embedded
     copy is written LF (matching its host file, keeping the HTML from becoming
     mixed-ending) and comparison ignores them. What is enforced is that the two
