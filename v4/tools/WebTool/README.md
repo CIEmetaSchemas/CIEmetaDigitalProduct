@@ -22,7 +22,7 @@ including the link to the Crossref deposit validator.
 | `CIEmetaDB_starter_short.json` | Nine-record subset of the starter database for quick testing, including two entries at revision 2 so the history views have something to show. |
 | `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text), plus three `*.csv` data files with their `*_metadata_v2.json` payloads for trying out metadata-file import and CSV validation. |
 | `sync_schema.py` | Keeps the schema embedded in `CIEmetaDB.html` identical to the schema file. See below. |
-| `checks/` | Every command-line check, with the reports two of them write. `db_integrity.js` (derived fields of a database: hashes and history), `selftest.js` (the tool's own migration and revision-pair code), `validate_published.js` (each CSV against its metadata) `compare_published.js` (each database entry against its published metadata file) and `check_related_dois.js` (each related-item DOI against doi.org). All five read `CIEmetaDB.html` and the databases from this folder; see below. |
+| `checks/` | Every command-line check, with the reports two of them write. `db_integrity.js` (derived fields of a database: hashes and history), `selftest.js` (the tool's own migration and revision-pair code), `validate_published.js` (each CSV against its metadata), `compare_published.js` (each database entry against its published metadata file) and `check_related_dois.js` (each related-item DOI against doi.org). All five read `CIEmetaDB.html` and the databases from this folder; see below. |
 | `QUICKSTART.md` | Short, task-oriented guide for curators. This README is the full reference. |
 | `README.md` | This file. |
 
@@ -154,17 +154,24 @@ cannot reach are exactly the ones that go wrong silently:
   `contentHash` defeats `historyContainsHash()`. The shipped databases are already
   migrated, so nothing here would notice a regression.
 - **The revision pair has to leave the published parent untouched** and the history
-  chain contiguous. No shipped database contains a pair, so again there is nothing to
-  check against.
+  chain contiguous. Any pair a shipped database holds was not made under test, so again
+  there is nothing to check against.
 
 `selftest.js` builds its fixtures instead — a database reduced to its genuine pre-4.1
 state, a legacy draft of the kind the two-state model stored, a revision pair — and
 drives the tool's **own** functions over them, lifted from `CIEmetaDB.html` the same way
 `db_integrity.js` lifts them, with `DB` supplied and the four UI calls `saveEnvelope()`
-makes stubbed out. 78 checks in four groups: the lifted primitives, `migrateDb`,
+makes stubbed out. 83 checks in five groups: the lifted primitives, `migrateDb`,
 `db_integrity`'s invariants (including that a legitimate revision pair passes and that
-`--fix` is not blocked by something it cannot repair), and the full pair lifecycle —
-start, edit, publish, discard, envelope save.
+`--fix` is not blocked by something it cannot repair), the full pair lifecycle (start,
+edit, publish, discard, envelope save), and the column-header paste and copy behind the
+Form tab's paste box and **New entry from .xlsx** (7- and 11-row blocks, the round trip).
+
+The fixtures are read from the shipped databases with their **open revisions removed**:
+the suites start their own pair on a published entry and assume it has none yet, and a
+pre-4.1 database could not hold one. The published halves are left as they are, so a
+database that carries revisions awaiting review (as the quantityPID/unitPID annotation
+does) is tested exactly like one that does not.
 
 It writes only to a temporary directory, which it removes again, and needs no network.
 
@@ -414,10 +421,12 @@ from the command line, see `checks/check_related_dois.js` below.
 Each data-table entry's **Column headers** (Form tab → *Data table info*) can be
 filled in one at a time, or in bulk via the paste box shown above the list:
 
-- Prepare **7 rows** — Title, Quantity, Unit, Description, Wavelength first,
-  Wavelength last, Wavelength step — with **one column per data column**,
-  column-for-column with the CSV. A leading label column (e.g. "Title" in
-  column A) is optional and auto-detected and stripped.
+- Prepare **7 rows** (Title, Quantity, Unit, Description, Wavelength first,
+  Wavelength last, Wavelength step) with **one column per data column**,
+  column-for-column with the CSV. Four optional rows may follow (Quantity PID,
+  Unit PID, Quantity symbol, Quantity symbol (LaTeX)); only the wavelength rows
+  are read as numbers. A leading label column (e.g. "Title" in column A) is
+  optional and auto-detected and stripped.
 - Copy that range in Excel, click the paste box and press **Ctrl+V**. This
   **replaces the whole Column headers list** (with a confirmation dialog if it
   wasn't already empty).
@@ -427,6 +436,28 @@ filled in one at a time, or in bulk via the paste box shown above the list:
 - Each column-header box is labelled **Column N** so a long list (e.g. 100
   columns, as in some CIE colour-fidelity tables) stays legible while
   scrolling.
+
+## Units, quantities and PIDs (schema 4.2)
+
+In each column header, **Quantity** and **Unit** are dropdowns fed by the
+database's vocabularies (`vocabularies.units` / `vocabularies.quantities`),
+edited with **Units…** and **Quantities…** in the toolbar. New databases start
+from `DEFAULT_UNITS` / `DEFAULT_QUANTITIES` in `CIEmetaDB.html`, which follow
+`v4/docs/INTEROPERABILITY.md` section 13.
+
+- Choosing a known value fills `unitPID` / `quantityPID` from the vocabulary;
+  **Open ↗** opens the PID. **? Build PID…** opens the BIPM unit expression
+  parser for compound units. Choosing *(other)* or a value without a PID clears
+  the PID field.
+- **Quantity PIDs are held back** until CIE agrees on the mapping: the quantity
+  vocabulary carries the names with empty PIDs, and the databases carry no
+  `quantityPID`. The candidates and their review are in `checks/PID_REPORT.md`.
+- The validation summary at the end of the Form tab warns about a missing
+  `unitPID` / `quantityPID` only when the vocabulary has one for that value.
+- `quantitySymbol` / `quantitySymbolLatex` hold the symbol of the *quantity*
+  (`x̄(λ)`, `\bar{x}(\lambda)`); the unit symbol is the `unit` field.
+- The PID **Open ↗** buttons only read, so they stay enabled on a published
+  entry.
 
 ## New entry from an Excel workbook (.xlsx)
 

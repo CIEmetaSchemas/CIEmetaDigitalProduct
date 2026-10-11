@@ -184,6 +184,8 @@
   <span style="flex:1"></span>
   <button id="btnNewEntry" class="sec">+ New entry</button>
   <button id="btnDomains" class="ghost">Domains&hellip;</button>
+  <button id="btnUnits" class="ghost" title="Manage the unit vocabulary: display values and their BIPM SI Reference Point PIDs">Units&hellip;</button>
+  <button id="btnQuantities" class="ghost" title="Manage the quantity vocabulary: display values and their CIE e-ILV PIDs">Quantities&hellip;</button>
   <button id="btnRelatedDois" class="ghost" title="Ask doi.org whether every related-item DOI in the database is registered (read-only)">Check related DOIs&hellip;</button>
   <button id="btnDefaults" class="ghost">Edit defaults&hellip;</button>
   <button id="btnExportDataCite" class="ghost" title="Export all entries as *.csv_metadata.json files">Export metadata-files&hellip;</button>
@@ -255,7 +257,7 @@
 	"$id": "https://doi.org/10.25039/CIE.SC.4taqevcd",
 	"title": "CIEmetaDigitalProduct",
 	"description": "Metadata schema for digital products published by the International Commission on Illumination (CIE), in particular data tables distributed as CSV alongside CIE publications. Based on the DataCite metadata kernel with CIE-specific additions. The accompanying description of the metadata model, including the obligation (mandatory / recommended / optional) of each property, is published at https://github.com/CIEmetaSchemas/CIEmetaDigitalProduct (v4/docs/README.md). To validate a metadata file against this schema, any JSON Schema draft-07 validator can be used, for example https://www.jsonschemavalidator.net/ .",
-	"$comment": "Based on the DataCite kernel-4.3 JSON schema:\nhttps://github.com/datacite/schema/blob/76de5e551d19e3e9b829af2f38ccc13e8c7677fe/source/json/kernel-4.3/datacite_4.3_schema.json\n\nChanges towards DataCite version 4.4:\n- field classificationCode added in the subjects field\n- address of metaschema has been changed\n- additional resourceTypeGeneral items\n- relatedItem added\n- only one identifier is allowed (as in the official schema), additional ones are introduced by \"alternateIdentifier\"\n- schemaType replaced by schemaName\n- relatedItem.title replaced by relatedItem.titles (array of string) to be compatible with the strict DataCite 4.4 XML definition\n\nCIE additions:\n- checksums (recommended)\n- datatableInfo (validation, dataQuality, extrapolationMethod, interpolationMethod)\n- schemaName (required)\n- schemaVersion (required)\n- schemaURL (required)\n- metadataRevision (optional): revision of the JSON metadata file itself (not the resource; see DataCite \"version\"). Increments only on metadata-content changes.\n\nVersion history:\n4.0 : new fields added in the column headers: wavelength_first, wavelength_last, wavelength_step\n4.1 : optional field metadataRevision added (revision of the JSON metadata file; backward-compatible, schemaVersion stays 4)\n4.1 : schema file corrections (editorial only; schemaVersion stays 4 and the schema DOI is unchanged). None of these can invalidate an existing metadata file - they only widen what is accepted:\n      - the file is now valid JSON. The descriptive header was previously written as // line comments inside the root object, which made the file unparsable by a strict JSON parser (and therefore unusable with the validators recommended above). That text is now carried in description and in this $comment.\n      - $id added.\n      - wavelength_first / wavelength_last / wavelength_step now reference definitions.wavelengthField, which accepts a number or one of the sentinel strings documented in v4/docs/README.md (CIE 2.4.5 - 2.4.7). Previously declared as plain numbers, which contradicted both the documentation and published metadata files for non-spectral data tables.\n      - \"ROR\" added to funderIdentifierType (GRID has been superseded by ROR).\n4.1 : validationType constrained to the value table already published in v4/docs/README.md (CIE 2.5): sumOfColumns, sampleRow, numberOfRows, numberOfColumns, :unap, other. It was the only one of the four README value tables not encoded as an enum here; the other three (interpolationMethod, extrapolationMethod, dataQuality) always were. Unlike the corrections above this one NARROWS what is accepted, so it is noted separately - but every value in every published CIE metadata file is already within the list. hashMethod is deliberately NOT constrained: README (CIE 1) gives md5 and sha256 as examples of a deliberately open set.",
+	"$comment": "Based on the DataCite kernel-4.3 JSON schema:\nhttps://github.com/datacite/schema/blob/76de5e551d19e3e9b829af2f38ccc13e8c7677fe/source/json/kernel-4.3/datacite_4.3_schema.json\n\nChanges towards DataCite version 4.4:\n- field classificationCode added in the subjects field\n- address of metaschema has been changed\n- additional resourceTypeGeneral items\n- relatedItem added\n- only one identifier is allowed (as in the official schema), additional ones are introduced by \"alternateIdentifier\"\n- schemaType replaced by schemaName\n- relatedItem.title replaced by relatedItem.titles (array of string) to be compatible with the strict DataCite 4.4 XML definition\n\nCIE additions:\n- checksums (recommended)\n- datatableInfo (validation, dataQuality, extrapolationMethod, interpolationMethod)\n- schemaName (required)\n- schemaVersion (required)\n- schemaURL (required)\n- metadataRevision (optional): revision of the JSON metadata file itself (not the resource; see DataCite \"version\"). Increments only on metadata-content changes.\n\nVersion history:\n4.0 : new fields added in the column headers: wavelength_first, wavelength_last, wavelength_step\n4.1 : optional field metadataRevision added (revision of the JSON metadata file; backward-compatible, schemaVersion stays 4)\n4.1 : schema file corrections (editorial only; schemaVersion stays 4 and the schema DOI is unchanged). None of these can invalidate an existing metadata file - they only widen what is accepted:\n      - the file is now valid JSON. The descriptive header was previously written as // line comments inside the root object, which made the file unparsable by a strict JSON parser (and therefore unusable with the validators recommended above). That text is now carried in description and in this $comment.\n      - $id added.\n      - wavelength_first / wavelength_last / wavelength_step now reference definitions.wavelengthField, which accepts a number or one of the sentinel strings documented in v4/docs/README.md (CIE 2.4.5 - 2.4.7). Previously declared as plain numbers, which contradicted both the documentation and published metadata files for non-spectral data tables.\n      - \"ROR\" added to funderIdentifierType (GRID has been superseded by ROR).\n4.1 : validationType constrained to the value table already published in v4/docs/README.md (CIE 2.5): sumOfColumns, sampleRow, numberOfRows, numberOfColumns, :unap, other. It was the only one of the four README value tables not encoded as an enum here; the other three (interpolationMethod, extrapolationMethod, dataQuality) always were. Unlike the corrections above this one NARROWS what is accepted, so it is noted separately - but every value in every published CIE metadata file is already within the list. hashMethod is deliberately NOT constrained: README (CIE 1) gives md5 and sha256 as examples of a deliberately open set.\n4.2 : optional fields added in columnHeaders items - strictly additive, all existing records remain valid, schemaVersion stays 4:\n      - unitPID (CIE 2.4.8, Recommended): permanent URI from the BIPM SI Reference Point (https://si-digital-framework.org/SI/units/) identifying the unit. Normative mapping table in v4/docs/INTEROPERABILITY.md section 13.\n      - quantityPID (CIE 2.4.9, Recommended): permanent URI from the CIE e-ILV (https://cie.co.at/eilvterm/) or BIPM quantities KB identifying the quantity. Absent when no resolvable PID exists (e.g. 'adaptation coefficient').\n      - quantitySymbol (CIE 2.4.10, Optional): Unicode symbol of the column quantity (the quantity symbol, not the unit symbol), e.g. x̄(λ). Distinct from title, which is the ASCII column label.\n      - quantitySymbolLatex (CIE 2.4.11, Optional): LaTeX representation of the quantity symbol, e.g. \\bar{x}(\\lambda).",
 	"definitions": {
 		"nameType": {
 			"type": "string",
@@ -1149,6 +1151,24 @@
 							"description": {
 								"type": "string"
 							},
+							"unitPID": {
+								"type": "string",
+								"format": "uri",
+								"$comment": "Permanent identifier for the unit from the BIPM SI Reference Point (https://si-digital-framework.org/SI/units/) or another authoritative vocabulary. Optional: absent when no resolvable PID exists. Normative mapping table in v4/docs/INTEROPERABILITY.md section 13."
+							},
+							"quantityPID": {
+								"type": "string",
+								"format": "uri",
+								"$comment": "Permanent identifier for the quantity from the CIE e-ILV (https://cie.co.at/eilvterm/) or BIPM quantities KB (https://si-digital-framework.org/quantities/). Optional: absent when no resolvable PID exists, e.g. 'adaptation coefficient' has no e-ILV term."
+							},
+							"quantitySymbol": {
+								"type": "string",
+								"$comment": "The quantity symbol in Unicode (not the unit symbol, which is carried by unit), e.g. 'λ', 'x̄(λ)'. Distinct from title, which is the ASCII column label in the CSV."
+							},
+							"quantitySymbolLatex": {
+								"type": "string",
+								"$comment": "LaTeX representation of the quantity symbol, e.g. '\\bar{x}(\\lambda)'. For use in typesetting consumers."
+							},
 							"wavelength_first": {
 								"$ref": "#/definitions/wavelengthField"
 							},
@@ -1207,7 +1227,7 @@
 
 /* ---------- constants ---------- */
 const APP = {
-  VERSION: "1.10.0",
+  VERSION: "1.12.0",
   DB_SCHEMA_NAME: "CIEmetaDB",
   DB_SCHEMA_VERSION: 1,
   DOI_PREFIX: "10.25039/CIE.DS.",
@@ -1220,6 +1240,38 @@ const APP = {
   LS_SAVED_HASH: "ciemetadb.savedhash",
   LS_USER: "ciemetadb.user"
 };
+
+/* Default interoperability vocabularies: mapping from unit/quantity strings to PIDs.
+   Source: v4/docs/INTEROPERABILITY.md section 13 (schema version 4.2).
+   Quantity PIDs are held back (pid "") until CIE agrees on them; the candidates are in
+   tools/WebTool/checks/PID_REPORT.md. An empty pid still offers the quantity name in the
+   dropdown but writes no quantityPID (see comboInp).
+   Stored in db.vocabularies at runtime and editable via the Units… / Quantities… toolbar buttons.
+   These constants seed new databases and act as fallback when an existing DB lacks db.vocabularies. */
+const DEFAULT_UNITS = [
+  {value:"nm",            pid:"https://si-digital-framework.org/SI/units/nanometre"},
+  {value:"dimensionless", pid:"https://si-digital-framework.org/SI/units/one"},
+  {value:"lm/W",          pid:"https://si-digital-framework.org/SI/units/lumen.watt-1"}
+];
+const DEFAULT_QUANTITIES = [
+  {value:"wavelength",                        pid:""},
+  {value:"spectral distribution",             pid:""},
+  {value:"spectral radiance factor",          pid:""},
+  {value:"chromaticity coordinates",          pid:""},
+  {value:"spectral chromaticity coordinates", pid:""},
+  {value:"colour-matching function",          pid:""},
+  {value:"CIE colour-matching functions",     pid:""},
+  {value:"spectral tristimulus values",       pid:""},
+  {value:"spectral sensitivity",             pid:""},
+  {value:"action spectra",                    pid:""},
+  {value:"spectral luminous efficiency",      pid:""},
+  {value:"luminous efficiency",               pid:""},
+  {value:"maximum luminous efficacy",         pid:""}
+];
+function getVocab(type){
+  return (DB && DB.vocabularies && DB.vocabularies[type]) ||
+         (type==="units" ? DEFAULT_UNITS : DEFAULT_QUANTITIES);
+}
 
 const DEFAULT_DOMAINS = [
   {code:"D1", label:"Vision and Colour"},
@@ -1641,7 +1693,9 @@ function newDB(){
     dbSchemaName:APP.DB_SCHEMA_NAME, dbSchemaVersion:APP.DB_SCHEMA_VERSION,
     dbId:uuid(), title:"", description:"", baseHash:"", generatedAt:now,
     lastModifiedDate:now, lastModifiedBy:currentUser(),
-    domains:clone(DEFAULT_DOMAINS), defaults:clone(DEFAULT_VALUES), entries:[]
+    domains:clone(DEFAULT_DOMAINS),
+    vocabularies:{units:clone(DEFAULT_UNITS), quantities:clone(DEFAULT_QUANTITIES)},
+    defaults:clone(DEFAULT_VALUES), entries:[]
   };
 }
 /* per-entry fingerprint for the DB hash: payload contentHash PLUS the envelope fields
@@ -2426,7 +2480,7 @@ function renderDetail(){
      mint a revision or change status — so they stay editable and are excluded here via .envelope.
      Validation and History stay interactive too; they do not change the payload. The action bar is
      unaffected, so Duplicate/Export/Delete still work. Buttons marked ro-ok only read (e.g. the
-     related-item DOI Check / Open) and stay enabled as well. */
+     related-item DOI Check / Open, the quantity/unit PID Open) and stay enabled as well. */
   if(locked && (activeTab==="form"||activeTab==="json")){
     page.classList.add("ro");            // greys legends/labels of the non-envelope fieldsets
     page.querySelectorAll("input,select,textarea,button").forEach(n=>{
@@ -2492,8 +2546,60 @@ function arraySection(parent, title, arr, itemRender, factory){
 }
 function g2(g,label,node){ const l=document.createElement("label"); l.textContent=label; g.appendChild(l); g.appendChild(node); }
 
-const COLUMN_HEADER_FIELD_LABELS=["Title","Quantity","Unit","Description","Wavelength first","Wavelength last","Wavelength step"];
-const COLUMN_HEADER_FIELD_KEYS=["title","quantity","unit","description","wavelength_first","wavelength_last","wavelength_step"];
+/* Combo input for quantity/unit: dropdown of known values + free-text fallback.
+   lookupMap: array of {value, pid} from getVocab(). pidKey: e.g. "quantityPID".
+   Returns a container div with the select (and optional text input) inside.
+   Selecting a known value auto-populates obj[pidKey]; selecting "(other)" clears it
+   and reveals a text input for a custom value. */
+function comboInp(obj, key, lookupMap, pidKey, pidInputEl){
+  const pidMap = new Map(lookupMap.map(e=>[e.value, e.pid]));
+  const known  = lookupMap.map(e=>e.value);
+  const currentVal = obj[key] || "";
+  const isKnown = pidMap.has(currentVal);
+
+  const wrap = document.createElement("div"); wrap.style.display="flex"; wrap.style.flexDirection="column"; wrap.style.gap="3px";
+
+  const sel = document.createElement("select");
+  const optionValues = [...known, "(other)"];
+  optionValues.forEach(v=>{
+    const o = document.createElement("option");
+    o.value = v; o.textContent = v;
+    if(isKnown && v === currentVal) o.selected = true;
+    if(!isKnown && v === "(other)") o.selected = true;
+    sel.appendChild(o);
+  });
+
+  const textInp = document.createElement("input");
+  textInp.value = isKnown ? "" : currentVal;
+  textInp.placeholder = "Enter value…";
+  textInp.style.display = isKnown ? "none" : "";
+  textInp.oninput = ()=>{ obj[key] = textInp.value; delete obj[pidKey]; markDirty(); };
+
+  sel.onchange = ()=>{
+    if(sel.value === "(other)"){
+      textInp.style.display = "";
+      obj[key] = textInp.value || "";
+      delete obj[pidKey];
+      if(pidInputEl) pidInputEl.value="";
+    } else {
+      textInp.style.display = "none";
+      obj[key] = sel.value;
+      const pid = pidMap.get(sel.value);
+      if(pid){ obj[pidKey]=pid; if(pidInputEl) pidInputEl.value=pid; }
+      else { delete obj[pidKey]; if(pidInputEl) pidInputEl.value=""; }
+    }
+    markDirty();
+  };
+
+  wrap.appendChild(sel); wrap.appendChild(textInp);
+  return wrap;
+}
+
+const COLUMN_HEADER_FIELD_LABELS=["Title","Quantity","Unit","Description","Wavelength first","Wavelength last","Wavelength step","Quantity PID","Unit PID","Quantity symbol","Quantity symbol (LaTeX)"];
+const COLUMN_HEADER_FIELD_KEYS=["title","quantity","unit","description","wavelength_first","wavelength_last","wavelength_step","quantityPID","unitPID","quantitySymbol","quantitySymbolLatex"];
+/* Rows 1-7 are required (Title ... Wavelength step); rows 8-11 (Quantity PID, Unit PID, Quantity
+   symbol, Quantity symbol (LaTeX)) are optional, so a 7-row block from an older workbook or an .xlsx
+   header still parses. Only the wavelength rows are numeric; the PID and symbol rows are text. */
 function parseColumnHeaderPaste(text){
   let lines=text.replace(/\r\n?/g,"\n").split("\n");
   while(lines.length && lines[lines.length-1].trim()==="") lines.pop();
@@ -2501,16 +2607,17 @@ function parseColumnHeaderPaste(text){
   let rows=lines.map(l=>l.split("\t"));
   if(rows.length && (rows[0][0]||"").trim().toLowerCase()==="title") rows=rows.map(r=>r.slice(1));
   if(rows.length<7) return null;
-  rows=rows.slice(0,7);
+  rows=rows.slice(0,COLUMN_HEADER_FIELD_KEYS.length);
   const n=Math.max(...rows.map(r=>r.length));
   const out=[];
   for(let i=0;i<n;i++){
     const obj={};
     COLUMN_HEADER_FIELD_KEYS.forEach((key,rowIdx)=>{
+      if(rowIdx>=rows.length) return;
       const cell=(rows[rowIdx][i]||"").trim();
       if(key==="title"||key==="quantity"||key==="unit"){ obj[key]=cell; }
-      else if(key==="description"){ if(cell!=="") obj[key]=cell; }
-      else{ if(cell!=="") obj[key]=cell.startsWith(":")?cell:parseFloat(cell); }
+      else if(key.startsWith("wavelength_")){ if(cell!=="") obj[key]=cell.startsWith(":")?cell:parseFloat(cell); }
+      else{ if(cell!=="") obj[key]=cell; }
     });
     out.push(obj);
   }
@@ -2705,7 +2812,7 @@ function renderForm(page,e){
   di.columnHeaders=di.columnHeaders||[];
   const chTools=document.createElement("div"); chTools.style.margin="0 0 8px";
   const chHint=document.createElement("p"); chHint.className="hint"; chHint.style.margin="0 0 6px";
-  chHint.textContent='Paste column headers from Excel: prepare 7 rows (Title, Quantity, Unit, Description, Wavelength first, Wavelength last, Wavelength step), one column per data column — column-for-column with the CSV. A leading label column is optional and auto-detected. Pasting replaces the whole list below.';
+  chHint.textContent='Paste column headers from Excel: prepare 7 rows (Title, Quantity, Unit, Description, Wavelength first, Wavelength last, Wavelength step), optionally followed by 4 more (Quantity PID, Unit PID, Quantity symbol, Quantity symbol (LaTeX)), one column per data column, column-for-column with the CSV. A leading label column is optional and auto-detected. Pasting replaces the whole list below.';
   chTools.appendChild(chHint);
   const chRow=document.createElement("div"); chRow.style.display="flex"; chRow.style.gap="8px"; chRow.style.alignItems="flex-start";
   const chPaste=document.createElement("textarea"); chPaste.rows=2; chPaste.placeholder="Click here, then Ctrl+V to paste rows copied from Excel…"; chPaste.style.flex="1";
@@ -2713,7 +2820,7 @@ function renderForm(page,e){
     ev.preventDefault();
     const text=(ev.clipboardData||window.clipboardData).getData("text");
     const parsed=parseColumnHeaderPaste(text);
-    if(!parsed || !parsed.length){ toast("Clipboard did not contain 7 tab-separated rows (Title/Quantity/Unit/Description/Wavelength first/last/step)","warn"); return; }
+    if(!parsed || !parsed.length){ toast("Clipboard did not contain at least 7 tab-separated rows (Title/Quantity/Unit/Description/Wavelength first/last/step)","warn"); return; }
     if(di.columnHeaders.length && !confirm(`Replace all ${di.columnHeaders.length} existing column header(s) with ${parsed.length} pasted column(s)?`)) return;
     di.columnHeaders=parsed; markDirty(); renderDetail();
     toast(`Pasted ${parsed.length} column header(s)`,"ok");
@@ -2729,8 +2836,26 @@ function renderForm(page,e){
     numLbl.textContent="Column "+(idx+1);
     g.appendChild(numLbl);
     g2(g,"Title",inp(it,"title"));
-    g2(g,"Quantity",inp(it,"quantity"));
-    g2(g,"Unit",inp(it,"unit"));
+    // Create PID inputs before the combos so comboInp can keep their displayed value in sync
+    const qpidInp=inp(it,"quantityPID",{deleteIfEmpty:true}); qpidInp.placeholder="auto-filled from Quantity dropdown"; qpidInp.style.flex="1";
+    const upidInp=inp(it,"unitPID",{deleteIfEmpty:true}); upidInp.placeholder="auto-filled from Unit dropdown"; upidInp.style.flex="1";
+    g2(g,"Quantity",comboInp(it,"quantity",getVocab("quantities"),"quantityPID",qpidInp));
+    g2(g,"Quantity symbol (Unicode)",inp(it,"quantitySymbol",{deleteIfEmpty:true}));
+    g2(g,"Quantity symbol (LaTeX)",inp(it,"quantitySymbolLatex",{deleteIfEmpty:true}));
+    // Quantity PID — visible, editable, with Open button
+    const qpidWrap=document.createElement("div"); qpidWrap.style.display="flex"; qpidWrap.style.gap="4px"; qpidWrap.style.alignItems="center";
+    const qOpenBtn=document.createElement("button"); qOpenBtn.type="button"; qOpenBtn.className="ghost small ro-ok"; qOpenBtn.title="Open quantityPID in CIE e-ILV"; qOpenBtn.textContent="Open ↗";
+    qOpenBtn.onclick=()=>{ if(it.quantityPID) window.open(it.quantityPID,"_blank"); else toast("No quantityPID set","warn"); };
+    qpidWrap.appendChild(qpidInp); qpidWrap.appendChild(qOpenBtn);
+    g2(g,"Quantity PID",qpidWrap);
+    g2(g,"Unit",    comboInp(it,"unit",    getVocab("units"),      "unitPID",    upidInp));
+    // Unit PID — visible, editable, with Open button and parser link
+    const upidWrap=document.createElement("div"); upidWrap.style.display="flex"; upidWrap.style.gap="4px"; upidWrap.style.alignItems="center";
+    const uOpenBtn=document.createElement("button"); uOpenBtn.type="button"; uOpenBtn.className="ghost small ro-ok"; uOpenBtn.title="Open unitPID in BIPM SI Digital Framework"; uOpenBtn.textContent="Open ↗";
+    uOpenBtn.onclick=()=>{ if(it.unitPID) window.open(it.unitPID,"_blank"); else toast("No unitPID set","warn"); };
+    const upidLink=document.createElement("a"); upidLink.href="https://si-digital-framework.org/SI/unitExpr"; upidLink.target="_blank"; upidLink.title="BIPM unit expression parser — build a PID for compound units"; upidLink.textContent="? Build PID…"; upidLink.className="hint"; upidLink.style.whiteSpace="nowrap";
+    upidWrap.appendChild(upidInp); upidWrap.appendChild(uOpenBtn); upidWrap.appendChild(upidLink);
+    g2(g,"Unit PID",upidWrap);
     g2(g,"Description",inp(it,"description",{deleteIfEmpty:true}));
     g2(g,"Wavelength first",inp(it,"wavelength_first",{number:true,deleteIfEmpty:true}));
     g2(g,"Wavelength last",inp(it,"wavelength_last",{number:true,deleteIfEmpty:true}));
@@ -2745,6 +2870,15 @@ function renderForm(page,e){
   const box=document.createElement("fieldset"); box.innerHTML='<legend>Schema validation</legend>';
   if(errs.length===0) box.innerHTML+='<div class="val-ok">✓ Valid against CIEmetaDigitalProduct v4 schema</div>';
   else box.innerHTML+='<ul class="val-list">'+errs.map(x=>`<li class="e">${esc(x)}</li>`).join("")+'</ul>';
+  const pidWarns=[];
+  const vocabPid=(type,value)=>{ const v=getVocab(type).find(x=>x.value===value); return (v&&v.pid)||""; };
+  (p.datatableInfo&&p.datatableInfo.columnHeaders||[]).forEach((ch,i)=>{
+    const col="Column "+(i+1)+" ("+esc(ch.title||"untitled")+")";
+    // a PID is expected only where the vocabulary has one for the column's quantity / unit
+    if(!ch.quantityPID && vocabPid("quantities",ch.quantity)) pidWarns.push(col+": quantityPID missing, the vocabulary has one for \""+esc(ch.quantity)+"\" (Recommended, CIE 2.4.9)");
+    if(!ch.unitPID && vocabPid("units",ch.unit))               pidWarns.push(col+": unitPID missing, the vocabulary has one for \""+esc(ch.unit)+"\" (Recommended, CIE 2.4.8)");
+  });
+  if(pidWarns.length) box.innerHTML+='<ul class="val-list">'+pidWarns.map(w=>`<li class="w">${w}</li>`).join("")+'</ul>';
   page.appendChild(box);
   const doiBox=document.createElement("div"); doiBox.id="doiFindings"; box.appendChild(doiBox);
   renderDoiFindings(doiBox);
@@ -3295,6 +3429,42 @@ function openDomainsDialog(){
     DB.domains=draft.filter(d=>d.code.trim()); persist(); refreshDomainFilter(); closeModal(); renderDetail(); renderList(); toast("Domains updated","ok");
   });
   modal("Manage domains",body,[mkBtn("Cancel","ghost",closeModal),save]);
+}
+
+function openVocabDialog(type){
+  const label=type==="units"?"Units":"Quantities";
+  const body=document.createElement("div");
+  const info=document.createElement("p"); info.className="hint";
+  info.innerHTML=label+" vocabulary: display value and its permanent identifier (PID). Editable; the column-header dropdown is built from this list."
+    +(type==="units"?' <a href="https://si-digital-framework.org/SI/unitExpr" target="_blank" title="BIPM unit expression parser — build a PID for compound units">? Build compound unit PID…</a>':"");
+  body.appendChild(info);
+  const list=document.createElement("div"); list.className="divmgr";
+  if(!DB.vocabularies) DB.vocabularies={};
+  if(!DB.vocabularies[type]) DB.vocabularies[type]=clone(type==="units"?DEFAULT_UNITS:DEFAULT_QUANTITIES);
+  const draft=clone(DB.vocabularies[type]);
+  function paint(){
+    list.innerHTML="";
+    draft.forEach((row,i)=>{
+      const row_el=document.createElement("div"); row_el.className="arr-item";
+      const v=document.createElement("input"); v.placeholder="value (e.g. nm)"; v.value=row.value||""; v.style.flex="1";
+      v.oninput=()=>{draft[i].value=v.value;};
+      const p=document.createElement("input"); p.placeholder="PID (URI)"; p.value=row.pid||""; p.style.flex="2";
+      p.oninput=()=>{draft[i].pid=p.value;};
+      const openA=document.createElement("a"); openA.href="#"; openA.title="Open PID in new tab"; openA.textContent="↗"; openA.className="hint"; openA.style.whiteSpace="nowrap";
+      openA.onclick=(e)=>{e.preventDefault(); const u=draft[i].pid; if(u) window.open(u,"_blank"); else toast("No PID set","warn");};
+      const rm=mkBtn("Remove","danger small",()=>{draft.splice(i,1);paint();});
+      row_el.appendChild(v); row_el.appendChild(p); row_el.appendChild(openA); row_el.appendChild(rm);
+      list.appendChild(row_el);
+    });
+  }
+  paint(); body.appendChild(list);
+  const add=mkBtn("+ Add entry","ghost small",()=>{draft.push({value:"",pid:""});paint();});
+  body.appendChild(add);
+  const save=mkBtn("Save "+label,"sec",()=>{
+    DB.vocabularies[type]=draft.filter(r=>r.value.trim());
+    persist(); closeModal(); renderDetail(); toast(label+" vocabulary updated","ok");
+  });
+  modal("Manage "+label,body,[mkBtn("Cancel","ghost",closeModal),save]);
 }
 
 /* every distinct related-item DOI in the database, each asked of doi.org once. Read-only. */
@@ -4059,7 +4229,7 @@ function pickFile(accept, cb){
 /* enable/disable toolbar actions that require an open database */
 function updateToolbarState(){
   const hasDb = !!DB;
-  ["btnSave","btnSaveAs","btnDbInfo","btnNewEntry","btnDomains","btnRelatedDois","btnDefaults","btnExportDataCite","btnImport"]
+  ["btnSave","btnSaveAs","btnDbInfo","btnNewEntry","btnDomains","btnUnits","btnQuantities","btnRelatedDois","btnDefaults","btnExportDataCite","btnImport"]
     .forEach(id=>{ const b=el(id); if(b) b.disabled=!hasDb; });
 }
 /* true when the open DB has changes not yet written to its file (baseHash drifted
@@ -4297,6 +4467,8 @@ function wire(){
   el("btnSaveAs").onclick=()=>saveDb(true);
   el("btnNewEntry").onclick=()=>{ if(!DB) return; openNewEntryDialog(); };
   el("btnDomains").onclick=openDomainsDialog;
+  el("btnUnits").onclick=()=>openVocabDialog("units");
+  el("btnQuantities").onclick=()=>openVocabDialog("quantities");
   el("btnRelatedDois").onclick=openRelatedDoiDialog;
   el("btnDefaults").onclick=()=>{ if(!DB) return; openDefaultsDialog(); };
   el("btnExportDataCite").onclick=()=>{ if(DB&&DB.entries.length) exportDataCiteFiles(DB.entries); else toast("No entries to export"); };

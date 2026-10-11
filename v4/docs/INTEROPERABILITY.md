@@ -1,6 +1,6 @@
 # CIEmetaDigitalProduct - Interoperability recommendations
 
-Advisory document, based on schema version 4.1.
+Advisory document, based on schema version 4.2.
 
 This document accompanies [README.md](README.md), which remains the normative description
 of the metadata model. Nothing here changes the current model; it collects recommendations
@@ -51,7 +51,7 @@ CIE corpus is a day of editorial work, not a project.
 |---|---|---|---|---|
 | A | Unit PIDs from the BIPM SI Reference Point | R | No | Low |
 | B | Quantity PIDs from the SI quantities KB and the CIE e-ILV | R | No | Low |
-| C | Explicit `symbol` field, separate from `title` | O | No | Low |
+| C | Explicit `quantitySymbol` field, separate from `title` | O | No | Low |
 | D | Optional JSON-LD `@context` at record root | O | No | Medium |
 | E | DCAT-AP / schema.org crosswalk, derived CSVW sidecar | O | No | Medium |
 | F | PIDs for creators, publisher, subjects and licence | R | No | Low |
@@ -63,7 +63,7 @@ invalidating it, and every existing record remains valid unchanged. `schemaName`
 `CIEmetaDigitalProduct` and `schemaVersion` stays `4`.
 
 This was checked, not assumed: the published `CIE_cc_1931_2deg` payload with `unitPID`,
-`quantityPID` and `symbol` added to every column validates against
+`quantityPID` and `quantitySymbol` added to every column validates against
 `CIEmetaDigitalProduct_schema_04.json` under a draft-07 validator.
 
 Section 10 lists defects that already exist in v4 and should be repaired regardless of
@@ -317,7 +317,7 @@ terminology committee — see recommendation G8.
 
 ---
 
-## 5. Recommendation C — an explicit `symbol` field
+## 5. Recommendation C: an explicit `quantitySymbol` field
 
 Today the symbol is embedded in `title`, and the transliteration is inconsistent. The
 repository contains `x_bar(lambda)`, `V'(lambda)`, `s_mel(lambda)`, `K_m,mes;m`.
@@ -330,18 +330,18 @@ not have to reverse-engineer `x_bar(lambda)` into *x̄*(λ).
 
 | ID | Property | Obligation |
 |---|---|---|
-| CIE 2.4.10 | symbol | O |
+| CIE 2.4.10 | quantitySymbol | O |
 
 ```json
 {
   "title":  "x_bar(lambda)",
-  "symbol": "x̄(λ)",
+  "quantitySymbol": "x̄(λ)",
   "quantity": "colour-matching function",
   "quantityPID": "https://cie.co.at/eilvterm/17-23-047"
 }
 ```
 
-Optionally a `symbolLatex` (`\bar{x}(\lambda)`) for typesetting consumers. Note that the
+Optionally a `quantitySymbolLatex` (`\bar{x}(\lambda)`) for typesetting consumers. Note that the
 e-ILV already publishes the authoritative symbol for each term — `λ` for 17-21-025 — so
 this field can be populated from the same source as `quantityPID`.
 
@@ -984,7 +984,7 @@ Every recommendation applied. Existing fields are untouched; four keys are added
 "columnHeaders": [
   {
     "title": "lambda",
-    "symbol": "λ",
+    "quantitySymbol": "λ",
     "unit": "nm",
     "unitPID": "https://si-digital-framework.org/SI/units/nanometre",
     "quantity": "wavelength",
@@ -993,7 +993,7 @@ Every recommendation applied. Existing fields are untouched; four keys are added
   },
   {
     "title": "x(lambda)",
-    "symbol": "x(λ)",
+    "quantitySymbol": "x(λ)",
     "unit": "dimensionless",
     "unitPID": "https://si-digital-framework.org/SI/units/one",
     "quantity": "chromaticity coordinates",
@@ -1019,7 +1019,7 @@ values the schema file used to reject.
 "columnHeaders": [
   {
     "title": "m",
-    "symbol": "m",
+    "quantitySymbol": "m",
     "unit": "dimensionless",
     "unitPID": "https://si-digital-framework.org/SI/units/one",
     "quantity": "adaptation coefficient",
@@ -1028,7 +1028,7 @@ values the schema file used to reject.
   },
   {
     "title": "K_m,mes;m",
-    "symbol": "K_m,mes;m",
+    "quantitySymbol": "K_m,mes;m",
     "unit": "lm/W",
     "unitPID": "https://si-digital-framework.org/SI/units/lumen.watt-1",
     "quantity": "maximum luminous efficacy",
@@ -1063,18 +1063,23 @@ concept with no identifier — better an honest gap than a fabricated URI.
 - *Schema identifier (defect 8): outstanding and not repairable here.* Needs a
   version-distinguishing schema DOI from CIE; see section 10.
 
-**Phase 2 — semantic annotation.** Add `unitPID`, `quantityPID`, `symbol` as optional
-fields; publish the appendix table as a normative annex to README.md; extend the WebTool so
-the Quantity and Unit inputs become dropdowns backed by that table, with the PID filled in
-automatically. Currently both are plain text inputs (`CIEmetaDB.html` around lines
-1443–1444) and the conventions are enforced by nothing — which is how the whitespace and
-missing-key defects arose. **Apply the same treatment to the Subject input**, backed by the
+**Phase 2: semantic annotation, schema version 4.2.** Added `unitPID` (CIE 2.4.8),
+`quantityPID` (CIE 2.4.9), `quantitySymbol` (CIE 2.4.10) and `quantitySymbolLatex` (CIE 2.4.11)
+as optional fields in `columnHeaders` items. The mapping table in section 13 is referenced from
+README.md. The WebTool `Quantity` and `Unit` column-header inputs are dropdowns backed by the
+database vocabularies (**Units…** / **Quantities…**), auto-populating the PID fields for known
+values; a helper link opens the BIPM unit expression parser for compound units not yet in the
+table. `schemaVersion` stays `4`. **Unit PIDs are applied; quantity PIDs are held back** until
+CIE agrees on the mapping. The candidates in section 13 were reviewed in
+[`../tools/WebTool/checks/PID_REPORT.md`](../tools/WebTool/checks/PID_REPORT.md), which found
+four of them wrong or imprecise; until agreement the vocabulary carries the quantity names
+without PIDs and the databases carry no `quantityPID`. The values follow as metadata revisions,
+with no schema change. **Still outstanding in Phase 2:** subject-input dropdown (backed by the
 eleven-value list in section 13 with `subjectScheme`, `schemeURI` and `lang` filled in
-automatically: the subject field has exactly the defect history of the quantity field and the
-same cause, and closing the list is what turns 5a from an editorial habit into a validation
-error. Remember the two-places rule for schema changes (section 10.1).
-`schemaVersion` stays `4`; document the change as 4.2. Effort: small for the data, moderate
-for the tool.
+automatically). The subject field has the same defect history as the quantity field and the
+same cause; closing the list turns 5a from an editorial habit into a validation error. The
+two-places rule (section 10.1) was followed: the embedded schema in `CIEmetaDB.html` was
+updated via `sync_schema.py`.
 
 **Phase 3 — linked data.** `@context`, the DCAT/schema.org crosswalk on DOI landing pages,
 derived CSVW sidecars, and the agent, subject and licence PIDs of recommendation F — including
@@ -1105,7 +1110,13 @@ and eleven for subjects.
 
 ### Quantities
 
-| `quantity` | `quantityPID` |
+**Status: under discussion.** The quantity PIDs below are *candidates*. They are not applied in
+the databases and not offered by the WebTool until CIE agrees on them; the review in
+[`../tools/WebTool/checks/PID_REPORT.md`](../tools/WebTool/checks/PID_REPORT.md) found
+`luminous efficiency`, `chromaticity coordinates`, `spectral distribution` and
+`spectral tristimulus values` wrong or imprecise. The `quantity` names themselves are in use.
+
+| `quantity` | candidate `quantityPID` |
 |---|---|
 | `wavelength` | `https://cie.co.at/eilvterm/17-21-025` |
 | `spectral distribution` | `https://cie.co.at/eilvterm/17-21-029` |
@@ -1190,7 +1201,8 @@ In addition, every record carries the two field-of-science entries of Layer 2:
 
 ### As a lookup object
 
-Embeddable directly in the WebTool.
+Embeddable directly in the WebTool. Quantity PIDs are `null` while the candidates above are
+under discussion; the WebTool's `DEFAULT_QUANTITIES` carries the same names with empty PIDs.
 
 ```json
 {
@@ -1200,19 +1212,19 @@ Embeddable directly in the WebTool.
     "lm/W":          "https://si-digital-framework.org/SI/units/lumen.watt-1"
   },
   "quantities": {
-    "wavelength":                        "https://cie.co.at/eilvterm/17-21-025",
-    "spectral distribution":             "https://cie.co.at/eilvterm/17-21-029",
-    "spectral radiance factor":          "https://cie.co.at/eilvterm/17-24-075",
-    "chromaticity coordinates":          "https://cie.co.at/eilvterm/17-23-053",
-    "spectral chromaticity coordinates": "https://cie.co.at/eilvterm/17-23-055",
-    "colour-matching function":          "https://cie.co.at/eilvterm/17-23-039",
-    "CIE colour-matching functions":     "https://cie.co.at/eilvterm/17-23-047",
-    "spectral tristimulus values":       "https://cie.co.at/eilvterm/17-23-038",
-    "spectral sensitivity":              "https://cie.co.at/eilvterm/17-25-063",
-    "action spectra":                    "https://cie.co.at/eilvterm/17-26-027",
-    "spectral luminous efficiency":      "https://cie.co.at/eilvterm/17-21-035",
-    "luminous efficiency":               "https://cie.co.at/eilvterm/17-21-094",
-    "maximum luminous efficacy":         "https://cie.co.at/eilvterm/17-21-092"
+    "wavelength":                        null,
+    "spectral distribution":             null,
+    "spectral radiance factor":          null,
+    "chromaticity coordinates":          null,
+    "spectral chromaticity coordinates": null,
+    "colour-matching function":          null,
+    "CIE colour-matching functions":     null,
+    "spectral tristimulus values":       null,
+    "spectral sensitivity":              null,
+    "action spectra":                    null,
+    "spectral luminous efficiency":      null,
+    "luminous efficiency":               null,
+    "maximum luminous efficacy":         null
   },
   "subjectScheme": {
     "subjectScheme": "CIE Subject Headings",

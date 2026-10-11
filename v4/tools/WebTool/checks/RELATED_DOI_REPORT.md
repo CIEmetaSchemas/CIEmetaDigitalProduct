@@ -1,6 +1,6 @@
 # Related-item DOI report
 
-Generated 2026-10-11T16:23:47Z by `check_related_dois.js` over `CIEmetaDBdataset.json`.
+Generated 2026-10-11T16:27:51Z by `check_related_dois.js` over `CIEmetaDBdataset.json`.
 
 Every distinct `relatedItems[].relatedItemIdentifier` of type DOI, resolved once through the DOI Handle API (`https://doi.org/api/handles/<doi>`), using the functions lifted verbatim from `CIEmetaDB.html` that also drive the tool's **Check related DOIs** dialog. DOIs are compared case-insensitively. *Registered* means doi.org knows the handle; it says nothing about whether the landing page itself is reachable.
 
@@ -8,7 +8,7 @@ Every distinct `relatedItems[].relatedItemIdentifier` of type DOI, resolved once
 
 | Database | Entries | Related items with a DOI | Distinct DOIs |
 |---|---:|---:|---:|
-| `CIEmetaDBdataset.json` | 39 | 45 | 14 |
+| `CIEmetaDBdataset.json` | 78 | 90 | 14 |
 
 - ✓ registered: **12**
 - ✗ not found: **2**
@@ -19,20 +19,20 @@ Every distinct `relatedItems[].relatedItemIdentifier` of type DOI, resolved once
 
 | DOI | Status | Resolves to | Referenced by |
 |---|---|---|---:|
-| [10.25039/CIE.DS.8svs5rqd](https://doi.org/10.25039/CIE.DS.8svs5rqd) | ✓ registered | https://cie.co.at/datatable/spectral-radiance-factors-99-test-samples-cie-colour-fidelity-index-calculation-1nm | 1 |
-| [10.25039/CIE.DS.wi5idbqu](https://doi.org/10.25039/CIE.DS.wi5idbqu) | ✓ registered | https://cie.co.at/datatable/spectral-radiance-factors-99-test-samples-cie-colour-fidelity-index-calculation | 1 |
-| [10.25039/IS.ISO_CIE.11664-1.2019](https://doi.org/10.25039/IS.ISO_CIE.11664-1.2019) | ✗ not found | not registered (doi.org: handle not found) | 5 |
-| [10.25039/IS.ISO_CIE.11664-2.2022](https://doi.org/10.25039/IS.ISO_CIE.11664-2.2022) | ✗ not found | not registered (doi.org: handle not found) | 3 |
-| [10.25039/S026.2018](https://doi.org/10.25039/S026.2018) | ✓ registered | https://cie.co.at/publications/cie-system-metrology-optical-radiation-iprgc-influenced-responses-light-0 | 1 |
-| [10.25039/tr.013.3.1995](https://doi.org/10.25039/tr.013.3.1995) | ✓ registered | https://cie.co.at/publications/method-measuring-and-specifying-colour-rendering-properties-light-sources | 1 |
-| [10.25039/tr.015.2018](https://doi.org/10.25039/tr.015.2018) | ✓ registered | https://cie.co.at/publications/colorimetry-4th-edition | 11 |
-| [10.25039/tr.018.2019](https://doi.org/10.25039/tr.018.2019) | ✓ registered | https://cie.co.at/publications/basis-physical-photometry-3rd-edition | 7 |
-| [10.25039/tr.170-1.2006](https://doi.org/10.25039/tr.170-1.2006) | ✓ registered | https://cie.co.at/publications/fundamental-chromaticity-diagram-physiological-axes-part-1 | 2 |
-| [10.25039/TR.170-2.2015](https://doi.org/10.25039/TR.170-2.2015) | ✓ registered | https://cie.co.at/publications/fundamental-chromaticity-diagram-physiological-axes-part-2-spectral-luminous-efficiency | 5 |
-| [10.25039/tr.184.2009](https://doi.org/10.25039/tr.184.2009) | ✓ registered | https://cie.co.at/publications/indoor-daylight-illuminants | 2 |
-| [10.25039/tr.224.2017](https://doi.org/10.25039/tr.224.2017) | ✓ registered | https://cie.co.at/publications/colour-fidelity-index-accurate-scientific-use | 2 |
-| [10.25039/TR.251.2023](https://doi.org/10.25039/TR.251.2023) | ✓ registered | https://cie.co.at/publications/led-reference-spectrum-photometer-calibration | 1 |
-| [10.25039/TR.253.2024](https://doi.org/10.25039/TR.253.2024) | ✓ registered | https://cie.co.at/publications/overview-methods-evaluating-colour-rendition-white-light-sources-beyond-colour-fidelity | 3 |
+| [10.25039/CIE.DS.8svs5rqd](https://doi.org/10.25039/CIE.DS.8svs5rqd) | ✓ registered | https://cie.co.at/datatable/spectral-radiance-factors-99-test-samples-cie-colour-fidelity-index-calculation-1nm | 2 |
+| [10.25039/CIE.DS.wi5idbqu](https://doi.org/10.25039/CIE.DS.wi5idbqu) | ✓ registered | https://cie.co.at/datatable/spectral-radiance-factors-99-test-samples-cie-colour-fidelity-index-calculation | 2 |
+| [10.25039/IS.ISO_CIE.11664-1.2019](https://doi.org/10.25039/IS.ISO_CIE.11664-1.2019) | ✗ not found | not registered (doi.org: handle not found) | 10 |
+| [10.25039/IS.ISO_CIE.11664-2.2022](https://doi.org/10.25039/IS.ISO_CIE.11664-2.2022) | ✗ not found | not registered (doi.org: handle not found) | 6 |
+| [10.25039/S026.2018](https://doi.org/10.25039/S026.2018) | ✓ registered | https://cie.co.at/publications/cie-system-metrology-optical-radiation-iprgc-influenced-responses-light-0 | 2 |
+| [10.25039/tr.013.3.1995](https://doi.org/10.25039/tr.013.3.1995) | ✓ registered | https://cie.co.at/publications/method-measuring-and-specifying-colour-rendering-properties-light-sources | 2 |
+| [10.25039/tr.015.2018](https://doi.org/10.25039/tr.015.2018) | ✓ registered | https://cie.co.at/publications/colorimetry-4th-edition | 22 |
+| [10.25039/tr.018.2019](https://doi.org/10.25039/tr.018.2019) | ✓ registered | https://cie.co.at/publications/basis-physical-photometry-3rd-edition | 14 |
+| [10.25039/tr.170-1.2006](https://doi.org/10.25039/tr.170-1.2006) | ✓ registered | https://cie.co.at/publications/fundamental-chromaticity-diagram-physiological-axes-part-1 | 4 |
+| [10.25039/TR.170-2.2015](https://doi.org/10.25039/TR.170-2.2015) | ✓ registered | https://cie.co.at/publications/fundamental-chromaticity-diagram-physiological-axes-part-2-spectral-luminous-efficiency | 10 |
+| [10.25039/tr.184.2009](https://doi.org/10.25039/tr.184.2009) | ✓ registered | https://cie.co.at/publications/indoor-daylight-illuminants | 4 |
+| [10.25039/tr.224.2017](https://doi.org/10.25039/tr.224.2017) | ✓ registered | https://cie.co.at/publications/colour-fidelity-index-accurate-scientific-use | 4 |
+| [10.25039/TR.251.2023](https://doi.org/10.25039/TR.251.2023) | ✓ registered | https://cie.co.at/publications/led-reference-spectrum-photometer-calibration | 2 |
+| [10.25039/TR.253.2024](https://doi.org/10.25039/TR.253.2024) | ✓ registered | https://cie.co.at/publications/overview-methods-evaluating-colour-rendition-white-light-sources-beyond-colour-fidelity | 6 |
 
 ## Entries referencing a DOI that is not registered or could not be checked
 
@@ -41,18 +41,26 @@ Every distinct `relatedItems[].relatedItemIdentifier` of type DOI, resolved once
 not registered (doi.org: handle not found)
 
 - CIE 1931 chromaticity coordinates of spectrum loci, 2 degree  observer (`CIEmetaDBdataset.json`, entry `ef65a1df-6316-4826-9242-71ea739c0f48`, IsPartOf, stored as `10.25039/IS.ISO_CIE.11664-1.2019`)
+- CIE 1931 chromaticity coordinates of spectrum loci, 2 degree  observer (`CIEmetaDBdataset.json`, entry `ef65a1df-6316-4826-9242-71ea739c0f48-rev`, IsPartOf, stored as `10.25039/IS.ISO_CIE.11664-1.2019`)
 - CIE 1964 chromaticity coordinates of spectrum loci, 10 degree  observer (`CIEmetaDBdataset.json`, entry `d7be1e15-2afd-4347-b9d9-7645fb317ec1`, IsPartOf, stored as `10.25039/IS.ISO_CIE.11664-1.2019`)
+- CIE 1964 chromaticity coordinates of spectrum loci, 10 degree  observer (`CIEmetaDBdataset.json`, entry `d7be1e15-2afd-4347-b9d9-7645fb317ec1-rev`, IsPartOf, stored as `10.25039/IS.ISO_CIE.11664-1.2019`)
 - CIE spectral luminous efficiency for photopic vision (`CIEmetaDBdataset.json`, entry `eed5ac4a-ebef-45a2-bcf8-1d2e7ba9511a`, IsPartOf, stored as `10.25039/IS.ISO_CIE.11664-1.2019`)
+- CIE spectral luminous efficiency for photopic vision (`CIEmetaDBdataset.json`, entry `eed5ac4a-ebef-45a2-bcf8-1d2e7ba9511a-rev`, IsPartOf, stored as `10.25039/IS.ISO_CIE.11664-1.2019`)
 - Colour-matching functions of CIE 1931 standard colorimetric observer (`CIEmetaDBdataset.json`, entry `decea119-6e29-4a5c-a7fb-12310bb6c29d`, IsPartOf, stored as `10.25039/IS.ISO_CIE.11664-1.2019`)
+- Colour-matching functions of CIE 1931 standard colorimetric observer (`CIEmetaDBdataset.json`, entry `decea119-6e29-4a5c-a7fb-12310bb6c29d-rev`, IsPartOf, stored as `10.25039/IS.ISO_CIE.11664-1.2019`)
 - CIE 1964 colour-matching functions , 10 degree  observer (`CIEmetaDBdataset.json`, entry `16e2c9f9-4f6e-4825-9ab9-1882ba8fb9f1`, IsPartOf, stored as `10.25039/IS.ISO_CIE.11664-1.2019`)
+- CIE 1964 colour-matching functions , 10 degree  observer (`CIEmetaDBdataset.json`, entry `16e2c9f9-4f6e-4825-9ab9-1882ba8fb9f1-rev`, IsPartOf, stored as `10.25039/IS.ISO_CIE.11664-1.2019`)
 
 ### 10.25039/IS.ISO_CIE.11664-2.2022 - ✗ not found
 
 not registered (doi.org: handle not found)
 
 - CIE standard illuminant A - 1 nm (`CIEmetaDBdataset.json`, entry `6eda1ee9-0ba7-4958-af18-c8b89e8418f3`, IsPartOf, stored as `10.25039/IS.ISO_CIE.11664-2.2022`)
+- CIE standard illuminant A - 1 nm (`CIEmetaDBdataset.json`, entry `6eda1ee9-0ba7-4958-af18-c8b89e8418f3-rev`, IsPartOf, stored as `10.25039/IS.ISO_CIE.11664-2.2022`)
 - CIE standard illuminant D50 (`CIEmetaDBdataset.json`, entry `075b90f6-43e9-4016-a82b-7b48514eadbb`, IsPartOf, stored as `10.25039/IS.ISO_CIE.11664-2.2022`)
+- CIE standard illuminant D50 (`CIEmetaDBdataset.json`, entry `075b90f6-43e9-4016-a82b-7b48514eadbb-rev`, IsPartOf, stored as `10.25039/IS.ISO_CIE.11664-2.2022`)
 - CIE standard illuminant D65 (`CIEmetaDBdataset.json`, entry `94add99f-0fcf-4f00-ba99-526fa4e45f9d`, IsPartOf, stored as `10.25039/IS.ISO_CIE.11664-2.2022`)
+- CIE standard illuminant D65 (`CIEmetaDBdataset.json`, entry `94add99f-0fcf-4f00-ba99-526fa4e45f9d-rev`, IsPartOf, stored as `10.25039/IS.ISO_CIE.11664-2.2022`)
 
 ## Self-tests
 
