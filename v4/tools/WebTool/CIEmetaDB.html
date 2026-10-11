@@ -2278,13 +2278,103 @@ function relatedDoiFindings(payload, cache){
   });
   return {findings, unchecked};
 }
-/* the related-item DOI part of the Form tab's validation summary. Redrawn in place when a check
-   finishes or an identifier changes, so the form itself is not re-rendered. */
-function renderDoiFindings(target){
-  const box=target||el("doiFindings"); if(!box || !editModel) return;
-  const {findings, unchecked}=relatedDoiFindings(editModel, doiCheckCache);
+
+/* ============================================================================
+   landing page and unit PID checks
+   The landing page lives on cie.co.at, which sends no CORS headers, so a page opened from
+   file:// cannot read whether it answers 200 or 404. What the tool checks instead is whether the
+   entry's DOI, as registered at doi.org, resolves to the landing page. Unit PIDs are asked of the
+   BIPM SI Digital Framework, which does send CORS headers (200 for a known unit, 400 for an
+   unknown one). Both run only when a Check button is pressed. checks/check_links.js lifts these
+   functions and also fetches every landing page directly, which the browser cannot.
+   ==========================================================================*/
+const SI_UNITS="https://si-digital-framework.org/SI/units/";
+/* true when two URLs name the same page: http and https, host case and a trailing slash ignored */
+function sameUrl(a, b){
+  const n=u=>{
+    const s=String(u==null?"":u).trim(), m=s.match(/^https?:\/\/([^/?#]+)(.*)$/i);
+    return m ? "https://"+m[1].toLowerCase()+m[2].replace(/\/+$/,"") : s.replace(/\/+$/,"");
+  };
+  return n(a)!=="" && n(a)===n(b);
+}
+/* {level:"e"|"w", text} about an entry's landing page, given checkDoi()'s answer r for the entry
+   DOI; null when there is nothing to report (also while unchecked). */
+function landingPageFinding(landingPage, r){
+  const lp=String(landingPage||"").trim();
+  if(!lp) return null;
+  if(!/^https?:\/\/\S+$/i.test(lp)) return {level:"e", text:'DOI landing page "'+lp+'" is not an http(s) URL'};
+  if(!r) return null;
+  if(r.state==="exists") return sameUrl(r.target, lp) ? null
+    : {level:"w", text:"DOI "+r.doi+" resolves to "+(r.target||"(no URL)")+", not to the landing page "+lp};
+  if(r.state==="missing") return {level:"w", text:"DOI "+r.doi+" is not registered at doi.org, so the landing page cannot be confirmed"};
+  if(r.state==="invalid") return {level:"w", text:"The entry identifier is not a DOI, so the landing page cannot be confirmed"};
+  return {level:"w", text:"The landing page could not be checked ("+r.message+")"};
+}
+/* {state, label, message} from an SI Digital Framework reply: "exists" (HTTP 200; label is the unit
+   name, or the factors of a compound unit), "missing" (HTTP 400 or 404) or "error" */
+function classifyUnitPidResponse(httpStatus, body){
+  if(httpStatus===200 && body && typeof body==="object"){
+    const parts=(body.resultsCombinedUnitList||[]).map(u=>(u.prefixName||"")+(u.unitName||"")+(u.exponent!=null&&u.exponent!==1?"^"+u.exponent:""));
+    return {state:"exists", label:body.label||parts.join(" "), message:""};
+  }
+  if(httpStatus===400 || httpStatus===404) return {state:"missing", label:"", message:"not found at the BIPM SI Digital Framework"};
+  return {state:"error", label:"", message:"unexpected reply: HTTP "+httpStatus};
+}
+/* Promise of {pid, state, label, message}; never rejects. PIDs outside the SI Digital Framework
+   are not asked (state "other"): their servers may not answer a page opened from file://. */
+function checkUnitPid(pid, fetchImpl){
+  const p=String(pid||"").trim();
+  if(!p.startsWith(SI_UNITS)) return Promise.resolve({pid:p, state:"other", label:"", message:"not an SI Digital Framework PID"});
+  return Promise.resolve().then(()=>(fetchImpl||fetch)(p))
+    .then(r=>r.json().catch(()=>null).then(body=>Object.assign({pid:p}, classifyUnitPidResponse(r.status, body))))
+    .catch(err=>({pid:p, state:"error", label:"", message:"SI Digital Framework not reachable: "+((err&&err.message)||err)}));
+}
+/* validation findings for the unit PIDs of a payload, one per distinct PID that a check found
+   missing (error) or could not check (warning): {findings, unchecked}. cache: PID -> checkUnitPid() */
+function unitPidFindings(payload, cache){
+  const cols=new Map();
+  ((payload&&payload.datatableInfo&&payload.datatableInfo.columnHeaders)||[]).forEach((ch,i)=>{
+    const p=String(ch.unitPID||"").trim(); if(!p) return;
+    if(!cols.has(p)) cols.set(p,[]); cols.get(p).push(i+1);
+  });
+  const findings=[]; let unchecked=0;
+  cols.forEach((nums,p)=>{
+    const r=cache&&cache.get(p);
+    const at="unitPID "+p+" ("+(nums.length===1?"column ":"columns ")+nums.slice(0,6).join(", ")+(nums.length>6?", ...":"")+")";
+    if(!r) unchecked++;
+    else if(r.state==="missing") findings.push({level:"e", text:at+" is "+r.message});
+    else if(r.state==="error") findings.push({level:"w", text:at+" could not be checked ("+r.message+")"});
+  });
+  return {findings, unchecked};
+}
+/* SI Digital Framework answers for this session, keyed by PID */
+const unitPidCache=new Map();
+/* status line under the landing page field, from checkDoi()'s answer r for the entry DOI */
+function landingPageStatusHtml(landingPage, r){
+  if(!String(landingPage||"").trim()) return "";
+  if(!r) return doiStatusHtml(null);
+  const f=landingPageFinding(landingPage, r);
+  if(!f) return '<span class="ok">&#10003; the DOI resolves to this landing page</span>';
+  return `<span class="${f.level==="e"?"bad":"warn"}">${f.level==="e"?"&#10007;":"&#9888;"}</span> ${esc(f.text)}`;
+}
+/* the online-check part of the Form tab's validation summary: landing page, related-item DOIs
+   and unit PIDs. Redrawn in place when a check finishes or a field changes, so the form itself
+   is not re-rendered. Never goes online by itself. */
+function renderLinkFindings(target){
+  const box=target||el("linkFindings"); if(!box || !editModel) return;
+  const doi=normalizeDoi(editModel.identifier&&editModel.identifier.identifier);
+  const lp=String((editMeta&&editMeta.landingPage)||"").trim();
+  const lpR=doi?doiCheckCache.get(doi.toLowerCase()):null;
+  const lpF=landingPageFinding(lp, lpR);
+  const rel=relatedDoiFindings(editModel, doiCheckCache);
+  const units=unitPidFindings(editModel, unitPidCache);
+  const findings=[...(lpF?[lpF]:[]), ...rel.findings, ...units.findings];
+  const pending=[];
+  if(lp && doi && !lpR && /^https?:\/\//i.test(lp)) pending.push("the landing page (<b>Check</b> beside it)");
+  if(rel.unchecked) pending.push(`${rel.unchecked} related-item DOI${rel.unchecked===1?"":"s"} (<b>Check</b> in Related items, or <b>Check related DOIs&hellip;</b>)`);
+  if(units.unchecked) pending.push(`${units.unchecked} unit PID${units.unchecked===1?"":"s"} (<b>Check unit PIDs</b> above Column headers)`);
   box.innerHTML=(findings.length?'<ul class="val-list">'+findings.map(f=>`<li class="${f.level}">${esc(f.text)}</li>`).join("")+"</ul>":"")
-    +(unchecked?`<p class="hint">${unchecked} related-item DOI${unchecked===1?" is":"s are"} not checked against doi.org yet: press <b>Check</b> in Related items, or <b>Check related DOIs&hellip;</b> in the toolbar.</p>`:"");
+    +(pending.length?`<p class="hint">Not checked online yet: ${pending.join("; ")}.</p>`:"");
 }
 /* DOIs must be unique: map of doi -> [entries] for any DOI used more than once.
    A published entry and its open revision legitimately share a DOI while the revision is
@@ -2652,7 +2742,31 @@ function renderForm(page,e){
     lab.appendChild(cb); lab.appendChild(document.createTextNode(d.code+" "+d.label)); domWrap.appendChild(lab);
   });
   gm.appendChild(field("Domains", domWrap));
-  gm.appendChild(field("DOI landing page (Crossref resource URL)", inp(editMeta,"landingPage",{placeholder:"https://cie.co.at/datatable/…"})));
+  // landing page with Open / Check. cie.co.at cannot be read from file://, so Check asks doi.org
+  // where the entry's DOI points and compares that with this field (see landingPageFinding)
+  const lpInp=inp(editMeta,"landingPage",{placeholder:"https://cie.co.at/datatable/…"}); lpInp.style.flex="1"; lpInp.style.minWidth="0";
+  const lpSt=document.createElement("div"); lpSt.className="doi-st";
+  const lpDoi=()=>normalizeDoi(p.identifier&&p.identifier.identifier);
+  const lpShow=()=>{ lpSt.innerHTML=landingPageStatusHtml(editMeta.landingPage, lpDoi()?doiCheckCache.get(lpDoi().toLowerCase()):null); };
+  const lpOpen=mkBtn("Open ↗","ghost small ro-ok",()=>{
+    const u=String(editMeta.landingPage||"").trim();
+    if(/^https?:\/\/\S+$/i.test(u)) window.open(u,"_blank","noopener"); else toast("No http(s) landing page set","warn");
+  });
+  lpOpen.type="button"; lpOpen.title="Open the landing page";
+  const lpChk=mkBtn("Check","ghost small ro-ok",()=>{
+    const d=lpDoi();
+    if(!String(editMeta.landingPage||"").trim()){ toast("No landing page set","warn"); return; }
+    if(!d){ toast("The entry has no DOI to compare with","warn"); return; }
+    lpSt.innerHTML=doiStatusHtml(null); lpChk.disabled=true;
+    checkDoi(d).then(r=>{ doiCheckCache.set(d.toLowerCase(),r); lpChk.disabled=false; lpShow(); renderLinkFindings(); });
+  });
+  lpChk.type="button"; lpChk.title="Ask doi.org whether the entry's DOI resolves to this landing page";
+  lpInp.addEventListener("input",()=>{ lpShow(); renderLinkFindings(); });
+  const lpRow=document.createElement("div"); lpRow.style.display="flex"; lpRow.style.gap="4px"; lpRow.style.alignItems="center";
+  lpRow.append(lpInp,lpChk,lpOpen);
+  const lpCell=document.createElement("div"); lpCell.append(lpRow,lpSt);
+  lpShow();
+  gm.appendChild(field("DOI landing page (Crossref resource URL)", lpCell));
   // metadata-file revision: read-only; only Publish entry mints a new revision.
   const revView=document.createElement("div"); revView.style.padding="6px 0"; revView.className="mono";
   revView.textContent = kindOf(e)==="published" ? String(e.rev)
@@ -2765,18 +2879,18 @@ function renderForm(page,e){
       if(!isDoiItem()) return;
       const d=normalizeDoi(it.relatedItemIdentifier);
       st.innerHTML=doiStatusHtml(null); chk.disabled=true;
-      checkDoi(d).then(r=>{ doiCheckCache.set(d.toLowerCase(),r); chk.disabled=false; showStatus(); renderDoiFindings(); });
+      checkDoi(d).then(r=>{ doiCheckCache.set(d.toLowerCase(),r); chk.disabled=false; showStatus(); renderLinkFindings(); });
     });
     chk.type="button"; chk.title="Ask doi.org whether this DOI is registered";
     const open=mkBtn("Open ↗","ghost small ro-ok",()=>{ if(isDoiItem()) window.open("https://doi.org/"+normalizeDoi(it.relatedItemIdentifier),"_blank","noopener"); });
     open.type="button"; open.title="Open this DOI at doi.org";
-    idInp.addEventListener("input",()=>{ showStatus(); renderDoiFindings(); });
+    idInp.addEventListener("input",()=>{ showStatus(); renderLinkFindings(); });
     const idRow=document.createElement("div"); idRow.style.display="flex"; idRow.style.gap="4px"; idRow.style.alignItems="center";
     idRow.append(idInp,chk,open);
     const idCell=document.createElement("div"); idCell.append(idRow,st);
     showStatus();
     g2(g,"Identifier",idCell);
-    const typeSel=sel(it,"relatedItemIdentifierType",ENUMS.relatedIdentifierType); typeSel.addEventListener("change",renderDoiFindings);
+    const typeSel=sel(it,"relatedItemIdentifierType",ENUMS.relatedIdentifierType); typeSel.addEventListener("change",()=>renderLinkFindings());
     g2(g,"Identifier type",typeSel);
     g2(g,"Relation type",sel(it,"relationType",ENUMS.relationType));
     g2(g,"Item type",sel(it,"relatedItemType",ENUMS.resourceTypeGeneral));
@@ -2829,6 +2943,24 @@ function renderForm(page,e){
   const chCopy=document.createElement("button"); chCopy.type="button"; chCopy.className="ghost small"; chCopy.textContent="Copy current as text";
   chCopy.onclick=()=>{ navigator.clipboard&&navigator.clipboard.writeText(columnHeadersToTsv(di.columnHeaders)); toast("Column headers copied","ok"); };
   chRow.appendChild(chCopy);
+  // unit PIDs: each distinct PID of this table asked of the SI Digital Framework once; findings go to
+  // the summary at the end of the page. Only reads, so it stays enabled on a published entry (ro-ok).
+  const chUnits=mkBtn("Check unit PIDs","ghost small ro-ok",()=>{
+    const pids=[...new Set(di.columnHeaders.map(c=>String(c.unitPID||"").trim()).filter(Boolean))];
+    if(!pids.length){ toast("No unit PIDs in the column headers","warn"); return; }
+    chUnits.disabled=true; chUnitsSt.textContent="checking…";
+    Promise.all(pids.map(pid=>checkUnitPid(pid).then(r=>{ unitPidCache.set(pid,r); return r; }))).then(rs=>{
+      chUnits.disabled=false;
+      const n=s=>rs.filter(r=>r.state===s).length;
+      chUnitsSt.textContent=`${n("exists")} of ${rs.length} unit PID${rs.length===1?"":"s"} found`
+        +(n("missing")?`, ${n("missing")} not found`:"")+(n("error")?`, ${n("error")} could not be checked`:"")
+        +(n("other")?`, ${n("other")} outside the SI Digital Framework (not checked)`:"")+".";
+      renderLinkFindings();
+    });
+  });
+  chUnits.type="button"; chUnits.title="Ask the BIPM SI Digital Framework whether each unit PID of this table exists";
+  const chUnitsSt=document.createElement("span"); chUnitsSt.className="hint"; chUnitsSt.style.alignSelf="center";
+  chRow.appendChild(chUnits); chRow.appendChild(chUnitsSt);
   chTools.appendChild(chRow);
   page.appendChild(chTools);
   arraySection(page,"Column headers",di.columnHeaders,(g,it,idx)=>{
@@ -2880,8 +3012,8 @@ function renderForm(page,e){
   });
   if(pidWarns.length) box.innerHTML+='<ul class="val-list">'+pidWarns.map(w=>`<li class="w">${w}</li>`).join("")+'</ul>';
   page.appendChild(box);
-  const doiBox=document.createElement("div"); doiBox.id="doiFindings"; box.appendChild(doiBox);
-  renderDoiFindings(doiBox);
+  const linkBox=document.createElement("div"); linkBox.id="linkFindings"; box.appendChild(linkBox);
+  renderLinkFindings(linkBox);
 }
 
 function renderJson(page,e){
@@ -3503,7 +3635,7 @@ function openRelatedDoiDialog(){
     checkDois(rows.map(r=>r.doi),null,4,(d,res,done)=>{
       doiCheckCache.set(d.toLowerCase(),res);
       cells.get(d).innerHTML=doiStatusHtml(res);
-      renderDoiFindings();
+      renderLinkFindings();
       sum.textContent=`Checked ${done} of ${rows.length}...`;
     }).then(res=>{
       const n=s=>[...res.values()].filter(x=>x.state===s).length;
@@ -4280,7 +4412,8 @@ function openHelpDialog(){
   body.innerHTML=`
     <p style="margin-top:0">CIE Metadatabase web tool — a self-contained, offline curator for
       <b>CIEmetaDigitalProduct</b> (DataCite v4) dataset metadata. No server and no external dependencies; the only network access is the
-      optional related-item DOI check, which asks doi.org. Interface v${esc(APP.VERSION)} · CIE schema v${APP.CIE_SCHEMA_VERSION}.</p>
+      optional online checks (doi.org for DOIs and the landing page, the BIPM SI Digital Framework for
+      unit PIDs), run only when you press a Check button. Interface v${esc(APP.VERSION)} · CIE schema v${APP.CIE_SCHEMA_VERSION}.</p>
 
     <h4>Toolbar</h4>
     <ul>
@@ -4294,6 +4427,11 @@ function openHelpDialog(){
         has its own <b>Check</b> and <b>Open ↗</b> buttons, which also work on a published entry.
         A DOI that is not DOI-shaped, or that a check found not registered, is also listed in the
         validation summary at the end of the Form tab.</li>
+      <li><b>DOI landing page</b> (Form tab) - <b>Open ↗</b> opens it; <b>Check</b> asks doi.org whether
+        the entry's DOI resolves to it (the page itself cannot be read from a local file; the
+        command-line <code>checks/check_links.js</code> fetches it directly). <b>Check unit PIDs</b> above
+        the column headers asks the BIPM SI Digital Framework. Findings appear in the validation summary at
+        the end of the Form tab.</li>
       <li><b>? Help</b> — this dialog.</li>
     </ul>
 
