@@ -22,7 +22,7 @@ including the link to the Crossref deposit validator.
 | `CIEmetaDB_starter_short.json` | Nine-record subset of the starter database for quick testing, including two entries at revision 2 so the history views have something to show. |
 | `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text), plus three `*.csv` data files with their `*_metadata_v2.json` payloads for trying out metadata-file import and CSV validation. |
 | `sync_schema.py` | Keeps the schema embedded in `CIEmetaDB.html` identical to the schema file. See below. |
-| `checks/` | Every command-line check, with the reports two of them write. `db_integrity.js` (derived fields of a database: hashes and history), `selftest.js` (the tool's own migration and revision-pair code), `validate_published.js` (each CSV against its metadata), `compare_published.js` (each database entry against its published metadata file) and `check_related_dois.js` (each related-item DOI against doi.org). All five read `CIEmetaDB.html` and the databases from this folder; see below. |
+| `checks/` | Every command-line check, with the reports two of them write. `db_integrity.js` (derived fields of a database: hashes and history), `selftest.js` (the tool's own migration and revision-pair code), `validate_published.js` (each CSV against its metadata), `compare_published.js` (each database entry against its published metadata file) `check_related_dois.js` (each related-item DOI against doi.org) and `check_links.js` (landing pages and unit PIDs). All six read `CIEmetaDB.html` and the databases from this folder; see below. |
 | `QUICKSTART.md` | Short, task-oriented guide for curators. This README is the full reference. |
 | `README.md` | This file. |
 
@@ -393,13 +393,22 @@ recovered from a registered DOI via the Crossref REST API
 (`https://api.crossref.org/works/<doi>` → `resource.primary.URL`) or by following
 `https://doi.org/<doi>`.
 
+Beside the field, **Open ↗** opens the landing page and **Check** confirms it. The page
+itself cannot be read from a tool opened as a local file (cie.co.at sends no CORS
+headers), so **Check** asks doi.org where the entry's DOI resolves and compares that with
+the field: ✓ when they match (http/https, host case and a trailing slash ignored), a
+warning when the DOI resolves elsewhere or is not registered yet (normal for a draft whose
+DOI has not been deposited). The command-line `checks/check_links.js` fetches every
+landing page directly and reports pages that do not exist.
+
 ### Related-item DOIs
 
 The DOIs in **Related items** (`relatedItems[].relatedItemIdentifier`, type `DOI`) are
 typed by hand, so the tool can ask doi.org whether each one is actually registered. It
 uses the DOI Handle API (`https://doi.org/api/handles/<doi>`), which answers for DataCite
-and Crossref DOIs alike and works from `file://`. This is the tool's only network access,
-made only when a check is pressed; nothing is written to the database.
+and Crossref DOIs alike and works from `file://`. Together with the landing-page and
+unit-PID checks this is the tool's only network access, made only when a check is
+pressed; nothing is written to the database.
 
 - **Form tab** - each related item has **Check** (asks doi.org; the answer appears under
   the identifier) and **Open ↗** (opens `https://doi.org/<doi>`). Both only read, so they
@@ -451,6 +460,11 @@ from `DEFAULT_UNITS` / `DEFAULT_QUANTITIES` in `CIEmetaDB.html`, which follow
   **Open ↗** opens the PID. **? Build PID…** opens the BIPM unit expression
   parser for compound units. Choosing *(other)* or a value without a PID clears
   the PID field.
+- **Check unit PIDs** (above the column headers) asks the BIPM SI Digital
+  Framework once for each distinct unit PID of the table: HTTP 200 means it
+  exists, 400 that it does not. An unknown PID appears as an error in the
+  validation summary at the end of the Form tab, naming its columns. PIDs from
+  other vocabularies are not asked.
 - **Quantity PIDs are held back** until CIE agrees on the mapping: the quantity
   vocabulary carries the names with empty PIDs, and the databases carry no
   `quantityPID`. The candidates and their review are in `checks/PID_REPORT.md`.
@@ -634,6 +648,30 @@ and `relatedDoiIndex` are lifted verbatim out of `CIEmetaDB.html`, so the script
 dialog cannot disagree. Offline self-tests T1-T7 feed the lifted code canned doi.org
 replies through a stub `fetch` and abort the run before any request if they fail; T7 pins
 `relatedDoiFindings`, the function behind the Form tab's validation summary.
+
+## Batch link check (`checks/check_links.js`)
+
+The batch counterpart of the landing-page **Check** and **Check unit PIDs**, plus the one
+check the tool cannot make from a local file:
+
+```
+node checks/check_links.js              check CIEmetaDBdataset.json, write both reports
+node checks/check_links.js FILE...      check other databases instead
+node checks/check_links.js --out DIR    write the reports somewhere else
+node checks/check_links.js --quiet      reports only, no per-item console detail
+```
+
+Each distinct landing page is **fetched directly** (redirects followed; 404 or 410 means
+it does not exist), each entry DOI is resolved at doi.org and compared with its landing
+page, and each distinct unit PID is asked of the BIPM SI Digital Framework. Output goes to
+**`LINK_REPORT.md`** and **`LINK_REPORT.json`**; entries without a landing page are listed
+but do not fail the run. Exit code `0` when everything resolves, `1` when a page is
+missing, a DOI is not registered or resolves elsewhere, a unit PID is not found, or
+anything could not be checked, `2` on a usage or self-test error.
+
+`sameUrl`, `landingPageFinding`, `checkUnitPid`, `unitPidFindings` and the DOI functions are
+lifted verbatim out of `CIEmetaDB.html`; offline self-tests T1-T5 pin them against canned
+replies before any request is made.
 
 ## Compare an entry with an external metadata file
 
