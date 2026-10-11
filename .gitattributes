@@ -1,0 +1,5 @@
+# Files the WebTool checks compare as stored: keep LF in every working copy, whatever
+# core.autocrlf is set to. sync_schema.py needs CIEmetaDB.html in LF, and db_integrity.js
+# needs each database exactly as the tool writes it (JSON.stringify(db, null, 2)).
+v4/tools/WebTool/CIEmetaDB.html text eol=lf
+v4/tools/WebTool/*.json text eol=lf

@@ -78,7 +78,9 @@ node checks/db_integrity.js --fix      # repair the derived fields in place
 ```
 
 With no file arguments both modes act on the three databases in this folder;
-otherwise pass paths.
+otherwise pass paths. Both modes need each database exactly as the tool writes it,
+LF line endings included; the repository's `.gitattributes` keeps the databases and
+`CIEmetaDB.html` in LF on every checkout, also on Windows with `core.autocrlf`.
 
 Getting this wrong is quiet rather than loud. A stale `contentHash` breaks
 `historyContainsHash()`, the ancestry test the merge path uses to tell a
