@@ -4,7 +4,7 @@ A short, task-oriented guide to `CIEmetaDB.html` for curators.
 For the complete reference see [`README.md`](README.md); the **? Help** button in the
 toolbar gives the same summary inside the application.
 
-Applies to **interface version 1.12.0** (CIE schema 4.2).
+Applies to **interface version 1.13.0** (CIE schema 4.2).
 
 ---
 
@@ -134,6 +134,8 @@ vocabularies, which you maintain with **Units…** and **Quantities…** in the 
 - Picking a known unit fills its **Unit PID**, a permanent identifier from the BIPM SI
   Digital Framework (e.g. `nm` → `…/SI/units/nanometre`); **Open ↗** opens it. For a
   compound unit, the **? Build PID…** link opens the BIPM unit expression parser.
+- **Check unit PIDs** (above the column headers) asks the BIPM whether each unit PID of
+  the table exists; an unknown one is listed in the validation summary.
 - **Quantity PIDs are on hold** until CIE agrees on them, so picking a quantity fills no
   PID for now, and the validation summary does not ask for one.
 - **Quantity symbol (Unicode)** and **(LaTeX)** hold the symbol of the *quantity*, e.g.
@@ -153,6 +155,9 @@ If two *unrelated* entries share a DOI, a red banner names it, the rows get a
 **DOI landing page**: the URL the DOI resolves to. Edit it in the **Database entry**
 section of the Form tab; it also shows as a link next to the DOI. It is required for
 Crossref deposit, and you will be prompted for it if it is empty when you export.
+**Open ↗** beside it opens the page; **Check** asks doi.org whether the entry's DOI
+resolves to it and reports a mismatch in the validation summary. (Whether the page itself
+exists is checked from the command line with `checks/check_links.js`.)
 
 **Related items** (the publications a dataset belongs to, is derived from, and so on)
 are usually referenced by DOI, typed by hand. To make sure such a DOI really exists:
@@ -239,9 +244,9 @@ at <https://data.crossref.org/reports/parser.html>.
 ## 12. Good to know
 
 - **Your data stays local.** No server, no CDN, no telemetry. The only network use is
-  optional: opening a DOI link or the Crossref validator, and the related-item DOI
-  check, which sends only the DOI to doi.org and only when you press **Check** or
-  **Check related DOIs…**.
+  optional: opening a link or the Crossref validator, and the online checks, which send
+  only a DOI to doi.org or a unit PID to the BIPM, and only when you press **Check**,
+  **Check unit PIDs** or **Check related DOIs…**.
 - A background working copy is kept in the browser. If the page closed with unsaved
   work, the tool offers to **restore** it; its first save asks for a location.
 - **● unsaved** in the toolbar means changes are not yet written to the file. Closing
