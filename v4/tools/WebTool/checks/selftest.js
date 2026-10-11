@@ -16,8 +16,9 @@
  *     of a published record.
  *
  * db_integrity.js --check guards the shipped databases, but it cannot guard either of these:
- * the shipped databases are already migrated, and no database contains a revision pair. So the
- * fixtures here are built on the fly.
+ * the shipped databases are already migrated, and any revision pair they hold was not made
+ * under test. So the fixtures here are built on the fly, from the shipped databases with their
+ * open revisions removed (see withoutOpenRevisions).
  *
  * The tool's own functions are lifted verbatim out of CIEmetaDB.html and evaluated in a
  * sandbox, exactly as db_integrity.js does it, so this tests the shipped code rather than a
@@ -137,7 +138,16 @@ function ok(cond, msg) {
   console.log(`  ${cond ? "pass" : "FAIL"}  ${msg}`);
 }
 
-const readDb = (name) => JSON.parse(fs.readFileSync(path.join(TOOL_DIR, name), "utf8"));
+/* The suites build their revision pairs themselves and assume every parent starts without one;
+   a pre-4.1 database (suite 2) could not hold a pair at all. A shipped database may carry open
+   revisions awaiting review, so they are dropped from every fixture. Their published halves are
+   untouched, and the result is still a database the tool could have written. */
+function withoutOpenRevisions(db) {
+  db.entries = db.entries.filter((e) => !api.isRevision(e));
+  db.baseHash = api.computeDbBaseHash(db);
+  return db;
+}
+const readDb = (name) => withoutOpenRevisions(JSON.parse(fs.readFileSync(path.join(TOOL_DIR, name), "utf8")));
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const nameOf = (e) => {
   const alt = ((e.payload && e.payload.alternateIdentifiers) || []).find((a) =>
