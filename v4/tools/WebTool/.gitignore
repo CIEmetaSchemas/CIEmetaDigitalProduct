@@ -2,6 +2,6 @@
 published/
 temp/
 
-# Generated documentation PDFs — rebuild from the .md sources with pandoc
+# Generated documentation PDFs - rebuild from the .md sources with pandoc
 README.pdf
 QUICKSTART.pdf
