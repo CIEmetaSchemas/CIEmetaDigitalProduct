@@ -22,8 +22,7 @@ including the link to the Crossref deposit validator.
 | `CIEmetaDB_starter_short.json` | Nine-record subset of the starter database for quick testing, including two entries at revision 2 so the history views have something to show. |
 | `examples/` | Example Excel workbooks for the **New entry from .xlsx** feature (spectral, numerical, text), plus three `*.csv` data files with their `*_metadata_v2.json` payloads for trying out metadata-file import and CSV validation. |
 | `sync_schema.py` | Keeps the schema embedded in `CIEmetaDB.html` identical to the schema file. See below. |
-| `db_integrity.js` | Checks and repairs the derived fields of a database — hashes and history. See below. |
-| `selftest.js` | Exercises the tool's own migration and revision-pair code. See below. |
+| `checks/` | Every command-line check, with the reports two of them write. `db_integrity.js` (derived fields of a database: hashes and history), `selftest.js` (the tool's own migration and revision-pair code), `validate_published.js` (each CSV against its metadata) `compare_published.js` (each database entry against its published metadata file) and `check_related_dois.js` (each related-item DOI against doi.org). All five read `CIEmetaDB.html` and the databases from this folder; see below. |
 | `README.md` | This file. |
 
 The metadata payload of each entry conforms to
@@ -73,8 +72,8 @@ payload before that patch, and the database `baseHash` fingerprints all entries.
 Nothing enforced any of it, and it drifted too:
 
 ```
-node db_integrity.js --check    # report violations; exit 1 if any
-node db_integrity.js --fix      # repair the derived fields in place
+node checks/db_integrity.js --check    # report violations; exit 1 if any
+node checks/db_integrity.js --fix      # repair the derived fields in place
 ```
 
 With no file arguments both modes act on the three databases in this folder;
@@ -88,8 +87,7 @@ backfill the schema-4.1 field `metadataRevision` into legacy payloads without
 recomputing `contentHash` or recording it in the history, which left 38 of 39
 entries in `CIEmetaDBdataset.json` (and every entry in both starter databases) with
 a hash describing the pre-backfill payload. Both the data and `migrateDb()` have
-been repaired; see defect 7 in
-[`../../docs/INTEROPERABILITY.md`](../../docs/INTEROPERABILITY.md).
+been repaired.
 
 The repair itself lives in **one** function, `repairDerivedFields()` in
 `CIEmetaDB.html`. `migrateDb()` calls it on every entry it migrates — and reports
@@ -144,10 +142,10 @@ functions are ever renamed the script stops with their names rather than guessin
 ### Self-test
 
 ```
-node selftest.js       # exit 0 when everything passes
+node checks/selftest.js   # exit 0 when everything passes
 ```
 
-`db_integrity.js --check` guards the databases in this folder, but two behaviours it
+`checks/db_integrity.js --check` guards the databases in this folder, but two behaviours it
 cannot reach are exactly the ones that go wrong silently:
 
 - **`migrateDb()` has to leave a database consistent.** When it did not, the symptom was
@@ -385,6 +383,31 @@ recovered from a registered DOI via the Crossref REST API
 (`https://api.crossref.org/works/<doi>` → `resource.primary.URL`) or by following
 `https://doi.org/<doi>`.
 
+### Related-item DOIs
+
+The DOIs in **Related items** (`relatedItems[].relatedItemIdentifier`, type `DOI`) are
+typed by hand, so the tool can ask doi.org whether each one is actually registered. It
+uses the DOI Handle API (`https://doi.org/api/handles/<doi>`), which answers for DataCite
+and Crossref DOIs alike and works from `file://`. This is the tool's only network access,
+made only when a check is pressed; nothing is written to the database.
+
+- **Form tab** - each related item has **Check** (asks doi.org; the answer appears under
+  the identifier) and **Open ↗** (opens `https://doi.org/<doi>`). Both only read, so they
+  also work on a published entry whose payload is otherwise locked.
+- **Check related DOIs…** (toolbar) - checks every distinct related-item DOI in the
+  database once and lists *registered* (with the URL it resolves to), *not found*,
+  *invalid* (not of the form `10.<prefix>/<suffix>`) or *could not check* (doi.org not
+  reachable). The entry count links to the list, filtered by that related publication.
+- **Validation summary** (end of the Form tab) - lists a related-item DOI as an error when
+  it is not DOI-shaped (known offline, always shown) or when a check found it *not
+  registered*, and as a warning when it *could not be checked*. DOIs not checked yet get a
+  one-line hint instead. The summary updates as soon as a check finishes or an identifier
+  is edited; it never goes online by itself.
+
+DOIs are compared case-insensitively, as DOIs are. *Registered* means doi.org knows the
+handle; it does not test whether the landing page itself loads. For the whole database
+from the command line, see `checks/check_related_dois.js` below.
+
 ## Column headers — bulk paste from Excel
 
 Each data-table entry's **Column headers** (Form tab → *Data table info*) can be
@@ -476,6 +499,107 @@ You can then:
   md5, sha256, overall pass/fail and every per-check result) into the entry's
   append-only `validationLog`, stored in the database. Past logged validations are
   listed under **Logged validations** in the same tab.
+
+## Batch validation of a published folder (`checks/validate_published.js`)
+
+The Validation tab checks one file at a time, through a file picker. To answer the
+same question for a whole corpus — after a restructure of `published/`, or a batch
+of metadata revisions — use:
+
+```
+node checks/validate_published.js                 validate published/, write both reports
+node checks/validate_published.js --dir DIR       validate a different tree, report into it
+node checks/validate_published.js --out DIR       write the reports somewhere else
+node checks/validate_published.js --quiet         reports only, no per-dataset console detail
+```
+
+It expects `published/<title>/` folders each holding one CSV and its metadata JSON,
+and pairs each CSV with the **latest** revision beside it —
+`<csv>_metadata_v2.json` when present, otherwise `<csv>_metadata.json`. Exit code is
+`1` if any dataset fails, `2` on a usage or self-test error.
+
+Output is written to **`VALIDATION_REPORT.md`** (summary table, per-dataset check
+lines in the tool's own wording, and what each metadata revision fixed) and
+**`VALIDATION_REPORT.json`** (one record per dataset in the same shape as the
+entry `validationLog`, plus `folder`, `metadataFile`, `metadataRevision` and
+`unchecked`). `--dir` redirects the reports into the tree it is given, so validating
+a scratch copy cannot overwrite the report describing `published/`.
+
+Nothing is reimplemented: `md5Bytes`, `sha256Bytes`, `analyzeCsv` and the exact
+decimal helpers are lifted verbatim out of `CIEmetaDB.html` at run time, the same
+single-source-of-truth approach as `db_integrity.js` and `sync_schema.py`. The one
+exception is the comparison itself, which lives inside `renderCsvResult()`
+interleaved with DOM construction; `checkCsvAgainstPayload()` restates it and must be
+kept in step. Self-tests T1–T3 pin the lifted algorithms against literals and against
+node's own `crypto` before any dataset is judged, and abort the run if they fail;
+T4 corroborates the CSV bytes against the hashes the tool logged in
+`CIEmetaDBdataset.json` and is informational, so a legitimately changed data file is
+reported as a failure rather than aborting the run.
+
+Two behaviours are inherited deliberately from the tool. A `validationType` absent
+from the metadata produces **no result at all** — neither pass nor warning — so the
+report lists those keys separately as *not checked* rather than letting silence read
+as success. And warnings (a missing stored checksum, a `columnHeaders` count
+mismatch) do not fail a dataset.
+
+## Batch comparison against the database (`checks/compare_published.js`)
+
+The batch counterpart of the Compare dialog below, and a **different question** from
+`validate_published.js`: that one checks each CSV against its metadata, reading only
+the checksums, `datatableInfo.validations`, the first column header's wavelengths and
+the `fileName` identifier. Titles, creators, subjects, descriptions, rights, related
+items and the column-header text are compared only here.
+
+```
+node checks/compare_published.js                  compare against published/, write both reports
+node checks/compare_published.js --dir DIR        compare against a different tree, report into it
+node checks/compare_published.js --out DIR        write the reports somewhere else
+node checks/compare_published.js --quiet          reports only, no per-dataset console detail
+```
+
+Entries are paired with folders by the `fileName` alternate identifier. Each entry's
+payload is compared with the latest metadata file in its folder using `deepDiff`
+lifted from `CIEmetaDB.html`, with `metadataRevision` excluded exactly as the dialog
+excludes it (and reported separately, so its absence is visible). Where a folder
+holds both revisions, the **superseded** `_metadata.json` is additionally compared
+with `reconstruct(history, 1)` — the entry's own revision-1 payload — which says
+whether the file published at the time matches what the database records for that
+revision. A difference there concerns a historical file and never affects the current
+verdict. Each file is also schema-checked, informationally, as the dialog does; note
+the validator **skips unknown properties**, so a misspelled key passes the schema and
+shows up only in the field comparison.
+
+Output goes to **`COMPARISON_REPORT.md`** and **`COMPARISON_REPORT.json`**. Exit code
+is `1` if any current comparison differs or any pairing fails, `2` on a usage or
+self-test error. Only the canonical `published/` tree is presumed complete: under
+`--dir` the tree may be a subset, so database entries with no folder there are noted
+rather than counted as failures, and — as with `validate_published.js` — the reports
+follow the tree given, so a scratch copy cannot overwrite the canonical report.
+
+## Batch related-item DOI check (`checks/check_related_dois.js`)
+
+The batch counterpart of **Check related DOIs…**, for a whole database:
+
+```
+node checks/check_related_dois.js              check CIEmetaDBdataset.json, write both reports
+node checks/check_related_dois.js FILE...      check other databases instead
+node checks/check_related_dois.js --out DIR    write the reports somewhere else
+node checks/check_related_dois.js --quiet      reports only, no per-DOI console detail
+```
+
+Each distinct related-item DOI across the databases given is resolved once at doi.org
+(four requests in flight). Unlike the other checks it needs the network, and node 18 or
+later for `fetch()`. Output goes to **`RELATED_DOI_REPORT.md`** (summary, one row per DOI
+with the URL it resolves to, and the entries referencing any DOI that failed) and
+**`RELATED_DOI_REPORT.json`**. Exit code is `0` when every DOI is registered, `1` when any
+is not found, invalid or could not be checked (the report keeps the three apart), `2` on a
+usage or self-test error.
+
+Nothing is reimplemented: `normalizeDoi`, `classifyDoiResponse`, `checkDoi`, `checkDois`
+and `relatedDoiIndex` are lifted verbatim out of `CIEmetaDB.html`, so the script and the
+dialog cannot disagree. Offline self-tests T1-T7 feed the lifted code canned doi.org
+replies through a stub `fetch` and abort the run before any request if they fail; T7 pins
+`relatedDoiFindings`, the function behind the Form tab's validation summary.
 
 ## Compare an entry with an external metadata file
 

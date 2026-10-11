@@ -10,7 +10,7 @@
  *
  *   - migrateDb() has to leave a database consistent. When it did not, the symptom was not an
  *     error but every entry being reported as a merge conflict, because a stale contentHash
- *     silently defeats historyContainsHash(). See defect 7 in ../../docs/INTEROPERABILITY.md.
+ *     silently defeats historyContainsHash(). See the contentHash section of ./README.md.
  *   - the revision pair (Start revision / publish / discard) has to leave the published parent
  *     untouched and the history chain contiguous. Getting that wrong corrupts the audit trail
  *     of a published record.
@@ -34,7 +34,8 @@ const vm = require("vm");
 const crypto = require("crypto");
 
 const HERE = __dirname;
-const HTML = path.join(HERE, "CIEmetaDB.html");
+const TOOL_DIR = path.join(HERE, "..");
+const HTML = path.join(TOOL_DIR, "CIEmetaDB.html");
 const INTEGRITY = path.join(HERE, "db_integrity.js");
 const DATASET = "CIEmetaDBdataset.json";
 const STARTER_SHORT = "CIEmetaDB_starter_short.json";
@@ -136,7 +137,7 @@ function ok(cond, msg) {
   console.log(`  ${cond ? "pass" : "FAIL"}  ${msg}`);
 }
 
-const readDb = (name) => JSON.parse(fs.readFileSync(path.join(HERE, name), "utf8"));
+const readDb = (name) => JSON.parse(fs.readFileSync(path.join(TOOL_DIR, name), "utf8"));
 const clone = (o) => JSON.parse(JSON.stringify(o));
 const nameOf = (e) => {
   const alt = ((e.payload && e.payload.alternateIdentifiers) || []).find((a) =>
